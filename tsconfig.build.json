@@ -1,0 +1,10 @@
+{
+  "extends": "",
+  "compilerOptions": {
+    "sourceMap": false,
+    "declaration": true,
+    "incremental": false,
+    "baseUrl": ".",
+    "outDir": "./album"
+  }
+}
