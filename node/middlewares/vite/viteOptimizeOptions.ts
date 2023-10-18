@@ -47,7 +47,6 @@ function prodOptions(context: AlbumContext, forceClient: boolean): UserConfig {
       minify: "terser",
       terserOptions: {
         compress: {
-          drop_console: true,
           drop_debugger: true,
           ecma: 2020
         },

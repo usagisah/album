@@ -6,7 +6,7 @@ import { resolveMiddlewareConfig } from "../../middlewares/resolveMiddlewareConf
 import { callPluginWithCatch } from "../../utils/utils.js"
 import { build as viteBuild } from "vite"
 import { rm } from "fs/promises"
-import { readdirSync, rmSync } from "fs"
+import { rmSync } from "fs"
 import { resolve } from "path"
 import { printLogInfo } from "../helper/printLogInfo.js"
 

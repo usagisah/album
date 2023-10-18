@@ -1,7 +1,7 @@
 import type { AlbumServerParams } from "../cli.type.js"
 import type { ILogger } from "../../modules/logger/logger.type.js"
 import { callPluginWithCatch, findEntryPath } from "../../utils/utils.js"
-import { parse, resolve } from "path"
+import { parse } from "path"
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "../../modules/app/app.module.js"
 import { Logger } from "../../modules/logger/logger.js"

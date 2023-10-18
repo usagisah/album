@@ -1,10 +1,20 @@
 {
-  "name": "@white/album",
-  "version": "0.0.1",
-  "private": true,
-  "description": "",
-  "license": "UNLICENSED",
-  "author": "",
+  "name": "@w-hite/album",
+  "version": "0.2.1",
+  "description": "一个组合 vite+nestjs 的集成式框架",
+  "keywords": [
+    "@w-hite",
+    "w-hite",
+    "album",
+    "@w-hite/album"
+  ],
+  "homepage": "https://github.com/usagisah/album#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usagisah/album.git"
+  },
+  "license": "MIT",
+  "author": "顾弦笙/usagisah",
   "type": "module",
   "exports": {
     ".": {
@@ -31,6 +41,7 @@
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "dev": "node ./scripts/dev.mjs",
+    "pub": "node ./scripts/publish.mjs",
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
