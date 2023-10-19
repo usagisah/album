@@ -29,7 +29,11 @@ try {
     stderr: process.stderr
   })
 
-  await execa("npm", ["publish", "--access", "public"])
+  await execa("npm", ["publish", "--access", "public"], {
+    cwd: resolve("album"),
+    stdout: process.stdout,
+    stderr: process.stderr
+  })
 } finally {
   writeFileSync(tsconfigPath, tsconfigText, "utf-8")
 }
