@@ -33,23 +33,29 @@ export let useLoader =
     "useLoader"
   )
 
-export type SSRServerContext = {
-  serverRouteData: Record<string, any>
-  serverDynamicData: Record<string, any>
+export type SSRProps = {
   req: Request
-  inputs: Record<string, string>
+  headers: Record<string, string>
   mode: string
-  logger: Record<string, (...message: string[]) => any>
+  serverMode: string
+  logger:  Record<string, (...message: string[]) => any>
+  inputs: Record<string, string>
+  outputs: Record<string, string>
+  meta: any
+  query: Record<string, any>
+  params: Record<string, any>
   [key: string]: any
 }
 
 export let useServer =
-  createEmptyHook<(fn: (context: SSRServerContext) => any) => Promise<void>>(
+  createEmptyHook<(fn: (context: SSRProps) => any) => Promise<void>>(
     "useServer"
   )
 
-export let useServerData: <T>(id: string, fn: () => T | Promise<T>) => T =
-  createEmptyHook<any>("useServerData")
+export let useServerData: <T>(
+  id: string,
+  fn: (ctx: SSRProps) => T | Promise<T>
+) => T = createEmptyHook<any>("useServerData")
 
 export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 

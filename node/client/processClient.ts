@@ -3,7 +3,7 @@ import { AlbumContext } from "../context/AlbumContext.js"
 import { initClient } from "./initClient/initClient.js"
 import { patchClient } from "./patchClient/patchClient.js"
 
-const pageReg = /\.(page|router|action)\.[a-z]+$/
+const pageReg = /\.?(page|router|action)\.[a-z]+$/
 
 export async function processClient(context: AlbumContext) {
   const { watcher } = context

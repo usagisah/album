@@ -30,14 +30,14 @@ export class SsrController {
         context: new Map(),
         api: plugins.event,
         result: {
-          ssrOptions: { req, res, headers },
+          ssrOptions: { req, res, headers: { ...headers } },
           context: {
             mode: ctx.mode,
             serverMode: ctx.serverMode,
             logger: logger,
             viteDevServer: ctx.vite.viteDevServer,
-            inputs: ctx.inputs,
-            outputs: ctx.outputs,
+            inputs: { ...ctx.inputs },
+            outputs: { ...ctx.outputs },
             meta: {}
           }
         }

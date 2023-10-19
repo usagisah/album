@@ -1,4 +1,4 @@
-import type { SpecialModule } from "../client.type.js"
+import type { SpecialModule, SpecialModuleFile } from "../client.type.js"
 import { readdir } from "fs/promises"
 import { Dirent } from "fs"
 import { basename, parse as pathParse, resolve } from "path"
@@ -9,11 +9,13 @@ type ParseRouterParams = {
   parentModule: SpecialModule
 }
 
+const regLegalModuleName = /^[a-zA-Z][a-zA-Z0-9]*$/
 export async function walkModules(params: ParseRouterParams) {
   const { modulePath } = params
   const modules: SpecialModule[] = []
   for (const m of await readdir(modulePath, { withFileTypes: true })) {
     if (m.isDirectory()) {
+      if (!regLegalModuleName.test(m.name)) continue
       const res = await resolveModules({
         ...params,
         modulePath: resolve(modulePath, m.name)
@@ -88,12 +90,15 @@ type BuildRouteParams = {
 }
 
 function buildRoute({ specialModule, parentModule }: BuildRouteParams) {
-  const _page = specialModule.files.find(f => f.fileName.endsWith(".page"))
+  const { _page, _router, _action } = findLegalEntries(specialModule.files)
   if (!_page) return false
 
-  if (!parentModule && specialModule.fileName === "Home") {
+  if (!parentModule && specialModule.fileName.toLocaleLowerCase() === "home") {
     specialModule.routePath = "/"
-  } else if (!parentModule && specialModule.fileName === "Error") {
+  } else if (
+    !parentModule &&
+    specialModule.fileName.toLocaleLowerCase() === "error"
+  ) {
     specialModule.routePath = "/*"
   } else {
     specialModule.routePath = "/" + _page.fileName.slice(0, -5)
@@ -101,11 +106,22 @@ function buildRoute({ specialModule, parentModule }: BuildRouteParams) {
   specialModule.routeFilePath = _page.filePath
   specialModule.page = _page
 
-  const _router = specialModule.files.find(f => f.fileName.endsWith(".router"))
   _router && (specialModule.router = _router)
-
-  const _action = specialModule.files.find(f => f.fileName.endsWith(".action"))
   _action && (specialModule.action = _action)
 
   return true
+}
+
+function findLegalEntries(files: SpecialModuleFile[]) {
+  const result: Record<string, null | SpecialModuleFile> = {}
+  const names = ["page", "router", "action"]
+  for (const file of files) {
+    for (const name of names) {
+      const { fileName } = file
+      if (fileName === name || fileName.endsWith("." + name)) {
+        result["_" + name] = file
+      }
+    }
+  }
+  return result
 }
