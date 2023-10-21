@@ -9,7 +9,8 @@ export type FindEntryPath = {
 }
 
 export async function findEntryPath(props: FindEntryPath) {
-  const { cwd, name, presets = ["./"], exts = [".js", ".mjs"] } = props
+  const { cwd, name, presets = ["./", "src"], exts = [".js", ".mjs"] } = props
+  if (exts.length === 0) exts.push("")
   for (const preset of presets) {
     for (const ext of exts) {
       const filePath = resolve(cwd, preset, name + ext)

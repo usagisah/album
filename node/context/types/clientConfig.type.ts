@@ -1,14 +1,19 @@
 import type { EnvValue } from "./env.type.js"
 
+export type ClientConfigModule = {
+  moduleName: string
+  modulePath: string
+}
+
+export type ClientConfigRouter = {
+  basename: string
+}
+
 export type ClientConfig = {
   main: string
-  mainSSR?: string
-  module?: {
-    moduleName: string
-    modulePath: string
-  }
+  mainSSR: string | null
+  module: ClientConfigModule
   env: EnvValue
-  router: { basename: string }
-  tsconfig?: string
+  router: ClientConfigRouter
   [x: string]: any
 }

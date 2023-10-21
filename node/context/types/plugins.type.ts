@@ -1,16 +1,14 @@
 import type EventEmitter from "events"
-import type {
-  UserConfig,
-  UserConfigApp,
-  UserConfigAppRouter
-} from "./userConfig.type.js"
+import type { UserConfig, UserConfigApp } from "./userConfig.type.js"
 import type { DirStruct } from "../../utils/utils.js"
 import type { AlbumContext } from "../AlbumContext.js"
 import type {
   AppInputs,
   AppMode,
   AppStatus,
-  ClientConfig
+  ClientConfig,
+  ClientConfigModule,
+  ClientConfigRouter
 } from "../AlbumContext.type.js"
 import type { SpecialModule } from "../../client/client.type.js"
 import type {
@@ -33,12 +31,13 @@ export type PluginConfig = (param: UserConfig) => any
 
 // 查找入口文件
 export type PluginFindEntriesParam = {
+  inputs: AppInputs
   result: {
     main: string
     mainSSR: string
-    module: string
+    module: ClientConfigModule
     appConfig: UserConfigApp
-    router: UserConfigAppRouter
+    router: ClientConfigRouter
   }
 } & PluginParamsContext
 export type PluginFindEntries = (param: PluginFindEntriesParam) => any

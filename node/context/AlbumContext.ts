@@ -224,6 +224,10 @@ export class AlbumContext {
       throw "配置错误 [config.app] 中找不到指定的或默认的启动项"
     }
 
+    if (conf.module && !isPlainObject(conf.module)) {
+      throw "配置错误 [config.app.module] 必须是对象"
+    }
+
     const userRouterConfig = isPlainObject(conf.router) ? conf.router : {}
     const _clientConfig: ClientConfig = {
       main: "",
@@ -237,15 +241,20 @@ export class AlbumContext {
       }
     }
 
+    const userConfigModule = conf.module ?? {}
     const { result } = await callPluginWithCatch<PluginFindEntriesParam>(
       this.plugins.hooks.findEntries,
       {
         context: new Map(),
         api: this.plugins.event,
+        inputs: this.inputs,
         result: {
           main: conf.main,
           mainSSR: conf.mainSSR,
-          module: conf.module,
+          module: {
+            moduleName: userConfigModule.name,
+            modulePath: userConfigModule.path
+          },
           appConfig: conf,
           router: _clientConfig.router
         }
@@ -256,11 +265,6 @@ export class AlbumContext {
     _clientConfig.main = result.main + ""
     _clientConfig.mainSSR = result.mainSSR ? result.mainSSR + "" : null
     _clientConfig.module = result.module
-      ? {
-          modulePath: result.module + "",
-          moduleName: basename(result.module + "")
-        }
-      : null
 
     if (["dev", "build"].includes(this.serverMode)) {
       if (!existsSync(_clientConfig.main)) {
@@ -276,7 +280,20 @@ export class AlbumContext {
         throw "配置错误 config.app 入口选项(tsconfig)不存在"
       }
       if (!isString(_clientConfig.router.basename)) {
-        throw "配置错误 config.app 入口选项(router.basename)必须是字符串"
+        throw "配置错误 config.app.router.name 必须是字符串"
+      }
+      if (userConfigModule) {
+        if (!isPlainObject(_clientConfig.module)) {
+          throw "配置错误 config.app.module 必须是对象"
+        }
+        if (
+          !_clientConfig.module.moduleName ||
+          !isString(_clientConfig.module.moduleName) ||
+          !_clientConfig.module.modulePath ||
+          !isString(_clientConfig.module.modulePath)
+        ) {
+          throw "配置错误 config.app.module[name | path] 必须是字符串"
+        }
       }
     }
 
@@ -317,7 +334,6 @@ export class AlbumContext {
     }
 
     const _ssrCompose: SSRCompose = {
-      enable: true,
       root: ""
     }
 

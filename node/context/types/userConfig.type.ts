@@ -14,14 +14,20 @@ export type UserConfigAppRouter = {
   basename?: string
 } & CustomUserConfigAppRouter
 
+export interface CustomUserConfigAppRouter {}
+export type UserConfigAppModule = {
+  path?: string
+  name?: string
+} & CustomUserConfigAppRouter
+
 export interface CustomConfigApp {}
 export type UserConfigApp = {
   id?: any
   env?: UserConfigEnv
   main?: string
   mainSSR?: string
-  module?: string
-  router?: UserConfigAppRouter
+  module?: UserConfigAppModule
+  router?: UserConfigAppModule
 } & CustomConfigApp
 
 export interface CustomUserSSRCompose {}

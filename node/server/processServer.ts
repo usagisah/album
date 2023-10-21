@@ -15,9 +15,6 @@ export async function processServer(
 ) {
   const { mode, status, vite, plugins, logger, configs } = context
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
-  if (configs.ssrCompose.enable) {
-    await ssrComposeMiddleware(app, midConfigs, context)
-  }
 
   const contextService = app.get(AlbumContextService)
   contextService.setContext(context)
@@ -37,6 +34,10 @@ export async function processServer(
   if (mode === "development") {
     const s = (vite.viteDevServer = await createServer(viteConfigs))
     app.use(s.middlewares)
+  }
+
+  if (configs.ssrCompose) {
+    await ssrComposeMiddleware(app, midConfigs, context)
   }
 
   for (const [name, { config, factory }] of [...midConfigs.entries()]) {

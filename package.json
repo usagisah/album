@@ -33,6 +33,10 @@
       "types": "./server.d.ts",
       "default": "./server.js"
     },
+    "./utils/*": {
+      "types": "./utils/*.d.ts",
+      "default": "./utils/*.js"
+    },
     "./types/*": {
       "types": "./types/*.d.ts"
     }

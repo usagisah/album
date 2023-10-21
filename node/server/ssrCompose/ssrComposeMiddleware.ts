@@ -13,38 +13,47 @@ export async function ssrComposeMiddleware(
   midConfigs: MiddlewareConfigs,
   context: AlbumContext
 ) {
-  const { root } = context.configs.ssrCompose
+  const { mode, configs } = context
+  const { root } = configs.ssrCompose
   const composePkgs = new Map<string, any>()
 
-  midConfigs.get("serve-static").factory = function proxyServerStaticFactory(...configs: any[]) {
-    let hasErrorApp = false
-    for (const dirName of readdirSync(root, "utf-8")) {
-      const _dirName = dirName.toLowerCase()
-      if (_dirName === "error") hasErrorApp = true
+  if (mode === "production") {
+    midConfigs.get("serve-static").factory = function proxyServerStaticFactory(
+      ...configs: any[]
+    ) {
+      let hasErrorApp = false
+      for (const dirName of readdirSync(root, "utf-8")) {
+        const _dirName = dirName.toLowerCase()
+        if (_dirName === "error") hasErrorApp = true
 
-      const clientPath = resolve(root, dirName, "client")
-      const serverPath = resolve(root, dirName, "client")
-      composePkgs.set(_dirName, {
-        clientPath,
-        serverPath,
-        serverStatic: serverStatic.apply(globalThis, configs[1])
-      })
-    }
-    return function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
-      const url = new URL(req.url)
-      let prefix = url.pathname.split("/")[1].toLowerCase()
-      if (prefix === "") prefix = "home"
-      if (!composePkgs.has(prefix)) {
-        if (!hasErrorApp) {
+        const clientPath = resolve(root, dirName, "client")
+        const serverPath = resolve(root, dirName, "client")
+        composePkgs.set(_dirName, {
+          clientPath,
+          serverPath,
+          serverStatic: serverStatic.apply(globalThis, configs[1])
+        })
+      }
+      return function proxyServerStaticMiddleware(
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) {
+        const url = new URL(req.url)
+        let prefix = url.pathname.split("/")[1].toLowerCase()
+        if (prefix === "") prefix = "home"
+        if (!composePkgs.has(prefix)) {
+          if (!hasErrorApp) {
+            return res.status(404).send("source not found")
+          }
+
+          prefix = "error"
+        }
+        if (url.pathname.slice(prefix.length).startsWith("/manifest.json")) {
           return res.status(404).send("source not found")
         }
-        
-        prefix = "error"
+        return composePkgs.get(prefix).serverStatic(req, res, next)
       }
-      if (url.pathname.slice(prefix.length).startsWith("/manifest.json")) {
-        return res.status(404).send("source not found")
-      }
-      return composePkgs.get(prefix).serverStatic(req, res, next)
     }
   }
 

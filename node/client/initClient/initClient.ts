@@ -10,7 +10,6 @@ import { existsSync } from "fs"
 
 export async function initClient(context: AlbumContext, client: ClientManager) {
   const { inputs, plugins, status, configs, logger, manager } = context
-
   const _specialModules = await buildSpecialModules(context)
   const { specialModules } =
     await callPluginWithCatch<PluginSpecialModuleParam>(
