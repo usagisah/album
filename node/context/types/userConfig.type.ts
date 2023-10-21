@@ -1,6 +1,6 @@
-import { UserConfig as ViteConfig } from "vite"
-import { UserPlugins } from "./plugins.type.js"
-import { ILogger } from "../../modules/logger/logger.type.js"
+import type { UserConfig as ViteConfig } from "vite"
+import type { UserPlugins } from "./plugins.type.js"
+import type { ILogger } from "../../modules/logger/logger.type.js"
 
 export interface CustomConfigEnv {}
 export type UserConfigEnv = {
@@ -9,6 +9,11 @@ export type UserConfigEnv = {
   development?: (Record<string, string> | string)[]
 }
 
+export interface CustomUserConfigAppRouter {}
+export type UserConfigAppRouter = {
+  basename?: string
+} & CustomUserConfigAppRouter
+
 export interface CustomConfigApp {}
 export type UserConfigApp = {
   id?: any
@@ -16,7 +21,11 @@ export type UserConfigApp = {
   main?: string
   mainSSR?: string
   module?: string
+  router?: UserConfigAppRouter
 } & CustomConfigApp
+
+export interface CustomUserSSRCompose {}
+export type UserSSRCompose = {} & CustomUserSSRCompose
 
 export interface CustomConfigServer {}
 export type UserConfigServer = {
@@ -27,6 +36,7 @@ export interface CustomConfig {}
 export type UserConfig = {
   env?: UserConfigEnv[]
   app?: UserConfigApp[]
+  ssrCompose?: UserSSRCompose
   server?: UserConfigServer
   logger?: ILogger
   plugins?: UserPlugins[]

@@ -5,6 +5,7 @@ import type { DirStruct } from "../utils/utils.js"
 import type { ClientManager } from "../client/client.type.js"
 import type { ServerManager } from "../server/server.type.js"
 import { UserConfig } from "./types/userConfig.type.js"
+import { SSRCompose } from "./types/ssrCompose.type.js"
 
 export type { AlbumContext } from "./AlbumContext.js"
 
@@ -33,6 +34,7 @@ export type AppConfigs = {
   clientConfig: ClientConfig
   serverConfig: ServerConfig
   userConfig: UserConfig
+  ssrCompose: SSRCompose
 }
 
 export type AppManager = {

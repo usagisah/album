@@ -4,6 +4,7 @@ import { PluginServerParam } from "../context/AlbumContext.type.js"
 import { LazyModuleLoader } from "@nestjs/core"
 import { createServer } from "vite"
 import { SsrModule } from "../modules/ssr/ssr.module.js"
+import { SsrRemoteModule } from "../modules/ssr-remote/ssr-remote.module.js"
 import { AlbumContextService } from "../modules/context/album-context.service.js"
 import { resolveMiddlewareConfig } from "../middlewares/resolveMiddlewareConfig.js"
 import { callPluginWithCatch } from "../utils/utils.js"
@@ -12,8 +13,10 @@ export async function processServer(
   app: INestApplication<any>,
   context: AlbumContext
 ) {
-  const { mode, status, vite, plugins, logger } = context
+  const { mode, status, vite, plugins, logger, configs } = context
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
+  const nestModuleLoader = app.get(LazyModuleLoader)
+
   const contextService = app.get(AlbumContextService)
   contextService.setContext(context)
 
@@ -28,6 +31,10 @@ export async function processServer(
     },
     e => logger.error("PluginServer", e, "album")
   )
+
+  if (status.ssr && configs.ssrCompose.enable) {
+    await nestModuleLoader.load(() => SsrRemoteModule)
+  }
 
   if (mode === "development") {
     const s = (vite.viteDevServer = await createServer(viteConfigs))
@@ -44,8 +51,7 @@ export async function processServer(
   }
 
   if (status.ssr) {
-    const ref = app.get(LazyModuleLoader)
-    await ref.load(() => SsrModule)
+    await nestModuleLoader.load(() => SsrModule)
   }
 
   return app

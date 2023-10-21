@@ -40,7 +40,18 @@ export async function albumDevServer(params?: AlbumServerParams) {
     await printLogInfo({
       type: "useConfig",
       context,
-      messages: [["dev config:", { app, mode, ssr: status.ssr }, "album"]]
+      messages: [
+        [
+          "dev config:",
+          {
+            app,
+            mode,
+            ssr: status.ssr,
+            router: { ...configs.clientConfig.router }
+          },
+          "album"
+        ]
+      ]
     })
 
     _logger = logger

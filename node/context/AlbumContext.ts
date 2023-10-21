@@ -31,9 +31,10 @@ import {
   isArray,
   isFunction,
   isNumber,
-  isPlainObject
+  isPlainObject,
+  isString
 } from "../utils/utils.js"
-import { createEmptyEnvValue, transformEnvValue } from "./helpers/env.js"
+import { createEmptyEnvValue, transformEnvValue } from "./process/env.js"
 
 export class AlbumContext {
   constructor(
@@ -83,9 +84,10 @@ export class AlbumContext {
           name: ".album",
           path: this.inputs.dumpInput
         }),
-        clientManager: {} as any,
-        serverManager: {} as any
+        clientManager: null,
+        serverManager: null
       }
+      userConfig.ssrCompose
 
       const [env, clientConfig, serverConfig] = await PromiseAll([
         transformEnvValue(userConfig.env),
@@ -96,7 +98,8 @@ export class AlbumContext {
       this.configs = {
         userConfig,
         clientConfig,
-        serverConfig
+        serverConfig,
+        ssrCompose: { enable: !!userConfig.ssrCompose }
       }
       this.status.env = this.registryEnv(env, clientConfig.env)
       this.inputs = this.buildInputs()
@@ -219,11 +222,17 @@ export class AlbumContext {
       throw "配置错误 [config.app] 中找不到指定的或默认的启动项"
     }
 
+    const userRouterConfig = isPlainObject(conf.router) ? conf.router : {}
     const _clientConfig: ClientConfig = {
       main: "",
       mainSSR: null,
       module: null,
-      env: {}
+      env: null,
+      router: {
+        basename: isString(userRouterConfig.basename)
+          ? userRouterConfig.basename
+          : ""
+      }
     }
 
     const { result } = await callPluginWithCatch<PluginFindEntriesParam>(
@@ -235,7 +244,8 @@ export class AlbumContext {
           main: conf.main,
           mainSSR: conf.mainSSR,
           module: conf.module,
-          appConfig: conf
+          appConfig: conf,
+          router: _clientConfig.router
         }
       },
       e => this.logger.error("findEntries", e, "album")
@@ -263,6 +273,9 @@ export class AlbumContext {
       if (_clientConfig.tsconfig && !existsSync(_clientConfig.tsconfig)) {
         throw "配置错误 config.app 入口选项(tsconfig)不存在"
       }
+      if (!isString(_clientConfig.router.basename)) {
+        throw "配置错误 config.app 入口选项(router.basename)必须是字符串"
+      }
     }
 
     if (_clientConfig.mainSSR) {
@@ -270,7 +283,7 @@ export class AlbumContext {
     }
 
     _clientConfig.env = conf.env
-      ? transformEnvValue(conf.env)
+      ? await transformEnvValue(conf.env)
       : createEmptyEnvValue()
 
     return _clientConfig

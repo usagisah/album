@@ -1,20 +1,27 @@
-import EventEmitter from "events"
-import { UserConfig, UserConfigApp } from "./userConfig.type.js"
-import { DirStruct } from "../../utils/utils.js"
-import { AlbumContext } from "../AlbumContext.js"
-import {
+import type EventEmitter from "events"
+import type {
+  UserConfig,
+  UserConfigApp,
+  UserConfigAppRouter
+} from "./userConfig.type.js"
+import type { DirStruct } from "../../utils/utils.js"
+import type { AlbumContext } from "../AlbumContext.js"
+import type {
   AppInputs,
   AppMode,
   AppStatus,
   ClientConfig
 } from "../AlbumContext.type.js"
-import { SpecialModule } from "../../client/client.type.js"
-import {
+import type { SpecialModule } from "../../client/client.type.js"
+import type {
   MiddlewareConfigs,
   ViteConfigs
 } from "../../middlewares/middlewares.type.js"
-import { INestApplication } from "@nestjs/common"
-import { AlbumSSRContext, AlbumSSROptions } from "../../modules/ssr/ssr.type.js"
+import type { INestApplication } from "@nestjs/common"
+import type {
+  AlbumSSRContext,
+  AlbumSSROptions
+} from "../../modules/ssr/ssr.type.js"
 
 export type PluginParamsContext = {
   api: EventEmitter
@@ -31,6 +38,7 @@ export type PluginFindEntriesParam = {
     mainSSR: string
     module: string
     appConfig: UserConfigApp
+    router: UserConfigAppRouter
   }
 } & PluginParamsContext
 export type PluginFindEntries = (param: PluginFindEntriesParam) => any
