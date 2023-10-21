@@ -3,7 +3,7 @@ import {
   PluginServerConfigParam
 } from "../context/AlbumContext.type.js"
 import { callPluginWithCatch } from "../utils/utils.js"
-import { viteCoreConfigs } from "./vite/viteCoreConfigs.js"
+import { viteCoreOptions } from "./vite/viteCoreOptions.js"
 import { viteOptimizeOptions } from "./vite/viteOptimizeOptions.js"
 import { expressOptimizeConfigs } from "./express/expressOptimizeConfigs.js"
 import { mergeMultipleViteConfig } from "./mergeMultipleViteConfig.js"
@@ -23,7 +23,7 @@ export async function resolveMiddlewareConfig(
         status,
         midConfigs: expressOptimizeConfigs(context),
         viteConfigs: [
-          viteCoreConfigs(context, forceClient),
+          viteCoreOptions(context, forceClient),
           viteOptimizeOptions(context, forceClient),
         ]
       },

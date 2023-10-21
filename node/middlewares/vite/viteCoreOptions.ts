@@ -5,7 +5,7 @@ import { relative, resolve } from "path"
 import { InlineConfig, PluginOption, createLogger, mergeConfig } from "vite"
 import { ViteConfigs } from "../middlewares.type.js"
 
-export function viteCoreConfigs(
+export function viteCoreOptions(
   context: AlbumContext,
   forceClient = false
 ): ViteConfigs {

@@ -34,7 +34,7 @@ export type AppConfigs = {
   clientConfig: ClientConfig
   serverConfig: ServerConfig
   userConfig: UserConfig
-  ssrCompose: SSRCompose
+  ssrCompose: SSRCompose | null
 }
 
 export type AppManager = {

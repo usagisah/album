@@ -13,7 +13,8 @@ import type {
   AppOutputs,
   AppConfigs,
   AppManager,
-  PluginFindEntriesParam
+  PluginFindEntriesParam,
+  UserSSRCompose
 } from "./AlbumContext.type.js"
 import { UserConfig as ViteUserConfig, ViteDevServer } from "vite"
 
@@ -35,6 +36,7 @@ import {
   isString
 } from "../utils/utils.js"
 import { createEmptyEnvValue, transformEnvValue } from "./process/env.js"
+import { SSRCompose } from "./types/ssrCompose.type.js"
 
 export class AlbumContext {
   constructor(
@@ -87,19 +89,19 @@ export class AlbumContext {
         clientManager: null,
         serverManager: null
       }
-      userConfig.ssrCompose
 
-      const [env, clientConfig, serverConfig] = await PromiseAll([
+      const [env, clientConfig, serverConfig, ssrCompose] = await PromiseAll([
         transformEnvValue(userConfig.env),
         this.normalizeClientConfig(userConfig.app),
-        this.normalizeServerConfig(userConfig.server)
+        this.normalizeServerConfig(userConfig.server),
+        this.normalizeSSRCompose(userConfig.ssrCompose)
       ])
 
       this.configs = {
         userConfig,
         clientConfig,
         serverConfig,
-        ssrCompose: { enable: !!userConfig.ssrCompose }
+        ssrCompose
       }
       this.status.env = this.registryEnv(env, clientConfig.env)
       this.inputs = this.buildInputs()
@@ -303,6 +305,44 @@ export class AlbumContext {
     return _serverConfig
   }
 
+  async normalizeSSRCompose(
+    ssrCompose: UserSSRCompose
+  ): Promise<SSRCompose | null> {
+    if (!ssrCompose) {
+      return null
+    }
+    if (!ssrCompose) ssrCompose = {}
+    if (!isPlainObject(ssrCompose)) {
+      throw "配置错误 config.ssrCompose 配置必须是一个对象"
+    }
+
+    const _ssrCompose: SSRCompose = {
+      enable: true,
+      root: ""
+    }
+
+    const { cwd } = this.inputs
+    if (ssrCompose.root) {
+      if (!isString(ssrCompose.root)) {
+        throw "配置错误 config.ssrCompose.root 配置必须是一个字符串"
+      }
+      if (!existsSync(resolve(cwd, ssrCompose.root))) {
+        throw "配置错误 config.ssrCompose.root 指定的 root 根目录不存在"
+      }
+      _ssrCompose.root = ssrCompose.root
+    } else {
+      let _path: string
+      if (existsSync((_path = resolve(cwd, "dist")))) {
+      } else if (existsSync((_path = resolve(cwd, ".album")))) {
+      } else {
+        throw "配置错误 config.ssrCompose.root 无法找到满足要求的默认根目录(root)，请手动指定"
+      }
+      _ssrCompose.root = _path
+    }
+
+    return _ssrCompose
+  }
+
   registryEnv(env: EnvValue, userEnv: EnvValue) {
     const _env = {
       ...env.common,
@@ -316,17 +356,20 @@ export class AlbumContext {
     return _env
   }
 
-  buildOutputs() {
-    const { dumpInput } = this.inputs
-    const outputs: AppOutputs = {
+  buildOutputs(): AppOutputs {
+    const outputs = {
       clientOutDir: "",
       ssrOutDir: ""
     }
+
+    const { cwd } = this.inputs
+    const prefix = this.app === "default" ? "dist" : this.app
+    const baseOutDir = resolve(cwd, prefix)
     if (this.status.ssr) {
-      outputs.clientOutDir = resolve(dumpInput, "dist_client")
-      outputs.ssrOutDir = resolve(dumpInput, "dist_server")
+      outputs.clientOutDir = resolve(baseOutDir, prefix, "client")
+      outputs.ssrOutDir = resolve(baseOutDir, prefix, "server")
     } else {
-      outputs.clientOutDir = resolve("dist")
+      outputs.clientOutDir = resolve(baseOutDir, prefix)
     }
     return outputs
   }

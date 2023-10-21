@@ -25,7 +25,9 @@ export type UserConfigApp = {
 } & CustomConfigApp
 
 export interface CustomUserSSRCompose {}
-export type UserSSRCompose = {} & CustomUserSSRCompose
+export type UserSSRCompose = {
+  root?: string
+} & CustomUserSSRCompose
 
 export interface CustomConfigServer {}
 export type UserConfigServer = {
