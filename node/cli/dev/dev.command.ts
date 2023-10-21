@@ -1,8 +1,7 @@
-import type { AlbumServerParams } from "../cli.type.js"
-import { resolve } from "path"
 import { existsSync, mkdirSync, writeFileSync } from "fs"
+import { resolve } from "path"
+import type { AlbumServerParams } from "../cli.type.js"
 import { albumDevServer } from "./dev.js"
-
 
 export class DevCommand {
   cwd = process.cwd()
@@ -27,16 +26,9 @@ export class DevCommand {
   async createPlaceholderEntry() {
     const { app } = this.params
     const entry = resolve(this.cwd, "album.bootStrap.js")
-    writeFileSync(
-      entry,
-      `import { devServerBootStrap } from "album/cli";\ndevServerBootStrap({ app: "${app}" });`,
-      "utf-8"
-    )
+    writeFileSync(entry, `import { devServerBootStrap } from "album/cli";\ndevServerBootStrap({ app: "${app}" });`, "utf-8")
   }
 }
-
-
-
 
 // const { createWebpackConfig } = require("../configs/webpack.config.js")
 // const webpack = require("webpack")

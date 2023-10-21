@@ -1,9 +1,9 @@
-import type { Request, Response } from "express"
-import type { AlbumSSRRender } from "./ssr.type.js"
-import { PluginOnSSREnterParam } from "../../context/AlbumContext.type.js"
 import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
-import { AlbumContextService } from "../context/album-context.service.js"
+import type { Request, Response } from "express"
+import { PluginOnSSREnterParam } from "../../context/AlbumContext.type.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
+import { AlbumContextService } from "../context/album-context.service.js"
+import type { AlbumSSRRender } from "./ssr.type.js"
 
 @Controller()
 export class SsrController {
@@ -15,12 +15,7 @@ export class SsrController {
   }
 
   @Get("*")
-  async ssr(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Headers() headers: Record<string, string>
-  ) {
-    if (!this.ssrRender) return
+  async ssr(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>) {
     const ctx = await this.context.getContext()
     const { logger, plugins } = ctx
 
@@ -67,9 +62,7 @@ export class SsrController {
 
     if (ctx.mode === "development") {
       this.ssrRender = async (...params: any[]) => {
-        return (await viteDevServer.ssrLoadModule(realSSRInput)).default(
-          ...params
-        )
+        return (await viteDevServer.ssrLoadModule(realSSRInput)).default(...params)
       }
       this.onSsrRenderError = (e: Error) => viteDevServer.ssrFixStacktrace(e)
       return

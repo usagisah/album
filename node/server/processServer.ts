@@ -1,18 +1,15 @@
 import type { INestApplication } from "@nestjs/common"
-import type { AlbumContext } from "../context/AlbumContext.js"
-import { PluginServerParam } from "../context/AlbumContext.type.js"
 import { LazyModuleLoader } from "@nestjs/core"
 import { createServer } from "vite"
-import { SsrModule } from "../modules/ssr/ssr.module.js"
-import { AlbumContextService } from "../modules/context/album-context.service.js"
+import type { AlbumContext } from "../context/AlbumContext.js"
+import { PluginServerParam } from "../context/AlbumContext.type.js"
 import { resolveMiddlewareConfig } from "../middlewares/resolveMiddlewareConfig.js"
+import { AlbumContextService } from "../modules/context/album-context.service.js"
+import { SsrModule } from "../modules/ssr/ssr.module.js"
 import { callPluginWithCatch } from "../utils/utils.js"
 import { ssrComposeMiddleware } from "./ssrCompose/ssrComposeMiddleware.js"
 
-export async function processServer(
-  app: INestApplication<any>,
-  context: AlbumContext
-) {
+export async function processServer(app: INestApplication<any>, context: AlbumContext) {
   const { mode, status, vite, plugins, logger, configs } = context
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
 

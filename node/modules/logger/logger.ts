@@ -50,10 +50,6 @@ export class Logger implements ILogger {
       minute: "numeric",
       second: "numeric"
     }).format(new Date())
-    process.stdout.write(
-      `${c("[" + level + "]")} ${this.color.red(t)} ${c(
-        "{" + context + "}"
-      )} -> ${c(msg)} \n`
-    )
+    process.stdout.write(`${c("[" + level + "]")} ${this.color.red(t)} ${c("{" + context + "}")} -> ${c(msg)} \n`)
   }
 }

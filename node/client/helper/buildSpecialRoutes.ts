@@ -1,7 +1,7 @@
-import type { SpecialModule, SpecialModuleFile } from "../client.type.js"
-import { readdir } from "fs/promises"
 import { Dirent } from "fs"
+import { readdir } from "fs/promises"
 import { basename, parse as pathParse, resolve } from "path"
+import type { SpecialModule, SpecialModuleFile } from "../client.type.js"
 
 type ParseRouterParams = {
   modulePath: string
@@ -95,10 +95,7 @@ function buildRoute({ specialModule, parentModule }: BuildRouteParams) {
 
   if (!parentModule && specialModule.fileName.toLocaleLowerCase() === "home") {
     specialModule.routePath = "/"
-  } else if (
-    !parentModule &&
-    specialModule.fileName.toLocaleLowerCase() === "error"
-  ) {
+  } else if (!parentModule && specialModule.fileName.toLocaleLowerCase() === "error") {
     specialModule.routePath = "/*"
   } else {
     specialModule.routePath = "/" + _page.fileName.slice(0, -5)

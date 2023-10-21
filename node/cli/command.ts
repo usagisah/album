@@ -1,9 +1,9 @@
 import { Logger } from "../modules/logger/logger.js"
+import { nodeArgs } from "../utils/utils.js"
 import { BuildCommand } from "./build/build.command.js"
+import { AlBumServerMode } from "./cli.type.js"
 import { DevCommand } from "./dev/dev.command.js"
 import { StartCommand } from "./start/start.command.js"
-import { nodeArgs } from "../utils/utils.js"
-import { AlBumServerMode } from "./cli.type.js"
 
 const args = nodeArgs()
 const serverMode: AlBumServerMode = args._[0] as any

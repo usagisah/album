@@ -16,8 +16,7 @@ export type RouterRoute = {
 }
 export let useRoutes = createEmptyHook<() => RouterRoute[]>("useRoutes")
 
-export let useRoutesMap =
-  createEmptyHook<() => Map<string, RouterRoute>>("useRoutesMap")
+export let useRoutesMap = createEmptyHook<() => Map<string, RouterRoute>>("useRoutesMap")
 
 export type RouterLocation = {
   params: Record<string, string>
@@ -28,17 +27,14 @@ export type RouterLocation = {
 }
 export let useRouter = createEmptyHook<() => RouterLocation>("useRouter")
 
-export let useLoader =
-  createEmptyHook<() => ["success", any] | ["loading", null] | ["fail", any]>(
-    "useLoader"
-  )
+export let useLoader = createEmptyHook<() => ["success", any] | ["loading", null] | ["fail", any]>("useLoader")
 
 export type SSRProps = {
   req: Request
   headers: Record<string, string>
   mode: string
   serverMode: string
-  logger:  Record<string, (...message: string[]) => any>
+  logger: Record<string, (...message: string[]) => any>
   inputs: Record<string, string>
   outputs: Record<string, string>
   meta: any
@@ -47,15 +43,9 @@ export type SSRProps = {
   [key: string]: any
 }
 
-export let useServer =
-  createEmptyHook<(fn: (context: SSRProps) => any) => Promise<void>>(
-    "useServer"
-  )
+export let useServer = createEmptyHook<(fn: (context: SSRProps) => any) => Promise<void>>("useServer")
 
-export let useServerData: <T>(
-  id: string,
-  fn: (ctx: SSRProps) => T | Promise<T>
-) => T = createEmptyHook<any>("useServerData")
+export let useServerData: <T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>) => T = createEmptyHook<any>("useServerData")
 
 export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 

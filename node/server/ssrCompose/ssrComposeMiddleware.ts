@@ -1,26 +1,20 @@
 import type { INestApplication } from "@nestjs/common"
-import type { AlbumContext } from "../../context/AlbumContext.type.js"
-import type { MiddlewareConfigs } from "../../middlewares/middlewares.type.js"
-import type { Request, Response, NextFunction } from "express"
 import { LazyModuleLoader } from "@nestjs/core"
+import type { NextFunction, Request, Response } from "express"
 import { readdirSync } from "fs"
 import { resolve } from "path"
 import serverStatic from "serve-static"
+import type { AlbumContext } from "../../context/AlbumContext.type.js"
+import type { MiddlewareConfigs } from "../../middlewares/middlewares.type.js"
 import { SsrRemoteModule } from "../../modules/ssr-remote/ssr-remote.module.js"
 
-export async function ssrComposeMiddleware(
-  app: INestApplication<any>,
-  midConfigs: MiddlewareConfigs,
-  context: AlbumContext
-) {
+export async function ssrComposeMiddleware(app: INestApplication<any>, midConfigs: MiddlewareConfigs, context: AlbumContext) {
   const { mode, configs } = context
   const { root } = configs.ssrCompose
   const composePkgs = new Map<string, any>()
 
   if (mode === "production") {
-    midConfigs.get("serve-static").factory = function proxyServerStaticFactory(
-      ...configs: any[]
-    ) {
+    midConfigs.get("serve-static").factory = function proxyServerStaticFactory(...configs: any[]) {
       let hasErrorApp = false
       for (const dirName of readdirSync(root, "utf-8")) {
         const _dirName = dirName.toLowerCase()
@@ -34,11 +28,7 @@ export async function ssrComposeMiddleware(
           serverStatic: serverStatic.apply(globalThis, configs[1])
         })
       }
-      return function proxyServerStaticMiddleware(
-        req: Request,
-        res: Response,
-        next: NextFunction
-      ) {
+      return function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
         const url = new URL(req.url)
         let prefix = url.pathname.split("/")[1].toLowerCase()
         if (prefix === "") prefix = "home"

@@ -1,40 +1,17 @@
 import type { FSWatcher } from "chokidar"
+import { ViteDevServer, UserConfig as ViteUserConfig } from "vite"
 import type { AlBumServerMode } from "../cli/cli.type.js"
 import type { ILogger } from "../modules/logger/logger.type.js"
-import type {
-  UserConfig,
-  AppMode,
-  Plugins,
-  EnvValue,
-  ClientConfig,
-  AppStatus,
-  ServerConfig,
-  AppInputs,
-  AppOutputs,
-  AppConfigs,
-  AppManager,
-  PluginFindEntriesParam,
-  UserSSRCompose
-} from "./AlbumContext.type.js"
-import { UserConfig as ViteUserConfig, ViteDevServer } from "vite"
+import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, EnvValue, PluginFindEntriesParam, Plugins, ServerConfig, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
 
 import chokidar from "chokidar"
-import { existsSync, rmSync } from "fs"
-import { basename, resolve } from "path"
-import { EventEmitter } from "events"
 import { build as esbuild } from "esbuild"
+import { EventEmitter } from "events"
+import { existsSync, rmSync } from "fs"
+import { resolve } from "path"
 import { SERVER_EXIT, SERVER_RESTART } from "../constants/constants.js"
 import { Logger } from "../modules/logger/logger.js"
-import {
-  DirStruct,
-  PromiseAll,
-  callPluginWithCatch,
-  isArray,
-  isFunction,
-  isNumber,
-  isPlainObject,
-  isString
-} from "../utils/utils.js"
+import { DirStruct, PromiseAll, callPluginWithCatch, isArray, isFunction, isNumber, isPlainObject, isString } from "../utils/utils.js"
 import { createEmptyEnvValue, transformEnvValue } from "./process/env.js"
 import { SSRCompose } from "./types/ssrCompose.type.js"
 
@@ -72,11 +49,7 @@ export class AlbumContext {
         event: this.createPluginEvents()
       }
 
-      const userConfig = await callPluginWithCatch<UserConfig>(
-        this.plugins.hooks.config,
-        _userConfig,
-        e => logger.error("PluginConfig", e, "album")
-      )
+      const userConfig = await callPluginWithCatch<UserConfig>(this.plugins.hooks.config, _userConfig, e => logger.error("PluginConfig", e, "album"))
       this.vite = {
         viteConfig: userConfig.vite ?? {},
         viteDevServer: null
@@ -90,13 +63,7 @@ export class AlbumContext {
         serverManager: null
       }
 
-      const [env, clientConfig, serverConfig, ssrCompose] = await PromiseAll([
-        transformEnvValue(userConfig.env),
-        this.normalizeClientConfig(userConfig.app),
-        this.normalizeServerConfig(userConfig.server),
-        this.normalizeSSRCompose(userConfig.ssrCompose)
-      ])
-
+      const [env, clientConfig, serverConfig, ssrCompose] = await PromiseAll([transformEnvValue(userConfig.env), this.normalizeClientConfig(userConfig.app), this.normalizeServerConfig(userConfig.server), this.normalizeSSRCompose(userConfig.ssrCompose)])
       this.configs = {
         userConfig,
         clientConfig,
@@ -215,10 +182,7 @@ export class AlbumContext {
       throw "配置错误 [config.app] 每项必须携带唯一 id，用于启动参数匹配"
     }
 
-    const conf =
-      clientConfig.length === 1
-        ? clientConfig[0]
-        : clientConfig.find(v => v.id === this.app)
+    const conf = clientConfig.length === 1 ? clientConfig[0] : clientConfig.find(v => v.id === this.app)
 
     if (!conf) {
       throw "配置错误 [config.app] 中找不到指定的或默认的启动项"
@@ -235,9 +199,7 @@ export class AlbumContext {
       module: null,
       env: null,
       router: {
-        basename: isString(userRouterConfig.basename)
-          ? userRouterConfig.basename
-          : ""
+        basename: isString(userRouterConfig.basename) ? userRouterConfig.basename : ""
       }
     }
 
@@ -286,12 +248,7 @@ export class AlbumContext {
         if (!isPlainObject(_clientConfig.module)) {
           throw "配置错误 config.app.module 必须是对象"
         }
-        if (
-          !_clientConfig.module.moduleName ||
-          !isString(_clientConfig.module.moduleName) ||
-          !_clientConfig.module.modulePath ||
-          !isString(_clientConfig.module.modulePath)
-        ) {
+        if (!_clientConfig.module.moduleName || !isString(_clientConfig.module.moduleName) || !_clientConfig.module.modulePath || !isString(_clientConfig.module.modulePath)) {
           throw "配置错误 config.app.module[name | path] 必须是字符串"
         }
       }
@@ -301,9 +258,7 @@ export class AlbumContext {
       this.status.ssr = true
     }
 
-    _clientConfig.env = conf.env
-      ? await transformEnvValue(conf.env)
-      : createEmptyEnvValue()
+    _clientConfig.env = conf.env ? await transformEnvValue(conf.env) : createEmptyEnvValue()
 
     return _clientConfig
   }
@@ -322,9 +277,7 @@ export class AlbumContext {
     return _serverConfig
   }
 
-  async normalizeSSRCompose(
-    ssrCompose: UserSSRCompose
-  ): Promise<SSRCompose | null> {
+  async normalizeSSRCompose(ssrCompose: UserSSRCompose): Promise<SSRCompose | null> {
     if (!ssrCompose) {
       return null
     }
@@ -397,18 +350,15 @@ export class AlbumContext {
 
     const modulePath = this.configs.clientConfig.module?.modulePath
     const configPath = resolve(this.inputs.cwd, "album.config.ts")
-    const watcher = chokidar.watch(
-      [configPath].concat(modulePath ? [modulePath] : []),
-      {
-        persistent: true,
-        ignorePermissionErrors: true,
-        useFsEvents: true,
-        ignoreInitial: true,
-        usePolling: false,
-        interval: 100,
-        binaryInterval: 300
-      }
-    )
+    const watcher = chokidar.watch([configPath].concat(modulePath ? [modulePath] : []), {
+      persistent: true,
+      ignorePermissionErrors: true,
+      useFsEvents: true,
+      ignoreInitial: true,
+      usePolling: false,
+      interval: 100,
+      binaryInterval: 300
+    })
     // watcher.on("change", path => {
     //   if (path === configPath) {
     //     process.stdout.write(this.signal.SERVER_RESTART)

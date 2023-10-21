@@ -1,29 +1,18 @@
-import { ViteConfigs } from "../middlewares.type.js"
-import { UserConfig, mergeConfig, splitVendorChunkPlugin } from "vite"
-import { AlbumContext } from "../../context/AlbumContext.type.js"
-import tsconfigPaths from "vite-tsconfig-paths"
+import { mergeConfig, splitVendorChunkPlugin, UserConfig } from "vite"
 import viteCompressionPlugin from "vite-plugin-compression"
+import tsconfigPaths from "vite-tsconfig-paths"
+import { AlbumContext } from "../../context/AlbumContext.type.js"
+import { ViteConfigs } from "../middlewares.type.js"
 
-export function viteOptimizeOptions(
-  context: AlbumContext,
-  forceClient: boolean
-): ViteConfigs {
+export function viteOptimizeOptions(context: AlbumContext, forceClient: boolean): ViteConfigs {
   const { mode } = context
   return {
     name: "albumOptimizeOptions",
-    options: mergeConfig(
-      commonOptions(context, forceClient),
-      mode === "production"
-        ? prodOptions(context, forceClient)
-        : devOptions(context, forceClient)
-    )
+    options: mergeConfig(commonOptions(context, forceClient), mode === "production" ? prodOptions(context, forceClient) : devOptions(context, forceClient))
   }
 }
 
-function commonOptions(
-  context: AlbumContext,
-  forceClient: boolean
-): UserConfig {
+function commonOptions(context: AlbumContext, forceClient: boolean): UserConfig {
   const { inputs } = context
   return {
     plugins: [splitVendorChunkPlugin(), tsconfigPaths({ root: inputs.cwd })],

@@ -1,6 +1,6 @@
+import helmet from "helmet"
 import { AlbumContext } from "../../context/AlbumContext.type.js"
 import { MiddlewareConfigs } from "../middlewares.type.js"
-import helmet from "helmet"
 
 export function expressOptimizeConfigs(context: AlbumContext) {
   const { mode } = context

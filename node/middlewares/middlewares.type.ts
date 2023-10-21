@@ -8,8 +8,4 @@ export type ViteConfigs = {
   options: ViteConfig | ViteUserConfig | InlineConfig | UserConfig
 }
 
-export type MiddlewareConfigs = Map<
-  string,
-  { config: any[]; factory: (...config: any[]) => any }
->
-
+export type MiddlewareConfigs = Map<string, { config: any[]; factory: (...config: any[]) => any }>

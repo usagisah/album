@@ -2,9 +2,7 @@ import type { AlbumContext } from "../../context/AlbumContext.js"
 import type { SpecialModule } from "../client.type.js"
 import { walkModules } from "./buildSpecialRoutes.js"
 
-export async function buildSpecialModules(
-  context: AlbumContext
-): Promise<SpecialModule[]> {
+export async function buildSpecialModules(context: AlbumContext): Promise<SpecialModule[]> {
   const module = context.configs.clientConfig.module
   if (!module) return []
 

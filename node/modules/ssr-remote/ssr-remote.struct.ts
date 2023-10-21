@@ -1,9 +1,4 @@
-import type {
-  SSRRemoteType,
-  SSRRemoteProps,
-  SSRRemoteMessages,
-  SSRRemoteSources
-} from "./ssr-remote.type.js"
+import type { SSRRemoteMessages, SSRRemoteProps, SSRRemoteSources, SSRRemoteType } from "./ssr-remote.type.js"
 
 export class SSRRemoteStruct {
   type: SSRRemoteType = "children"
@@ -13,11 +8,13 @@ export class SSRRemoteStruct {
     public messages: SSRRemoteMessages,
     public props: SSRRemoteProps
   ) {
-    this.sources[name] = {
-      preloads: [],
-      sourcePath: "",
-      sourceValue: "",
-      meta: {}
+    this.sources = {
+      [name]: {
+        preloads: [],
+        sourcePath: "",
+        sourceValue: "",
+        meta: {}
+      }
     }
   }
 }

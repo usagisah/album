@@ -1,6 +1,6 @@
 import type { UserConfig as ViteConfig } from "vite"
-import type { UserPlugins } from "./plugins.type.js"
 import type { ILogger } from "../../modules/logger/logger.type.js"
+import type { UserPlugins } from "./plugins.type.js"
 
 export interface CustomConfigEnv {}
 export type UserConfigEnv = {

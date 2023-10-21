@@ -1,25 +1,13 @@
+import type { INestApplication } from "@nestjs/common"
 import type EventEmitter from "events"
-import type { UserConfig, UserConfigApp } from "./userConfig.type.js"
+import type { SpecialModule } from "../../client/client.type.js"
+import type { MiddlewareConfigs, ViteConfigs } from "../../middlewares/middlewares.type.js"
+import type { AlbumSSRContext, AlbumSSROptions } from "../../modules/ssr/ssr.type.js"
 import type { DirStruct } from "../../utils/utils.js"
 import type { AlbumContext } from "../AlbumContext.js"
-import type {
-  AppInputs,
-  AppMode,
-  AppStatus,
-  ClientConfig,
-  ClientConfigModule,
-  ClientConfigRouter
-} from "../AlbumContext.type.js"
-import type { SpecialModule } from "../../client/client.type.js"
-import type {
-  MiddlewareConfigs,
-  ViteConfigs
-} from "../../middlewares/middlewares.type.js"
-import type { INestApplication } from "@nestjs/common"
-import type {
-  AlbumSSRContext,
-  AlbumSSROptions
-} from "../../modules/ssr/ssr.type.js"
+import type { AppInputs, AppMode, AppStatus, ClientConfig, ClientConfigModule, ClientConfigRouter } from "../AlbumContext.type.js"
+import type { UserConfig, UserConfigApp } from "./userConfig.type.js"
+import { SSRCompose } from "./ssrCompose.type.js"
 
 export type PluginParamsContext = {
   api: EventEmitter
@@ -64,6 +52,7 @@ export type PluginInitClientParam = {
   result: {
     realClientInput: string
     realSSRInput: string
+    ssrCompose: SSRCompose | null
   }
 } & PluginParamsContext
 export type PluginInitClient = (param: PluginInitClientParam) => any

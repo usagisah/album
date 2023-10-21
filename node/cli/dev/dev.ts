@@ -1,28 +1,24 @@
-import type { AlbumServerParams } from "../cli.type.js"
-import type { ILogger } from "../../modules/logger/logger.type.js"
 import { PluginContextParam } from "../../context/AlbumContext.type.js"
+import type { ILogger } from "../../modules/logger/logger.type.js"
+import type { AlbumServerParams } from "../cli.type.js"
 
 import { NestFactory } from "@nestjs/core"
+import { rmSync } from "fs"
+import { resolve } from "path"
+import { processClient } from "../../client/processClient.js"
+import { AlbumContext } from "../../context/AlbumContext.js"
 import { AppModule } from "../../modules/app/app.module.js"
 import { Logger } from "../../modules/logger/logger.js"
-import { AlbumContext } from "../../context/AlbumContext.js"
-import { processClient } from "../../client/processClient.js"
 import { processServer } from "../../server/processServer.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import { printLogInfo } from "../helper/printLogInfo.js"
-import { rmSync } from "fs"
-import { resolve } from "path"
 
 export async function albumDevServer(params?: AlbumServerParams) {
   let { app = "default" } = params ?? {}
   let _logger: ILogger
   try {
     rmSync(resolve(".album"), { force: true, recursive: true })
-    const [contextErrors, context] = await new AlbumContext(
-      app,
-      "dev",
-      "development"
-    ).normalize()
+    const [contextErrors, context] = await new AlbumContext(app, "dev", "development").normalize()
     const { logger, mode, status, configs, plugins } = context
     for (const e of contextErrors) {
       logger.error(e, "AlbumContext", "album")
@@ -65,9 +61,7 @@ export async function albumDevServer(params?: AlbumServerParams) {
     await printLogInfo({
       type: "onServerStart",
       context,
-      messages: [
-        [`listen port: http://localhost:${configs.serverConfig.port}`, "album"]
-      ]
+      messages: [[`listen port: http://localhost:${configs.serverConfig.port}`, "album"]]
     })
   } catch (e: any) {
     ;(_logger ?? new Logger()).error(e, "album")

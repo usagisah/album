@@ -1,24 +1,20 @@
-import type { AlbumServerParams } from "../cli.type.js"
+import { rmSync } from "fs"
+import { rm } from "fs/promises"
+import { resolve } from "path"
+import { build as viteBuild } from "vite"
+import { processClient } from "../../client/processClient.js"
 import { AlbumContext } from "../../context/AlbumContext.js"
 import { PluginContextParam } from "../../context/AlbumContext.type.js"
-import { processClient } from "../../client/processClient.js"
 import { resolveMiddlewareConfig } from "../../middlewares/resolveMiddlewareConfig.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
-import { build as viteBuild } from "vite"
-import { rm } from "fs/promises"
-import { rmSync } from "fs"
-import { resolve } from "path"
+import type { AlbumServerParams } from "../cli.type.js"
 import { printLogInfo } from "../helper/printLogInfo.js"
 
 export async function albumBuild(params?: AlbumServerParams) {
   rmSync(resolve(".album"), { force: true, recursive: true })
 
   const { app = "default" } = params ?? {}
-  const [contextErrors, context] = await new AlbumContext(
-    app,
-    "build",
-    "production"
-  ).normalize()
+  const [contextErrors, context] = await new AlbumContext(app, "build", "production").normalize()
   const {
     mode,
     status: { ssr },
@@ -95,11 +91,8 @@ async function buildSSR(context: AlbumContext) {
   const ssrBuildConfig = await resolveMiddlewareConfig(context)
   const clientBuildConfig = await resolveMiddlewareConfig(context, true)
 
-  await Promise.all([
-    rm(clientOutDir, { force: true, recursive: true }),
-    rm(ssrOutDir, { force: true, recursive: true })
-  ])
+  await Promise.all([rm(clientOutDir, { force: true, recursive: true }), rm(ssrOutDir, { force: true, recursive: true })])
   await viteBuild(ssrBuildConfig.viteConfigs)
-  console.log( "\n\n" )
+  console.log("\n\n")
   await viteBuild(clientBuildConfig.viteConfigs)
 }

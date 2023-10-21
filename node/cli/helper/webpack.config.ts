@@ -12,14 +12,8 @@ type Params = {
   lib: boolean
 }
 
-export function createWebpackConfig({
-  mode,
-  entry,
-  lib,
-  output
-}: Params): Configuration {
-  const { devtool, optimization, plugins } =
-    mode === "production" ? productionOptions() : developmentOptions()
+export function createWebpackConfig({ mode, entry, lib, output }: Params): Configuration {
+  const { devtool, optimization, plugins } = mode === "production" ? productionOptions() : developmentOptions()
   return {
     devtool,
     ignoreWarnings: [/^(?!CriticalDependenciesWarning$)/],
@@ -93,7 +87,7 @@ const developmentOptions = () =>
       moduleIds: "deterministic"
     },
     plugins: []
-  } as any)
+  }) as any
 
 const productionOptions = () =>
   ({
@@ -115,4 +109,4 @@ const productionOptions = () =>
       ]
     },
     plugins: [new ProgressPlugin(true)]
-  } as any)
+  }) as any

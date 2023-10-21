@@ -1,10 +1,10 @@
 import { Body, Controller, Headers, Post, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
-import { AlbumContextService } from "../context/album-context.service.js"
-import { findEntryPath, isPlainObject } from "../../utils/utils.js"
-import { SSRRemoteStruct } from "./ssr-remote.struct.js"
-import { resolve } from "path"
 import { existsSync } from "fs"
+import { resolve } from "path"
+import { isPlainObject } from "../../utils/utils.js"
+import { AlbumContextService } from "../context/album-context.service.js"
+import { SSRRemoteStruct } from "./ssr-remote.struct.js"
 
 @Controller()
 export class SsrRemoteController {
@@ -13,24 +13,18 @@ export class SsrRemoteController {
   }
 
   @Post("*")
-  async ssrRemoteEntry(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Headers() headers: Record<string, string>,
-    @Body() props: any
-  ) {
+  async ssrRemoteEntry(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>, @Body() props: any) {
     const describe = headers["album-remote-source"]
     if (!describe) {
       return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
     }
 
+    debugger
     const [name] = describe.split(";")
-    if (!name)
-      return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
+    if (!name) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
 
     const struct = this.resolveSSRRemoteStruct(props, name)
-    if (struct === false)
-      return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
+    if (struct === false) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
 
     const { mode, vite, configs } = await this.context.getContext()
     const { viteDevServer } = vite
@@ -40,6 +34,10 @@ export class SsrRemoteController {
       return res.status(404).send({ reason: "ssr-remote 指定资源不存在" })
     }
 
+    if (1) {
+      return res.status(200).send("aa")
+    }
+
     try {
       const entry = (await viteDevServer.ssrLoadModule(filePath)).default
       if (!entry) {
@@ -47,8 +45,7 @@ export class SsrRemoteController {
       }
 
       res.send("success")
-    }
-    catch(error) {
+    } catch (error) {
       return res.status(500).send({ reason: "服务器错误", error })
     }
   }
@@ -66,7 +63,7 @@ export class SsrRemoteController {
       return false
     }
 
-    return new SSRRemoteStruct(name, value.message, value.props)
+    return new SSRRemoteStruct(name, value.messages, value.props)
   }
 
   async initModule() {

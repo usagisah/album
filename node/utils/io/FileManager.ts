@@ -10,11 +10,7 @@ function joinName(type: FileType, name: string) {
 
 export type FileType = "file" | "dir"
 
-type GetFileReturn<T extends FileType> = T extends "dir"
-  ? DirStruct | undefined
-  : T extends "file"
-  ? FileStruct | undefined
-  : never
+type GetFileReturn<T extends FileType> = T extends "dir" ? DirStruct | undefined : T extends "file" ? FileStruct | undefined : never
 
 export class FileStruct {
   #type: "file" = "file"
@@ -24,12 +20,7 @@ export class FileStruct {
 
   constructor(params: { name: string; path: string; value: string }) {
     const { name, path, value } = params
-    if (
-      !isString(name) ||
-      name.length === 0 ||
-      !isString(path) ||
-      !isString(value)
-    ) {
+    if (!isString(name) || name.length === 0 || !isString(path) || !isString(value)) {
       throw false
     }
     this.#name = name

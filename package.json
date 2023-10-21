@@ -45,7 +45,7 @@
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "dev": "node ./scripts/dev.mjs",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write \"node/**/*.ts\" \"client/**/*.ts\"",
     "pub": "node ./scripts/publish.mjs"
   },
   "dependencies": {
@@ -86,7 +86,9 @@
     "@types/minimist": "^1.2.3",
     "@types/node": "^20.3.1",
     "@types/serve-static": "^1.15.3",
-    "prettier": "^2.8.8",
-    "prettier-config-usagisah": "^2.0.0"
+    "prettier": "^3.0.3",
+    "prettier-config-usagisah": "^3.0.0",
+    "prettier-plugin-organize-imports": "^3.2.3",
+    "prettier-plugin-packagejson": "^2.4.6"
   }
 }

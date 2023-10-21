@@ -1,7 +1,7 @@
 const fns: any[] = []
 const signalHandle = () => {
   fns.forEach(f => f())
-  process.exit(0);
+  process.exit(0)
 }
 const exitHandle = () => {
   fns.forEach(f => f())

@@ -1,24 +1,20 @@
-import type { AlbumServerParams } from "../cli.type.js"
-import type { ILogger } from "../../modules/logger/logger.type.js"
-import { callPluginWithCatch, findEntryPath } from "../../utils/utils.js"
-import { parse } from "path"
 import { NestFactory } from "@nestjs/core"
-import { AppModule } from "../../modules/app/app.module.js"
-import { Logger } from "../../modules/logger/logger.js"
+import { parse } from "path"
 import { AlbumContext } from "../../context/AlbumContext.js"
 import { PluginContextParam } from "../../context/AlbumContext.type.js"
+import { AppModule } from "../../modules/app/app.module.js"
+import { Logger } from "../../modules/logger/logger.js"
+import type { ILogger } from "../../modules/logger/logger.type.js"
 import { processServer } from "../../server/processServer.js"
+import { callPluginWithCatch, findEntryPath } from "../../utils/utils.js"
+import type { AlbumServerParams } from "../cli.type.js"
 import { printLogInfo } from "../helper/printLogInfo.js"
 
 export async function albumStartServer(params?: AlbumServerParams) {
   let { app = "default" } = params ?? {}
   let _logger: ILogger
   try {
-    const [contextErrors, context] = await new AlbumContext(
-      app,
-      "start",
-      "production"
-    ).normalize()
+    const [contextErrors, context] = await new AlbumContext(app, "start", "production").normalize()
     const { logger, configs, inputs, outputs, plugins } = context
     const { port } = configs.serverConfig
     for (const e of contextErrors) {
@@ -48,9 +44,7 @@ export async function albumStartServer(params?: AlbumServerParams) {
     await printLogInfo({
       type: "onServerStart",
       context,
-      messages: [
-        [`listen port: http://localhost:${configs.serverConfig.port}`, "album"]
-      ]
+      messages: [[`listen port: http://localhost:${configs.serverConfig.port}`, "album"]]
     })
   } catch (e: any) {
     ;(_logger ?? new Logger()).error(e, "album")

@@ -1,19 +1,15 @@
 import { readFileSync, writeFileSync } from "fs"
-import { ILogger } from "../../modules/logger/logger.type.js"
-import { AlbumContext } from "../../context/AlbumContext.js"
 import { relative, resolve } from "path"
 import { InlineConfig, PluginOption, createLogger, mergeConfig } from "vite"
+import { AlbumContext } from "../../context/AlbumContext.js"
+import { ILogger } from "../../modules/logger/logger.type.js"
 import { ViteConfigs } from "../middlewares.type.js"
 
-export function viteCoreOptions(
-  context: AlbumContext,
-  forceClient = false
-): ViteConfigs {
+export function viteCoreOptions(context: AlbumContext, forceClient = false): ViteConfigs {
   const { mode, serverMode, inputs, status, vite, logger } = context
   const { cwd } = inputs
   const { env } = status
-  const [preferConfig, pluginApi] =
-    !forceClient && status.ssr ? ssrOptions(context) : spaOptions(context)
+  const [preferConfig, pluginApi] = !forceClient && status.ssr ? ssrOptions(context) : spaOptions(context)
 
   const albumVitePlugin: PluginOption = {
     name: "album-plugin",
@@ -85,13 +81,7 @@ function spaOptions(context: AlbumContext): [InlineConfig, PluginOption] {
   const devPlugin: PluginOption = {
     name: "",
     transformIndexHtml(html) {
-      return html.replace(
-        "</body>",
-        `<script type="module" src="/${relative(
-          cwd,
-          realClientInput
-        )}"></script></body>`
-      )
+      return html.replace("</body>", `<script type="module" src="/${relative(cwd, realClientInput)}"></script></body>`)
     }
   }
 
@@ -101,17 +91,7 @@ function spaOptions(context: AlbumContext): [InlineConfig, PluginOption] {
     buildStart() {
       if (ssr) return
       html = readFileSync(resolve(cwd, "index.html"), "utf-8")
-      writeFileSync(
-        resolve(cwd, "index.html"),
-        html.replace(
-          "</body>",
-          `<script type="module" src="/${relative(
-            cwd,
-            realClientInput
-          )}"></script></body>`
-        ),
-        "utf-8"
-      )
+      writeFileSync(resolve(cwd, "index.html"), html.replace("</body>", `<script type="module" src="/${relative(cwd, realClientInput)}"></script></body>`), "utf-8")
     },
     buildEnd() {
       if (ssr) return
@@ -119,9 +99,7 @@ function spaOptions(context: AlbumContext): [InlineConfig, PluginOption] {
     }
   }
 
-  return mode === "production"
-    ? [prodConfig, prodPlugin]
-    : [devConfig, devPlugin]
+  return mode === "production" ? [prodConfig, prodPlugin] : [devConfig, devPlugin]
 }
 
 function ssrOptions(context: AlbumContext): [InlineConfig, PluginOption] {

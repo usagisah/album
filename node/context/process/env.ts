@@ -1,7 +1,7 @@
 import { EnvValue } from "../AlbumContext.type.js"
 
-import { resolve } from "path"
 import { build as esbuild } from "esbuild"
+import { resolve } from "path"
 import { isFunction, isPlainObject, isString } from "../../utils/utils.js"
 
 export function createEmptyEnvValue() {

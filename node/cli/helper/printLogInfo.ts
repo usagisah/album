@@ -1,5 +1,5 @@
-import { PluginOnLogParam } from "../../context/AlbumContext.type.js"
 import { AlbumContext } from "../../context/AlbumContext.js"
+import { PluginOnLogParam } from "../../context/AlbumContext.type.js"
 import { callPluginWithCatch, isString } from "../../utils/utils.js"
 
 type BuildLogInfo = {
