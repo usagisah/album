@@ -1,6 +1,6 @@
 import type { Request, Response } from "express"
 import type { ViteDevServer } from "vite"
-import { AlBumServerMode } from "../../cli/cli.type.js"
+import type { AlBumServerMode } from "../../cli/cli.type.js"
 import type { AppInputs, AppMode, AppOutputs } from "../../context/AlbumContext.type.js"
 import type { ILogger } from "../logger/logger.type.js"
 

@@ -33,7 +33,7 @@ export class AlbumContext {
   plugins: { hooks: Plugins; event: EventEmitter }
   vite: {
     viteConfig: ViteUserConfig
-    viteDevServer?: ViteDevServer
+    viteDevServer: ViteDevServer | null
   }
   errors: any[] = []
 
@@ -100,7 +100,8 @@ export class AlbumContext {
       clientInput: clientConfig.main,
       realClientInput: null,
       ssrInput: clientConfig.mainSSR,
-      realSSRInput: null
+      realSSRInput: null,
+      realSSRComposeInput: null
     }
   }
 

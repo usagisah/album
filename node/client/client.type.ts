@@ -11,8 +11,8 @@ export type SpecialModule = {
   filePath: string
   fileName: string
   page: SpecialModuleFile
-  router?: SpecialModuleFile
-  action?: SpecialModuleFile
+  router: SpecialModuleFile | null
+  action: SpecialModuleFile | null
   routePath: string
   routeFilePath: string
   files: SpecialModuleFile[]

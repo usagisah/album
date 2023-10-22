@@ -49,10 +49,11 @@ export type PluginInitClientParam = {
   inputs: AppInputs
   fileManager: DirStruct
   specialModules: SpecialModule[]
+  ssrCompose: SSRCompose | null
   result: {
     realClientInput: string
     realSSRInput: string
-    ssrCompose: SSRCompose | null
+    realSSRComposeInput: string | null
   }
 } & PluginParamsContext
 export type PluginInitClient = (param: PluginInitClientParam) => any
@@ -64,6 +65,7 @@ export type PluginPatchClientParam = {
   inputs: AppInputs
   fileManager: DirStruct
   specialModules: SpecialModule[]
+  ssrCompose: SSRCompose | null
 } & PluginParamsContext
 export type PluginPatchClient = (param: PluginPatchClientParam) => any
 

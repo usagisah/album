@@ -1,10 +1,10 @@
 import { Body, Controller, Headers, Post, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
-import { existsSync } from "fs"
-import { resolve } from "path"
-import { isPlainObject } from "../../utils/utils.js"
+import { resolve, parse as pathParse } from "path"
+import { mergeConfig, build as viteBuild, type InlineConfig as ViteInlineConfig } from "vite"
+import { findEntryPath, isPlainObject } from "../../utils/utils.js"
 import { AlbumContextService } from "../context/album-context.service.js"
-import { SSRRemoteStruct } from "./ssr-remote.struct.js"
+import { createSSRRemoteStruct } from "./ssr-remote.struct.js"
 
 @Controller()
 export class SsrRemoteController {
@@ -19,38 +19,68 @@ export class SsrRemoteController {
       return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
     }
 
-    debugger
-    const [name] = describe.split(";")
-    if (!name) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
+    const [sourcePath] = describe.split(";")
+    if (!sourcePath) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
 
-    const struct = this.resolveSSRRemoteStruct(props, name)
-    if (struct === false) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
+    const ssrRemoteStruct = this.resolveSSRRemoteStruct(props)
+    if (ssrRemoteStruct === false) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
 
-    const { mode, vite, configs } = await this.context.getContext()
-    const { viteDevServer } = vite
-    const cwd = resolve(configs.clientConfig.module.modulePath, "../")
-    const filePath = resolve(cwd, name)
-    if (!existsSync(filePath)) {
-      return res.status(404).send({ reason: "ssr-remote 指定资源不存在" })
-    }
-
-    if (1) {
-      return res.status(200).send("aa")
-    }
-
+    const { mode, vite, configs, inputs, logger, serverMode, outputs } = await this.context.getContext()
+    const { modulePath } = configs.clientConfig.module
+    const { viteDevServer, viteConfig } = vite
+    // const { modulePath } = configs.clientConfig.module
+    // const filePath = await findEntryPath({
+    //   cwd: resolve(modulePath, "../"),
+    //   name: resolve(modulePath, "../", sourcePath)
+    // })
+    // if (!filePath) {
+    //   return res.status(404).send({ reason: "ssr-remote 指定资源不存在" })
+    // }
     try {
-      const entry = (await viteDevServer.ssrLoadModule(filePath)).default
-      if (!entry) {
-        return res.status(404).send({ reason: "ssr-remote 指定资源不存在" })
+      const { renderRemoteComponent } = await viteDevServer.ssrLoadModule(inputs.realSSRComposeInput)
+      if (!renderRemoteComponent) {
+        return res.status(500).send({ reason: "服务器错误" })
       }
 
-      res.send("success")
+      const params: any = {
+        logger,
+        sourcePath,
+        props,
+        inputs,
+        mountContext: true,
+        sources: ssrRemoteStruct.sources,
+        moduleRoot: resolve(modulePath, "../"),
+        viteComponentBuild: this.createViteComponentBuild(viteConfig)
+      }
+      const result = await renderRemoteComponent(params)
+
+      // const ssrRemoteOptions: AlbumSSRRemoteOptions = {
+      //   req,
+      //   headers,
+      //   sourcePath,
+      //   filePath,
+      //   ssrRemoteStruct
+      // }
+      // const ssrRemoteContext: AlbumSSRRemoteContext = {
+      //   inputs,
+      //   logger,
+      //   mode,
+      //   outputs,
+      //   serverMode,
+      //   viteDevServer,
+      //   createViteConfig: () => {
+
+      //   }
+      // }
+
+      // res.send(ssrRemoteStruct)
+      res.status(200).send(result)
     } catch (error) {
       return res.status(500).send({ reason: "服务器错误", error })
     }
   }
 
-  resolveSSRRemoteStruct(value: unknown, name: string) {
+  resolveSSRRemoteStruct(value: unknown) {
     if (!isPlainObject(value)) {
       return false
     }
@@ -63,13 +93,34 @@ export class SsrRemoteController {
       return false
     }
 
-    return new SSRRemoteStruct(name, value.messages, value.props)
+    return createSSRRemoteStruct(value.messages, value.props)
   }
 
-  async initModule() {
-    const { mode, vite } = await this.context.getContext()
-    if (mode === "production") {
-      return
+  createViteComponentBuild(viteConfig: ViteInlineConfig) {
+    return async function viteComponentBuild({ input, outDir }: any) {
+      const config = mergeConfig(viteConfig, {
+        mode: "development",
+        logLevel: "error",
+        build: {
+          manifest: true,
+          ssrManifest: true,
+          minify: false,
+          cssMinify: false,
+          rollupOptions: {
+            input
+          },
+          lib: {
+            entry: input,
+            formats: ["es"],
+            fileName: pathParse(input).name
+          },
+          assetsDir: "assets",
+          outDir
+        }
+      } as ViteInlineConfig)
+      await viteBuild(config)
     }
   }
+
+  async initModule() {}
 }

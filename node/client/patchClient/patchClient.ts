@@ -27,7 +27,8 @@ export async function patchClient(context: AlbumContext, client: ClientManager) 
       clientConfig: configs.clientConfig,
       inputs,
       fileManager: manager.fileManager,
-      specialModules
+      specialModules,
+      ssrCompose: configs.ssrCompose
     },
     e => logger.error("PluginPatchClient", e, "album")
   )

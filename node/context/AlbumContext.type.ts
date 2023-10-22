@@ -26,6 +26,7 @@ export type AppInputs = {
   realClientInput: string
   ssrInput: string
   realSSRInput: string
+  realSSRComposeInput: string | null
 }
 
 export type AppOutputs = {
