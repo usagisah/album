@@ -1,4 +1,3 @@
-import { rmSync } from "fs"
 import { rm } from "fs/promises"
 import { resolve } from "path"
 import { build as viteBuild } from "vite"
@@ -11,8 +10,6 @@ import type { AlbumServerParams } from "../cli.type.js"
 import { printLogInfo } from "../helper/printLogInfo.js"
 
 export async function albumBuild(params?: AlbumServerParams) {
-  rmSync(resolve(".album"), { force: true, recursive: true })
-
   const { app = "default" } = params ?? {}
   const [contextErrors, context] = await new AlbumContext(app, "build", "production").normalize()
   const {

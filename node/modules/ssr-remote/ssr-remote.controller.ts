@@ -14,13 +14,9 @@ export class SsrRemoteController {
 
   @Post("*")
   async ssrRemoteEntry(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>, @Body() props: any) {
-    const describe = headers["album-remote-source"]
-    if (!describe) {
+    if (!Object.hasOwn(headers, "album-remote-source")) {
       return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
     }
-
-    const [sourcePath] = describe.split(";")
-    if (!sourcePath) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
 
     const ssrRemoteStruct = this.resolveSSRRemoteStruct(props)
     if (ssrRemoteStruct === false) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
@@ -28,14 +24,8 @@ export class SsrRemoteController {
     const { mode, vite, configs, inputs, logger, serverMode, outputs } = await this.context.getContext()
     const { modulePath } = configs.clientConfig.module
     const { viteDevServer, viteConfig } = vite
-    // const { modulePath } = configs.clientConfig.module
-    // const filePath = await findEntryPath({
-    //   cwd: resolve(modulePath, "../"),
-    //   name: resolve(modulePath, "../", sourcePath)
-    // })
-    // if (!filePath) {
-    //   return res.status(404).send({ reason: "ssr-remote 指定资源不存在" })
-    // }
+    const sourcePath = req.path
+
     try {
       const { renderRemoteComponent } = await viteDevServer.ssrLoadModule(inputs.realSSRComposeInput)
       if (!renderRemoteComponent) {
@@ -43,35 +33,17 @@ export class SsrRemoteController {
       }
 
       const params: any = {
-        logger,
         sourcePath,
         props,
-        inputs,
-        mountContext: true,
         sources: ssrRemoteStruct.sources,
         moduleRoot: resolve(modulePath, "../"),
+        ssrContextProps: null,
+        serverRouteData: {},
+        albumSSROptions: {},
+        albumSSRContext: {},
         viteComponentBuild: this.createViteComponentBuild(viteConfig)
       }
       const result = await renderRemoteComponent(params)
-
-      // const ssrRemoteOptions: AlbumSSRRemoteOptions = {
-      //   req,
-      //   headers,
-      //   sourcePath,
-      //   filePath,
-      //   ssrRemoteStruct
-      // }
-      // const ssrRemoteContext: AlbumSSRRemoteContext = {
-      //   inputs,
-      //   logger,
-      //   mode,
-      //   outputs,
-      //   serverMode,
-      //   viteDevServer,
-      //   createViteConfig: () => {
-
-      //   }
-      // }
 
       // res.send(ssrRemoteStruct)
       res.status(200).send(result)
@@ -82,10 +54,6 @@ export class SsrRemoteController {
 
   resolveSSRRemoteStruct(value: unknown) {
     if (!isPlainObject(value)) {
-      return false
-    }
-
-    if (!value.messages || !isPlainObject(value.messages)) {
       return false
     }
 
@@ -103,7 +71,6 @@ export class SsrRemoteController {
         logLevel: "error",
         build: {
           manifest: true,
-          ssrManifest: true,
           minify: false,
           cssMinify: false,
           rollupOptions: {

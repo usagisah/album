@@ -1,23 +1,19 @@
-import { PluginContextParam } from "../../context/AlbumContext.type.js"
-import type { ILogger } from "../../modules/logger/logger.type.js"
-import type { AlbumServerParams } from "../cli.type.js"
-
 import { NestFactory } from "@nestjs/core"
-import { rmSync } from "fs"
-import { resolve } from "path"
 import { processClient } from "../../client/processClient.js"
 import { AlbumContext } from "../../context/AlbumContext.js"
+import { PluginContextParam } from "../../context/AlbumContext.type.js"
 import { AppModule } from "../../modules/app/app.module.js"
 import { Logger } from "../../modules/logger/logger.js"
+import type { ILogger } from "../../modules/logger/logger.type.js"
 import { processServer } from "../../server/processServer.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
+import type { AlbumServerParams } from "../cli.type.js"
 import { printLogInfo } from "../helper/printLogInfo.js"
 
 export async function albumDevServer(params?: AlbumServerParams) {
   let { app = "default" } = params ?? {}
   let _logger: ILogger
   try {
-    rmSync(resolve(".album"), { force: true, recursive: true })
     const [contextErrors, context] = await new AlbumContext(app, "dev", "development").normalize()
     const { logger, mode, status, configs, plugins } = context
     for (const e of contextErrors) {
