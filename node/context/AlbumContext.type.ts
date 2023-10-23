@@ -6,11 +6,12 @@ import { SSRCompose } from "./types/ssrCompose.type.js"
 import { UserConfig } from "./types/userConfig.type.js"
 
 export type { AlbumContext } from "./AlbumContext.js"
-export * from "./types/clientConfig.type.js"
-export * from "./types/env.type.js"
-export * from "./types/plugins.type.js"
-export * from "./types/serverConfig.type.js"
-export * from "./types/userConfig.type.js"
+export type * from "./types/clientConfig.type.js"
+export type * from "./types/env.type.js"
+export type * from "./types/plugins.type.js"
+export type * from "./types/serverConfig.type.js"
+export type * from "./types/userConfig.type.js"
+export type * from "./types/ssrCompose.type.js"
 
 export type AppMode = "development" | "production"
 

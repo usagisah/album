@@ -1,5 +1,5 @@
 export type * from "./context/album-context.service.js"
 export type * from "./logger/logger.service.js"
 export type * from "./logger/logger.type.js"
-export type { AlbumSSRContext, AlbumSSROptions } from "./ssr/ssr.type.js"
+export type { AlbumSSRContext, AlbumSSROptions, AlbumSSRContextProps } from "./ssr/ssr.type.js"
 export type { AlbumSSRRemoteContext, AlbumSSRRemoteOptions } from "./ssr-remote/ssr-remote.type.js"

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express"
 import type { ViteDevServer } from "vite"
 import type { AlBumServerMode } from "../../cli/cli.type.js"
-import type { AppInputs, AppMode, AppOutputs } from "../../context/AlbumContext.type.js"
+import type { AppInputs, AppMode, AppOutputs, SSRCompose } from "../../context/AlbumContext.type.js"
 import type { ILogger } from "../logger/logger.type.js"
 
 export type AlbumSSROptions = {
@@ -17,7 +17,25 @@ export type AlbumSSRContext = {
   viteDevServer: ViteDevServer
   inputs: AppInputs
   outputs: AppOutputs
+  ssrCompose: SSRCompose | null
   meta: Record<any, any>
+}
+
+export type AlbumSSRContextProps = {
+  ssrSlideProps: {
+    req: Request
+    headers: Record<string, string>
+    mode: AppMode
+    serverMode: AlBumServerMode
+    logger: ILogger
+    inputs: AppInputs
+    outputs: AppOutputs
+    meta: Record<any, any>
+    query: Record<string, any>
+    params: Record<string, string>
+  },
+  serverRouteData: Record<string, any>
+  serverDynamicData: Map<string, Record<string, any>>
 }
 
 export type AlbumSSRRender = (ssrOptions: AlbumSSROptions, context: AlbumSSRContext) => Promise<any> | any

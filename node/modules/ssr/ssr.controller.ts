@@ -17,7 +17,7 @@ export class SsrController {
   @Get("*")
   async ssr(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>) {
     const ctx = await this.context.getContext()
-    const { logger, plugins } = ctx
+    const { logger, plugins, configs } = ctx
 
     const { result } = await callPluginWithCatch<PluginOnSSREnterParam>(
       plugins.hooks.onSSREnter,
@@ -33,6 +33,7 @@ export class SsrController {
             viteDevServer: ctx.vite.viteDevServer,
             inputs: { ...ctx.inputs },
             outputs: { ...ctx.outputs },
+            ssrCompose: configs.ssrCompose ? { ...ctx.configs.ssrCompose } : null,
             meta: {}
           }
         }
