@@ -54,8 +54,10 @@ export let useServerData: <T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>)
 
 export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 
-export interface ComponentRemoteAppLoader {}
-export let RemoteAppLoader: ComponentRemoteAppLoader = createEmptyComponent("RemoteAppLoader")
+export interface CreateRemoteAppLoader {}
+export let createRemoteAppLoader: CreateRemoteAppLoader = () => {
+  throw new Error(`the createRemoteAppLoader hasn't been registered`)
+}
 
 export function registryHook(name: string, value: any) {
   switch (name) {
@@ -80,8 +82,8 @@ export function registryHook(name: string, value: any) {
     case "useServerRouteData":
       useServerRouteData = value
       return true
-    case "RemoteAppLoader":
-      RemoteAppLoader = value
+    case "createRemoteAppLoader":
+      createRemoteAppLoader = value
       return true
   }
   return false

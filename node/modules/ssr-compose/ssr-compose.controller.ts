@@ -6,7 +6,6 @@ import type { AlbumContext } from "../../context/AlbumContext.type.js"
 import { isPlainObject } from "../../utils/utils.js"
 import { AlbumContextService } from "../context/album-context.service.js"
 import type { AlbumSSRContextProps } from "../ssr/ssr.type.js"
-import { createSSRRemoteStruct } from "./ssr-compose.struct.js"
 import type { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
 
 @Controller()
@@ -18,11 +17,11 @@ export class SsrComposeController {
   @Post("*")
   async ssrRemoteEntry(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>, @Body() props: any) {
     if (!Object.hasOwn(headers, "album-remote-source")) {
-      return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
+      return res.status(404).send({ code: 404, messages: "非法 ssr-remote 资源请求" })
     }
-
-    const ssrRemoteStruct = this.resolveSSRRemoteStruct(props)
-    if (ssrRemoteStruct === false) return res.status(404).send({ reason: "非法 ssr-remote 资源请求" })
+    if (!this.checkRemoteProps(props)) {
+      return res.status(404).send({ code: 404, messages: "非法 ssr-remote 资源请求" })
+    }
 
     const albumContext = await this.context.getContext()
     const { mode, vite, inputs, logger, serverMode, outputs } = albumContext
@@ -32,7 +31,7 @@ export class SsrComposeController {
     try {
       const { renderRemoteComponent } = await viteDevServer.ssrLoadModule(inputs.realSSRComposeInput)
       if (!renderRemoteComponent) {
-        return res.status(500).send({ reason: "服务器错误" })
+        return res.status(500).send({ code: 500, messages: "服务器错误" })
       }
 
       const ssrContextProps: AlbumSSRContextProps = {
@@ -74,12 +73,12 @@ export class SsrComposeController {
       const result: SSRComposeRenderRemoteComponentReturn = await renderRemoteComponent(renderOptions)
       return res.send({ code: 200, messages: "", result })
     } catch (error) {
-      console.log(error, "????")
+      logger.error("资源序列化失败", error, "ssr-compose")
       return res.send({ code: 500, messages: "资源序列化失败", error })
     }
   }
-  // 'TypeError: Cannot read properties of null (reading 'j')\n    at ff (/Users/guxiansheng/Desktop/baseCode/album/react/.album/ssr-compose/.cache/b2051f2314e56e3ed3f60ca299b30097/aa-cf7a5e3c.js:7:48)\n    at renderWithHooks (/Users/guxiansheng/Desktop/baseCode/album/react/node_modules/.pnpm/registry.npmmirror.com+react-dom@18.2.0_react@18.2.0/node_modules/react-dom/cjs/react-dom-server.node.development.js:5724:16)\n    at renderIndeterminateComponent (/Users/guxiansheng/Desktop/baseCode/album/react/no…odules/react-dom/cjs/react-dom-server.node.development.js:6142:14)\n    at renderNode (/Users/guxiansheng/Desktop/baseCode/album/react/node_modules/.pnpm/registry.npmmirror.com+react-dom@18.2.0_react@18.2.0/node_modules/react-dom/cjs/react-dom-server.node.development.js:6325:12)\n    at renderChildrenArray (/Users/guxiansheng/Desktop/baseCode/album/react/node_modules/.pnpm/registry.npmmirror.com+react-dom@18.2.0_react@18.2.0/node_modules/react-dom/cjs/react-dom-server.node.development.js:6277:7)'
-  resolveSSRRemoteStruct(value: unknown) {
+
+  checkRemoteProps(value: unknown) {
     if (!isPlainObject(value)) {
       return false
     }
@@ -88,7 +87,7 @@ export class SsrComposeController {
       return false
     }
 
-    return createSSRRemoteStruct(value.props)
+    return true
   }
 
   static createSsrComposeOptions(ctx: AlbumContext) {
