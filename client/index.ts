@@ -3,11 +3,6 @@ function createEmptyHook<T>(name: string) {
     throw new Error(`the album-hooks ${name} hasn't been registered`)
   }) as T
 }
-function createEmptyComponent(name: string): any {
-  return function EmptyComponent() {
-    throw new Error(`the album-component ${name} hasn't been registered`)
-  }
-}
 
 export type RouterRoute = {
   name: string
@@ -56,6 +51,8 @@ export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 
 export interface CreateRemoteAppLoader {}
 export let createRemoteAppLoader: CreateRemoteAppLoader = () => {
+  const g: any = globalThis
+  if (g?.window?.__$_album_ssr_compose) return g.window.__$_album_ssr_compose
   throw new Error(`the createRemoteAppLoader hasn't been registered`)
 }
 
@@ -84,6 +81,36 @@ export function registryHook(name: string, value: any) {
       return true
     case "createRemoteAppLoader":
       createRemoteAppLoader = value
+      return true
+  }
+  return false
+}
+
+export function registryHookIfAbsent(name: string, value: any) {
+  switch (name) {
+    case "useRoutes":
+      if(!useRoutes) useRoutes = value
+      return true
+    case "useRoutesMap":
+      if(!useRoutesMap) useRoutesMap = value
+      return true
+    case "useRouter":
+      if(!useRouter) useRouter = value
+      return true
+    case "useLoader":
+      if(!useLoader) useLoader = value
+      return true
+    case "useServer":
+      if(!useServer) useServer = value
+      return true
+    case "useServerData":
+      if(!useServerData) useServerData = value
+      return true
+    case "useServerRouteData":
+      if(!useServerRouteData) useServerRouteData = value
+      return true
+    case "createRemoteAppLoader":
+      if(!createRemoteAppLoader) createRemoteAppLoader = value
       return true
   }
   return false
