@@ -74,10 +74,11 @@ export class SsrComposeController {
       const result: SSRComposeRenderRemoteComponentReturn = await renderRemoteComponent(renderOptions)
       return res.send({ code: 200, messages: "", result })
     } catch (error) {
+      console.log(error, "????")
       return res.send({ code: 500, messages: "资源序列化失败", error })
     }
   }
-
+  // 'TypeError: Cannot read properties of null (reading 'j')\n    at ff (/Users/guxiansheng/Desktop/baseCode/album/react/.album/ssr-compose/.cache/b2051f2314e56e3ed3f60ca299b30097/aa-cf7a5e3c.js:7:48)\n    at renderWithHooks (/Users/guxiansheng/Desktop/baseCode/album/react/node_modules/.pnpm/registry.npmmirror.com+react-dom@18.2.0_react@18.2.0/node_modules/react-dom/cjs/react-dom-server.node.development.js:5724:16)\n    at renderIndeterminateComponent (/Users/guxiansheng/Desktop/baseCode/album/react/no…odules/react-dom/cjs/react-dom-server.node.development.js:6142:14)\n    at renderNode (/Users/guxiansheng/Desktop/baseCode/album/react/node_modules/.pnpm/registry.npmmirror.com+react-dom@18.2.0_react@18.2.0/node_modules/react-dom/cjs/react-dom-server.node.development.js:6325:12)\n    at renderChildrenArray (/Users/guxiansheng/Desktop/baseCode/album/react/node_modules/.pnpm/registry.npmmirror.com+react-dom@18.2.0_react@18.2.0/node_modules/react-dom/cjs/react-dom-server.node.development.js:6277:7)'
   resolveSSRRemoteStruct(value: unknown) {
     if (!isPlainObject(value)) {
       return false
@@ -110,15 +111,16 @@ export class SsrComposeController {
           minify: false,
           cssMinify: false,
           rollupOptions: {
-            input
+            input,
+            external: [/node_modules/]
           },
           lib: {
             entry: input,
             formats: ["es"],
             fileName: pathParse(input).name
           },
-          assetsDir: "assets",
-          outDir
+          outDir,
+          cssCodeSplit: false
         }
       } as ViteInlineConfig)
       await viteBuild(config)

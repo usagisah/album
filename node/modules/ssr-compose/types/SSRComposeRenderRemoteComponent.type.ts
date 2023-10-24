@@ -1,11 +1,13 @@
 import type { AlbumSSRContextProps, ServerDynamicData } from "../../ssr/ssr.type.js"
 import type { SSRComposeContextProps } from "./SSRComposeContextProps.type.js"
 
+export type SSRComposeRenderProps = {
+  sourcePath: string
+  props: Record<string, any>
+}
+
 export type SSRComposeRenderRemoteComponentOptions = {
-  renderProps: {
-    sourcePath: string
-    props: Record<string, any>
-  }
+  renderProps: SSRComposeRenderProps
   ssrContextProps: AlbumSSRContextProps
   ssrComposeContextProps: SSRComposeContextProps
 }

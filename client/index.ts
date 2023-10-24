@@ -54,7 +54,8 @@ export let useServerData: <T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>)
 
 export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 
-export let RemoteAppLoader = createEmptyComponent("RemoteAppLoader")
+export interface ComponentRemoteAppLoader {}
+export let RemoteAppLoader: ComponentRemoteAppLoader = createEmptyComponent("RemoteAppLoader")
 
 export function registryHook(name: string, value: any) {
   switch (name) {
