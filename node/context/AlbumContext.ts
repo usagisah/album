@@ -11,7 +11,7 @@ import { existsSync, rmSync } from "fs"
 import { resolve } from "path"
 import { SERVER_EXIT, SERVER_RESTART } from "../constants/constants.js"
 import { Logger } from "../modules/logger/logger.js"
-import { DirStruct, PromiseAll, callPluginWithCatch, isArray, isFunction, isNumber, isPlainObject, isString } from "../utils/utils.js"
+import { DirStruct, PromiseAll, callPluginWithCatch, findEntryPath, isArray, isFunction, isNumber, isPlainObject, isString } from "../utils/utils.js"
 import { createEmptyEnvValue, transformEnvValue } from "./process/env.js"
 import { SSRCompose } from "./types/ssrCompose.type.js"
 
@@ -63,13 +63,14 @@ export class AlbumContext {
         serverManager: null
       }
 
-      const [env, clientConfig, serverConfig, ssrCompose] = await PromiseAll([transformEnvValue(userConfig.env), this.normalizeClientConfig(userConfig.app), this.normalizeServerConfig(userConfig.server), this.normalizeSSRCompose(userConfig.ssrCompose)])
+      const [env, clientConfig, serverConfig] = await PromiseAll([transformEnvValue(userConfig.env), this.normalizeClientConfig(userConfig.app), this.normalizeServerConfig(userConfig.server)])
       this.configs = {
         userConfig,
         clientConfig,
         serverConfig,
-        ssrCompose
+        ssrCompose: null
       }
+      this.configs.ssrCompose = await this.normalizeSSRCompose(userConfig.ssrCompose)
       this.status.env = this.registryEnv(env, clientConfig.env)
       this.inputs = this.buildInputs()
       this.outputs = this.buildOutputs()
@@ -288,26 +289,23 @@ export class AlbumContext {
     }
 
     const _ssrCompose: SSRCompose = {
-      root: ""
+      moduleRoot: "",
+      devModuleRoot: null
     }
 
     const { cwd } = this.inputs
-    if (ssrCompose.root) {
+    const { modulePath } = this.configs.clientConfig.module
+    if (this.mode === "production") {
       if (!isString(ssrCompose.root)) {
         throw "配置错误 config.ssrCompose.root 配置必须是一个字符串"
       }
       if (!existsSync(resolve(cwd, ssrCompose.root))) {
         throw "配置错误 config.ssrCompose.root 指定的 root 根目录不存在"
       }
-      _ssrCompose.root = ssrCompose.root
-    } else {
-      let _path: string
-      if (existsSync((_path = resolve(cwd, "dist")))) {
-      } else if (existsSync((_path = resolve(cwd, ".album")))) {
-      } else {
-        throw "配置错误 config.ssrCompose.root 无法找到满足要求的默认根目录(root)，请手动指定"
-      }
-      _ssrCompose.root = _path
+      _ssrCompose.moduleRoot = ssrCompose.root
+    }
+    if (this.mode === "development") {
+      _ssrCompose.devModuleRoot = resolve(modulePath, "../")
     }
 
     return _ssrCompose

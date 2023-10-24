@@ -1,3 +1,4 @@
 export type SSRCompose = {
-  root: string
+  moduleRoot: string
+  devModuleRoot: string | null
 }

@@ -3,6 +3,11 @@ function createEmptyHook<T>(name: string) {
     throw new Error(`the album-hooks ${name} hasn't been registered`)
   }) as T
 }
+function createEmptyComponent(name: string): any {
+  return function EmptyComponent() {
+    throw new Error(`the album-component ${name} hasn't been registered`)
+  }
+}
 
 export type RouterRoute = {
   name: string
@@ -49,28 +54,33 @@ export let useServerData: <T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>)
 
 export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 
-export function registryHook(name: string, hook: any) {
+export let RemoteAppLoader = createEmptyComponent("RemoteAppLoader")
+
+export function registryHook(name: string, value: any) {
   switch (name) {
     case "useRoutes":
-      useRoutes = hook
+      useRoutes = value
       return true
     case "useRoutesMap":
-      useRoutesMap = hook
+      useRoutesMap = value
       return true
     case "useRouter":
-      useRouter = hook
+      useRouter = value
       return true
     case "useLoader":
-      useLoader = hook
+      useLoader = value
       return true
     case "useServer":
-      useServer = hook
+      useServer = value
       return true
     case "useServerData":
-      useServerData = hook
+      useServerData = value
       return true
     case "useServerRouteData":
-      useServerRouteData = hook
+      useServerRouteData = value
+      return true
+    case "RemoteAppLoader":
+      RemoteAppLoader = value
       return true
   }
   return false

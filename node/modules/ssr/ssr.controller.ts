@@ -3,11 +3,12 @@ import type { Request, Response } from "express"
 import { PluginOnSSREnterParam } from "../../context/AlbumContext.type.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import { AlbumContextService } from "../context/album-context.service.js"
-import type { AlbumSSRRender } from "./ssr.type.js"
+import { SsrComposeController } from "../ssr-compose/ssr-compose.controller.js"
+import type { AlbumSSRRenderOptions } from "./ssr.type.js"
 
 @Controller()
 export class SsrController {
-  ssrRender: AlbumSSRRender
+  ssrRender: (options: AlbumSSRRenderOptions) => Promise<any>
   onSsrRenderError: any
 
   constructor(private context: AlbumContextService) {
@@ -16,9 +17,8 @@ export class SsrController {
 
   @Get("*")
   async ssr(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>) {
-    const ctx = await this.context.getContext()
-    const { logger, plugins, configs } = ctx
-
+    const albumContext = await this.context.getContext()
+    const { logger, plugins, configs } = albumContext
     const { result } = await callPluginWithCatch<PluginOnSSREnterParam>(
       plugins.hooks.onSSREnter,
       {
@@ -27,13 +27,13 @@ export class SsrController {
         result: {
           ssrOptions: { req, res, headers: { ...headers } },
           context: {
-            mode: ctx.mode,
-            serverMode: ctx.serverMode,
+            mode: albumContext.mode,
+            serverMode: albumContext.serverMode,
             logger: logger,
-            viteDevServer: ctx.vite.viteDevServer,
-            inputs: { ...ctx.inputs },
-            outputs: { ...ctx.outputs },
-            ssrCompose: configs.ssrCompose ? { ...ctx.configs.ssrCompose } : null,
+            viteDevServer: albumContext.vite.viteDevServer,
+            inputs: { ...albumContext.inputs },
+            outputs: { ...albumContext.outputs },
+            ssrCompose: configs.ssrCompose ? { ...configs.ssrCompose } : null,
             meta: {}
           }
         }
@@ -42,7 +42,11 @@ export class SsrController {
     )
 
     try {
-      await this.ssrRender(result.ssrOptions, result.context)
+      await this.ssrRender({
+        context: result.context,
+        ssrOptions: result.ssrOptions,
+        ssrComposeOptions: configs.ssrCompose ? SsrComposeController.createSsrComposeOptions(albumContext) : null
+      })
     } catch (e: any) {
       res.status(500).send("服务器错误")
       this.onSsrRenderError(e)

@@ -8,7 +8,7 @@ export type FindEntryPath = {
   exts?: string[]
 }
 
-export async function findEntryPath(props: FindEntryPath) {
+export async function findEntryPath(props: FindEntryPath): Promise<null | string> {
   const { cwd, name, presets = ["./", "src"], exts = [".js", ".mjs"] } = props
   if (exts.length === 0) exts.push("")
   for (const preset of presets) {

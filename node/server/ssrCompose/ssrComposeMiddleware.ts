@@ -6,22 +6,22 @@ import { resolve } from "path"
 import serverStatic from "serve-static"
 import type { AlbumContext } from "../../context/AlbumContext.type.js"
 import type { MiddlewareConfigs } from "../../middlewares/middlewares.type.js"
-import { SsrRemoteModule } from "../../modules/ssr-remote/ssr-remote.module.js"
+import { SsrComposeModule } from "../../modules/ssr-compose/ssr-compose.module.js"
 
 export async function ssrComposeMiddleware(app: INestApplication<any>, midConfigs: MiddlewareConfigs, context: AlbumContext) {
   const { mode, configs } = context
-  const { root } = configs.ssrCompose
+  const { moduleRoot } = configs.ssrCompose
   const composePkgs = new Map<string, any>()
 
   if (mode === "production") {
     midConfigs.get("serve-static").factory = function proxyServerStaticFactory(...configs: any[]) {
       let hasErrorApp = false
-      for (const dirName of readdirSync(root, "utf-8")) {
+      for (const dirName of readdirSync(moduleRoot, "utf-8")) {
         const _dirName = dirName.toLowerCase()
         if (_dirName === "error") hasErrorApp = true
 
-        const clientPath = resolve(root, dirName, "client")
-        const serverPath = resolve(root, dirName, "client")
+        const clientPath = resolve(moduleRoot, dirName, "client")
+        const serverPath = resolve(moduleRoot, dirName, "client")
         composePkgs.set(_dirName, {
           clientPath,
           serverPath,
@@ -48,5 +48,5 @@ export async function ssrComposeMiddleware(app: INestApplication<any>, midConfig
   }
 
   const nestModuleLoader = app.get(LazyModuleLoader)
-  await nestModuleLoader.load(() => SsrRemoteModule)
+  await nestModuleLoader.load(() => SsrComposeModule)
 }

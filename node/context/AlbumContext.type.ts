@@ -10,8 +10,8 @@ export type * from "./types/clientConfig.type.js"
 export type * from "./types/env.type.js"
 export type * from "./types/plugins.type.js"
 export type * from "./types/serverConfig.type.js"
-export type * from "./types/userConfig.type.js"
 export type * from "./types/ssrCompose.type.js"
+export type * from "./types/userConfig.type.js"
 
 export type AppMode = "development" | "production"
 
@@ -39,7 +39,7 @@ export type AppConfigs = {
   clientConfig: ClientConfig
   serverConfig: ServerConfig
   userConfig: UserConfig
-  ssrCompose: SSRCompose | null
+  ssrCompose: null | SSRCompose
 }
 
 export type AppManager = {
