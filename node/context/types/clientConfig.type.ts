@@ -1,4 +1,4 @@
-import type { EnvValue } from "./env.type.js"
+import type { EnvValue } from "../env/env.type.js"
 
 export type ClientConfigModule = {
   moduleName: string

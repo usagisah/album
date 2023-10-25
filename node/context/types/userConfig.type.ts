@@ -31,14 +31,18 @@ export type UserConfigApp = {
 } & CustomConfigApp
 
 export interface CustomUserSSRCompose {}
-export type UserSSRCompose = {
-  root?: string
-} & CustomUserSSRCompose
+export type UserSSRCompose = {} & CustomUserSSRCompose
 
 export interface CustomConfigServer {}
 export type UserConfigServer = {
   port?: number
 } & CustomConfigServer
+
+
+export interface CustomUserStart {}
+export type UserStart = {
+  root?: string
+} & CustomUserStart
 
 export interface CustomConfig {}
 export type UserConfig = {
@@ -49,4 +53,5 @@ export type UserConfig = {
   logger?: ILogger
   plugins?: UserPlugins[]
   vite?: ViteConfig
+  start?: UserStart
 } & CustomConfig

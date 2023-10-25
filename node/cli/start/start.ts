@@ -33,11 +33,6 @@ export async function albumStartServer(params?: AlbumServerParams) {
 
     _logger = logger
 
-    inputs.realSSRInput = await findEntryPath({
-      cwd: outputs.ssrOutDir,
-      name: parse(inputs.ssrInput).name
-    })
-
     const serverApp = await NestFactory.create(AppModule, { logger })
     await processServer(serverApp, context)
     await serverApp.listen(port)
