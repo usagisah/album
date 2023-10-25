@@ -89,28 +89,28 @@ export function registryHook(name: string, value: any) {
 export function registryHookIfAbsent(name: string, value: any) {
   switch (name) {
     case "useRoutes":
-      if(!useRoutes) useRoutes = value
+      if (!useRoutes) useRoutes = value
       return true
     case "useRoutesMap":
-      if(!useRoutesMap) useRoutesMap = value
+      if (!useRoutesMap) useRoutesMap = value
       return true
     case "useRouter":
-      if(!useRouter) useRouter = value
+      if (!useRouter) useRouter = value
       return true
     case "useLoader":
-      if(!useLoader) useLoader = value
+      if (!useLoader) useLoader = value
       return true
     case "useServer":
-      if(!useServer) useServer = value
+      if (!useServer) useServer = value
       return true
     case "useServerData":
-      if(!useServerData) useServerData = value
+      if (!useServerData) useServerData = value
       return true
     case "useServerRouteData":
-      if(!useServerRouteData) useServerRouteData = value
+      if (!useServerRouteData) useServerRouteData = value
       return true
     case "createRemoteAppLoader":
-      if(!createRemoteAppLoader) createRemoteAppLoader = value
+      if (!createRemoteAppLoader) createRemoteAppLoader = value
       return true
   }
   return false

@@ -10,6 +10,8 @@ import type { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SS
 
 @Controller()
 export class SsrComposeController {
+  loadRenderFactory: (prefix: string) => Promise<any>
+
   constructor(private context: AlbumContextService) {
     this.initModule()
   }
@@ -19,25 +21,26 @@ export class SsrComposeController {
     if (!Object.hasOwn(headers, "album-remote-source")) {
       return res.status(404).send({ code: 404, messages: "非法 ssr-remote 资源请求" })
     }
-    if (!this.checkRemoteProps(props)) {
+    if (!checkRemoteProps(props)) {
       return res.status(404).send({ code: 404, messages: "非法 ssr-remote 资源请求" })
     }
 
     const albumContext = await this.context.getContext()
-    const { mode, vite, inputs, logger, serverMode, outputs } = albumContext
-    const { viteDevServer } = vite
+    const { mode, inputs, logger, serverMode, outputs } = albumContext
     const sourcePath = req.path
 
     try {
-      const { renderRemoteComponent } = await viteDevServer.ssrLoadModule(inputs.realSSRComposeInput)
-      if (!renderRemoteComponent) {
-        return res.status(500).send({ code: 500, messages: "服务器错误" })
-      }
+      const { renderRemoteComponent } = await this.loadRenderFactory(req.albumOptions.prefix)
+      if (!renderRemoteComponent) return res.status(404).send({ code: 404, messages: "该服务不支持 ssr-compose" })
+
+      const ssrComposeOptions = createSsrComposeOptions(albumContext)
+      if (!ssrComposeOptions.moduleRoot) return res.status(404).send({ code: 404, messages: "not founded" })
 
       const ssrContextProps: AlbumSSRContextProps = {
         serverDynamicData: {},
         serverRouteData: {},
         ssrSlideProps: {
+          pathname: req.albumOptions.pathname,
           headers,
           inputs,
           logger,
@@ -52,7 +55,7 @@ export class SsrComposeController {
       }
       const ssrComposeContextProps: SSRComposeContextProps = {
         sources: {},
-        ssrComposeOptions: SsrComposeController.createSsrComposeOptions(albumContext),
+        ssrComposeOptions,
         renderRemoteComponent(renderProps) {
           const renderOptions: SSRComposeRenderRemoteComponentOptions = {
             renderProps,
@@ -78,53 +81,64 @@ export class SsrComposeController {
     }
   }
 
-  checkRemoteProps(value: unknown) {
-    if (!isPlainObject(value)) {
-      return false
+  async initModule() {
+    const { serverMode, vite, inputs } = await this.context.getContext()
+    const { realSSRComposeInput, ssrComposeProjectsInput } = inputs
+    const { viteDevServer } = vite
+    if (serverMode === "start") {
+      this.loadRenderFactory = (prefix) => {
+        if (ssrComposeProjectsInput.has(prefix)) return import(ssrComposeProjectsInput.get(prefix).ssrComposeInput)
+        if (ssrComposeProjectsInput.has("error")) return import(ssrComposeProjectsInput.get("error").ssrComposeInput)
+        return Promise.resolve({})
+      }
     }
+    this.loadRenderFactory = () => viteDevServer.ssrLoadModule(realSSRComposeInput)
+  }
+}
 
-    if (!value.props || !isPlainObject(value.props)) {
-      return false
-    }
-
-    return true
+function checkRemoteProps(value: unknown) {
+  if (!isPlainObject(value)) {
+    return false
   }
 
-  static createSsrComposeOptions(ctx: AlbumContext) {
-    const { mode, configs, vite } = ctx
-    const { moduleRoot, devModuleRoot } = configs.ssrCompose
-    const { viteConfig } = vite
-    return {
-      moduleRoot: mode === "production" ? moduleRoot : devModuleRoot,
-      viteComponentBuild: this.createViteComponentBuild(viteConfig)
-    }
+  if (!value.props || !isPlainObject(value.props)) {
+    return false
   }
 
-  static createViteComponentBuild(viteConfig: ViteInlineConfig) {
-    return async function viteComponentBuild({ input, outDir }: any) {
-      const config = mergeConfig(viteConfig, {
-        mode: "development",
-        logLevel: "error",
-        build: {
-          manifest: true,
-          minify: false,
-          cssMinify: false,
-          rollupOptions: {
-            input,
-            external: [/node_modules/]
-          },
-          lib: {
-            entry: input,
-            formats: ["es"],
-            fileName: pathParse(input).name
-          },
-          outDir,
-          cssCodeSplit: false
-        }
-      } as ViteInlineConfig)
-      await viteBuild(config)
-    }
-  }
+  return true
+}
 
-  async initModule() {}
+export function createSsrComposeOptions(ctx: AlbumContext) {
+  const { inputs, vite } = ctx
+  const { viteConfig } = vite
+  return {
+    moduleRoot: inputs.ssrComposeModuleRootInput,
+    viteComponentBuild: createViteComponentBuild(viteConfig)
+  }
+}
+
+function createViteComponentBuild(viteConfig: ViteInlineConfig) {
+  return async function viteComponentBuild({ input, outDir }: any) {
+    const config = mergeConfig(viteConfig, {
+      mode: "development",
+      logLevel: "error",
+      build: {
+        manifest: true,
+        minify: false,
+        cssMinify: false,
+        rollupOptions: {
+          input,
+          external: [/node_modules/]
+        },
+        lib: {
+          entry: input,
+          formats: ["es"],
+          fileName: pathParse(input).name
+        },
+        outDir,
+        cssCodeSplit: false
+      }
+    } as ViteInlineConfig)
+    await viteBuild(config)
+  }
 }

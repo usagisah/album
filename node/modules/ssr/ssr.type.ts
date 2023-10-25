@@ -6,6 +6,7 @@ import type { ILogger } from "../logger/logger.type.js"
 import type { SSRComposeOptions } from "../ssr-compose/ssr-compose.type.js"
 
 export type AlbumSSROptions = {
+  pathname: string | null
   req: Request
   res: Response
   headers: Record<string, string>
@@ -26,6 +27,7 @@ export type ServerDynamicData = Record<string, Record<string, any>>
 
 export type AlbumSSRContextProps = {
   ssrSlideProps: {
+    pathname: string
     req: Request
     headers: Record<string, string>
     mode: AppMode

@@ -3,7 +3,7 @@ import type { Request, Response } from "express"
 import { PluginOnSSREnterParam } from "../../context/AlbumContext.type.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import { AlbumContextService } from "../context/album-context.service.js"
-import { SsrComposeController } from "../ssr-compose/ssr-compose.controller.js"
+import { createSsrComposeOptions } from "../ssr-compose/ssr-compose.controller.js"
 import type { AlbumSSRRenderOptions } from "./ssr.type.js"
 
 @Controller()
@@ -25,7 +25,7 @@ export class SsrController {
         context: new Map(),
         api: plugins.event,
         result: {
-          ssrOptions: { req, res, headers: { ...headers } },
+          ssrOptions: { pathname: req.albumOptions.pathname, req, res, headers: { ...headers } },
           context: {
             mode: albumContext.mode,
             serverMode: albumContext.serverMode,
@@ -45,7 +45,7 @@ export class SsrController {
       await this.ssrRender({
         context: result.context,
         ssrOptions: result.ssrOptions,
-        ssrComposeOptions: configs.ssrCompose ? SsrComposeController.createSsrComposeOptions(albumContext) : null
+        ssrComposeOptions: configs.ssrCompose ? createSsrComposeOptions(albumContext) : null
       })
     } catch (e: any) {
       res.status(500).send("服务器错误")
@@ -55,17 +55,32 @@ export class SsrController {
   }
 
   async initModule() {
-    const ctx = await this.context.getContext()
-    const { viteDevServer } = ctx.vite
-    const { realSSRInput } = ctx.inputs
+    const { mode, vite, inputs, configs } = await this.context.getContext()
+    const { viteDevServer } = vite
+    const { realSSRInput, ssrComposeProjectsInput } = inputs
 
-    if (ctx.mode === "production") {
+    if (!configs.ssrCompose && mode === "production") {
       this.ssrRender = (await import(realSSRInput)).default
       this.onSsrRenderError = () => {}
       return
     }
 
-    if (ctx.mode === "development") {
+    if (configs.ssrCompose && mode === "production") {
+      const errorPage = ssrComposeProjectsInput.get("error")
+      this.ssrRender = async (options: AlbumSSRRenderOptions) => {
+        const { req, res } = options.ssrOptions
+        const { prefix } = req.albumOptions
+        if (!ssrComposeProjectsInput.has(prefix)) {
+          if (errorPage) return import(errorPage.mainServerInput)
+          return res.status(404).send("")
+        }
+        return import(ssrComposeProjectsInput.get(prefix).mainServerInput)
+      }
+      this.onSsrRenderError = () => {}
+      return
+    }
+
+    if (mode === "development") {
       this.ssrRender = async (...params: any[]) => {
         return (await viteDevServer.ssrLoadModule(realSSRInput)).default(...params)
       }

@@ -51,7 +51,7 @@ function prodOptions(context: AlbumContext): MiddlewareConfigs {
           const serverStatic = await import("serve-static")
           const _serverStatic = serverStatic.default.apply(globalThis, config)
           return (req: any, res: any, next: any) => {
-            if (req.url === "/manifest.json") {
+            if (req.path === "/manifest.json") {
               return next()
             }
             return _serverStatic(req, res, next)

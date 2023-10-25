@@ -38,7 +38,6 @@ export type UserConfigServer = {
   port?: number
 } & CustomConfigServer
 
-
 export interface CustomUserStart {}
 export type UserStart = {
   root?: string

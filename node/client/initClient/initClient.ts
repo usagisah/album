@@ -13,7 +13,7 @@ export async function initClient(context: AlbumContext, client: ClientManager) {
     {
       context: new Map(),
       api: plugins.event,
-      specialModules: _specialModules,
+      specialModules: _specialModules
     },
     e => logger.error("PluginSpecialModule", e, "album")
   )

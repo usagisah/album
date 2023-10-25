@@ -109,14 +109,6 @@ export class AlbumContext {
     }
   }
 
-  mountBasicServeInput() {
-    if (this.serverMode !== "start") {
-      const { main, mainSSR } = this.configs.clientConfig
-      this.inputs.clientInput = main
-      this.inputs.ssrInput = mainSSR
-    }
-  }
-
   async loadConfig(): Promise<UserConfig> {
     const entry = resolve(this.inputs.cwd, "album.config.ts")
     if (!existsSync(entry)) return {}
@@ -205,7 +197,7 @@ export class AlbumContext {
       this.inputs.startInput = startInput
       this.inputs.ssrComposeModuleRootInput = startInput
     } else {
-      const targetDir = (this.configs.ssrCompose || this.app !== "default") ? "dist" : this.app
+      const targetDir = this.configs.ssrCompose || this.app !== "default" ? "dist" : this.app
       const distPath = resolve(cwd, targetDir)
       const startInput = existsSync(distPath) ? distPath : cwd
       this.inputs.startInput = startInput
@@ -320,6 +312,8 @@ export class AlbumContext {
 
     _clientConfig.env = conf.env ? await transformEnvValue(conf.env) : createEmptyEnvValue()
     this.configs.clientConfig = _clientConfig
+    this.inputs.clientInput = _clientConfig.main
+    this.inputs.ssrInput = _clientConfig.mainSSR
   }
 
   async normalizeServerConfig(serverConfig: any) {
@@ -347,19 +341,25 @@ export class AlbumContext {
         const { name } = fileInfo
         if (!fileInfo.isDirectory()) continue
 
-        const clientPath = resolve(ssrComposeModuleRootInput, name, "client")
+        const clientInput = resolve(ssrComposeModuleRootInput, name, "client")
         const clientManifestInput = resolve(ssrComposeModuleRootInput, name, "client/manifest.json")
-        const serverPath = resolve(ssrComposeModuleRootInput, name, "server")
-        if (!existsSync(clientPath) || !!existsSync(clientManifestInput) || !existsSync(serverPath)) continue
+        const serverInput = resolve(ssrComposeModuleRootInput, name, "server")
+        if (!existsSync(clientInput) || !!existsSync(clientManifestInput) || !existsSync(serverInput)) continue
 
-        const serverInput = await findEndEntryPath({
-          cwd: ssrComposeModuleRootInput,
-          presets: ["./"],
-          suffixes: ["main.ssr"]
-        })
-        if (!serverInput) continue
-
-        projectInputs.set(name, { clientManifestInput, serverInput })
+        const [mainServerInput, ssrComposeInput] = await Promise.all([
+          findEndEntryPath({
+            cwd: ssrComposeModuleRootInput,
+            presets: ["./"],
+            suffixes: ["main.ssr"]
+          }),
+          findEndEntryPath({
+            cwd: ssrComposeModuleRootInput,
+            presets: ["./"],
+            suffixes: ["ssr-compose"]
+          })
+        ])
+        if (!mainServerInput || !ssrComposeInput) continue
+        projectInputs.set(name.toLowerCase(), { clientInput, clientManifestInput, serverInput, mainServerInput, ssrComposeInput })
       }
       return
     }
@@ -369,6 +369,9 @@ export class AlbumContext {
     if (!isPlainObject(ssrCompose)) {
       throw "配置错误 config.ssrCompose 配置必须是一个对象"
     }
+
+    const modulePath = this.configs.clientConfig.module?.modulePath
+    this.inputs.ssrComposeModuleRootInput = modulePath ? resolve(modulePath, "../") : null
     this.configs.ssrCompose = {}
   }
 

@@ -6,10 +6,11 @@ import { patchClient } from "./patchClient/patchClient.js"
 const pageReg = /\.?(page|router|action)\.[a-z]+$/
 
 export async function processClient(context: AlbumContext) {
-  const { watcher } = context
-  const clientManager: ClientManager = {
-    specialModules: []
-  }
+  const { serverMode, watcher } = context
+
+  if (serverMode === "start") return
+
+  const clientManager: ClientManager = { specialModules: [] }
   await initClient(context, clientManager)
 
   if (context.watcher) {

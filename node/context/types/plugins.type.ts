@@ -6,8 +6,8 @@ import type { AlbumSSRContext, AlbumSSROptions } from "../../modules/ssr/ssr.typ
 import type { DirStruct } from "../../utils/utils.js"
 import type { AlbumContext } from "../AlbumContext.js"
 import type { AppInputs, AppMode, AppStatus, ClientConfig, ClientConfigModule, ClientConfigRouter } from "../AlbumContext.type.js"
-import type { UserConfig, UserConfigApp } from "./userConfig.type.js"
 import { SSRCompose } from "./ssr-compose.type.js"
+import type { UserConfig, UserConfigApp } from "./userConfig.type.js"
 
 export type PluginParamsContext = {
   api: EventEmitter

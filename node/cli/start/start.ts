@@ -1,12 +1,11 @@
 import { NestFactory } from "@nestjs/core"
-import { parse } from "path"
 import { AlbumContext } from "../../context/AlbumContext.js"
 import { PluginContextParam } from "../../context/AlbumContext.type.js"
 import { AppModule } from "../../modules/app/app.module.js"
 import { Logger } from "../../modules/logger/logger.js"
 import type { ILogger } from "../../modules/logger/logger.type.js"
 import { processServer } from "../../server/processServer.js"
-import { callPluginWithCatch, findEntryPath } from "../../utils/utils.js"
+import { callPluginWithCatch } from "../../utils/utils.js"
 import type { AlbumServerParams } from "../cli.type.js"
 import { printLogInfo } from "../helper/printLogInfo.js"
 

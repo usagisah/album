@@ -28,14 +28,12 @@ export async function processServer(app: INestApplication<any>, context: AlbumCo
     e => logger.error("PluginServer", e, "album")
   )
 
-  if (mode === "development") {
+  if (mode !== "production") {
     const s = (vite.viteDevServer = await createServer(viteConfigs))
     app.use(s.middlewares)
   }
 
-  if (configs.ssrCompose) {
-    await ssrComposeMiddleware(app, midConfigs, context)
-  }
+  await ssrComposeMiddleware(app, midConfigs, context)
 
   for (const [name, { config, factory }] of [...midConfigs.entries()]) {
     try {
