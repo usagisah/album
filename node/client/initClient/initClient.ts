@@ -31,8 +31,7 @@ export async function initClient(context: AlbumContext, client: ClientManager) {
       ssrCompose: configs.ssrCompose,
       result: {
         realClientInput: "",
-        realSSRInput: "",
-        realSSRComposeInput: null
+        realSSRInput: ""
       }
     },
     e => logger.error("PluginInitClient", e, "album")
@@ -48,12 +47,6 @@ export async function initClient(context: AlbumContext, client: ClientManager) {
     throw `client 客户端真实指向入口(SSR)不存在(${initClientResult.realSSRInput})`
   } else {
     inputs.realSSRInput = initClientResult.realSSRInput
-  }
-
-  if (configs.ssrCompose && !existsSync(initClientResult.realSSRComposeInput)) {
-    throw `client 客户端真实指向入口(ssrCompose)不存在(${initClientResult.realSSRComposeInput})`
-  } else {
-    inputs.realSSRComposeInput = initClientResult.realSSRComposeInput
   }
 
   client.specialModules = specialModules

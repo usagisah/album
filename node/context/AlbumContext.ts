@@ -1,6 +1,7 @@
 import type { FSWatcher } from "chokidar"
-import { ViteDevServer, UserConfig as ViteUserConfig } from "vite"
+import type { ViteDevServer } from "vite"
 import type { AlBumServerMode } from "../cli/cli.type.js"
+import type { ViteUserConfig } from "../middlewares/middlewares.type.js"
 import type { ILogger } from "../modules/logger/logger.type.js"
 import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, EnvValue, PluginFindEntriesParam, Plugins, ServerConfig, SsrComposeProjectsInput, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
 
@@ -33,7 +34,6 @@ export class AlbumContext {
     ssrInput: null,
     realClientInput: null,
     realSSRInput: null,
-    realSSRComposeInput: null,
 
     // ssr-compose
     ssrComposeModuleRootInput: null,
@@ -342,24 +342,16 @@ export class AlbumContext {
         if (!fileInfo.isDirectory()) continue
 
         const clientInput = resolve(ssrComposeModuleRootInput, name, "client")
-        const clientManifestInput = resolve(ssrComposeModuleRootInput, name, "client/manifest.json")
         const serverInput = resolve(ssrComposeModuleRootInput, name, "server")
-        if (!existsSync(clientInput) || !!existsSync(clientManifestInput) || !existsSync(serverInput)) continue
+        if (!existsSync(clientInput) || !existsSync(serverInput)) continue
 
-        const [mainServerInput, ssrComposeInput] = await Promise.all([
-          findEndEntryPath({
-            cwd: ssrComposeModuleRootInput,
-            presets: ["./"],
-            suffixes: ["main.ssr"]
-          }),
-          findEndEntryPath({
-            cwd: ssrComposeModuleRootInput,
-            presets: ["./"],
-            suffixes: ["ssr-compose"]
-          })
-        ])
-        if (!mainServerInput || !ssrComposeInput) continue
-        projectInputs.set(name.toLowerCase(), { clientInput, clientManifestInput, serverInput, mainServerInput, ssrComposeInput })
+        const mainServerInput = await findEndEntryPath({
+          cwd: ssrComposeModuleRootInput,
+          presets: ["./"],
+          suffixes: ["main.ssr"]
+        })
+        if (!mainServerInput) continue
+        projectInputs.set(name.toLowerCase(), { clientInput, serverInput, mainServerInput })
       }
       return
     }
@@ -389,14 +381,10 @@ export class AlbumContext {
   }
 
   mountOutputs() {
-    const outputs = {
-      clientOutDir: "",
-      ssrOutDir: ""
-    }
-
+    const outputs = { clientOutDir: "", ssrOutDir: "" }
     const { cwd } = this.inputs
-    const targetDir = this.app === "default" ? "dist" : this.app
-    const baseOutDir = resolve(cwd, targetDir)
+    const baseOutDir = resolve(cwd, "dist")
+    const targetDir = this.app === "default" ? "" : this.app
     if (this.status.ssr) {
       outputs.clientOutDir = resolve(baseOutDir, targetDir, "client")
       outputs.ssrOutDir = resolve(baseOutDir, targetDir, "server")

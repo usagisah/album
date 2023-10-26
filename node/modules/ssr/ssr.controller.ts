@@ -55,34 +55,34 @@ export class SsrController {
   }
 
   async initModule() {
-    const { mode, vite, inputs, configs } = await this.context.getContext()
+    const { serverMode, vite, inputs, configs } = await this.context.getContext()
     const { viteDevServer } = vite
     const { realSSRInput, ssrComposeProjectsInput } = inputs
 
-    if (!configs.ssrCompose && mode === "production") {
-      this.ssrRender = (await import(realSSRInput)).default
+    if (!configs.ssrCompose && serverMode === "start") {
+      this.ssrRender = (await import(realSSRInput)).ssrRender
       this.onSsrRenderError = () => {}
       return
     }
 
-    if (configs.ssrCompose && mode === "production") {
+    if (configs.ssrCompose && serverMode === "start") {
       const errorPage = ssrComposeProjectsInput.get("error")
       this.ssrRender = async (options: AlbumSSRRenderOptions) => {
         const { req, res } = options.ssrOptions
         const { prefix } = req.albumOptions
         if (!ssrComposeProjectsInput.has(prefix)) {
-          if (errorPage) return import(errorPage.mainServerInput)
+          if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender
           return res.status(404).send("")
         }
-        return import(ssrComposeProjectsInput.get(prefix).mainServerInput)
+        return (await import(ssrComposeProjectsInput.get(prefix).mainServerInput)).ssrRender
       }
       this.onSsrRenderError = () => {}
       return
     }
 
-    if (mode === "development") {
+    if (serverMode !== "start") {
       this.ssrRender = async (...params: any[]) => {
-        return (await viteDevServer.ssrLoadModule(realSSRInput)).default(...params)
+        return (await viteDevServer.ssrLoadModule(realSSRInput)).ssrRender(...params)
       }
       this.onSsrRenderError = (e: Error) => viteDevServer.ssrFixStacktrace(e)
       return

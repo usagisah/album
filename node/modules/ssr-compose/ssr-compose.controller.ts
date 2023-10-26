@@ -1,12 +1,14 @@
+import type { AlbumContext } from "../../context/AlbumContext.type.js"
+import type { ViteConfig } from "../../middlewares/middlewares.type.js"
+import type { AlbumSSRContextProps } from "../ssr/ssr.type.js"
+import type { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
+
 import { Body, Controller, Headers, Post, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
 import { parse as pathParse } from "path"
-import { mergeConfig, build as viteBuild, type InlineConfig as ViteInlineConfig } from "vite"
-import type { AlbumContext } from "../../context/AlbumContext.type.js"
+import { mergeConfig, build as viteBuild } from "vite"
 import { isPlainObject } from "../../utils/utils.js"
 import { AlbumContextService } from "../context/album-context.service.js"
-import type { AlbumSSRContextProps } from "../ssr/ssr.type.js"
-import type { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
 
 @Controller()
 export class SsrComposeController {
@@ -83,16 +85,23 @@ export class SsrComposeController {
 
   async initModule() {
     const { serverMode, vite, inputs } = await this.context.getContext()
-    const { realSSRComposeInput, ssrComposeProjectsInput } = inputs
+    const { realSSRInput, ssrComposeProjectsInput } = inputs
     const { viteDevServer } = vite
     if (serverMode === "start") {
-      this.loadRenderFactory = (prefix) => {
-        if (ssrComposeProjectsInput.has(prefix)) return import(ssrComposeProjectsInput.get(prefix).ssrComposeInput)
-        if (ssrComposeProjectsInput.has("error")) return import(ssrComposeProjectsInput.get("error").ssrComposeInput)
-        return Promise.resolve({})
-      }
+      return (this.loadRenderFactory = async prefix => {
+        if (ssrComposeProjectsInput.has(prefix)) {
+          return (await import(ssrComposeProjectsInput.get(prefix).serverInput)).renderRemoteComponent
+        }
+        if (ssrComposeProjectsInput.has("error")) {
+          return (await import(ssrComposeProjectsInput.get("error").serverInput)).renderRemoteComponent
+        }
+        return () => ({})
+      })
     }
-    this.loadRenderFactory = () => viteDevServer.ssrLoadModule(realSSRComposeInput)
+
+    this.loadRenderFactory = async () => {
+      return (await viteDevServer.ssrLoadModule(realSSRInput)).renderRemoteComponent
+    }
   }
 }
 
@@ -117,7 +126,7 @@ export function createSsrComposeOptions(ctx: AlbumContext) {
   }
 }
 
-function createViteComponentBuild(viteConfig: ViteInlineConfig) {
+function createViteComponentBuild(viteConfig: ViteConfig) {
   return async function viteComponentBuild({ input, outDir }: any) {
     const config = mergeConfig(viteConfig, {
       mode: "development",
@@ -138,7 +147,7 @@ function createViteComponentBuild(viteConfig: ViteInlineConfig) {
         outDir,
         cssCodeSplit: false
       }
-    } as ViteInlineConfig)
+    } as ViteConfig)
     await viteBuild(config)
   }
 }

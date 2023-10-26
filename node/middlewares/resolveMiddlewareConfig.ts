@@ -6,7 +6,7 @@ import { viteCoreOptions } from "./vite/viteCoreOptions.js"
 import { viteOptimizeOptions } from "./vite/viteOptimizeOptions.js"
 
 export async function resolveMiddlewareConfig(context: AlbumContext, forceClient = false) {
-  const { plugins, mode, status, logger } = context
+  const { plugins, mode, status, logger, vite } = context
   const { midConfigs, viteConfigs } = await callPluginWithCatch<PluginServerConfigParam>(
     plugins.hooks.serverConfig,
     {
@@ -15,7 +15,7 @@ export async function resolveMiddlewareConfig(context: AlbumContext, forceClient
       mode,
       status,
       midConfigs: expressOptimizeConfigs(context),
-      viteConfigs: [viteCoreOptions(context, forceClient), viteOptimizeOptions(context, forceClient)]
+      viteConfigs: [viteCoreOptions(context, forceClient), viteOptimizeOptions(context, forceClient), { name: "userViteConfig", options: vite.viteConfig }]
     },
     e => logger.error("PluginServerConfig", e, "album")
   )

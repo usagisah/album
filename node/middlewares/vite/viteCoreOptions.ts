@@ -1,14 +1,15 @@
 import { readFileSync, writeFileSync } from "fs"
 import { relative, resolve } from "path"
-import { InlineConfig, PluginOption, createLogger, mergeConfig } from "vite"
+import { InlineConfig, PluginOption, createLogger } from "vite"
 import { AlbumContext } from "../../context/AlbumContext.js"
 import { ILogger } from "../../modules/logger/logger.type.js"
-import { ViteConfigs } from "../middlewares.type.js"
+import { PluginViteConfig } from "../middlewares.type.js"
 
-export function viteCoreOptions(context: AlbumContext, forceClient = false): ViteConfigs {
-  const { mode, serverMode, inputs, status, vite, logger } = context
+export function viteCoreOptions(context: AlbumContext, forceClient = false): PluginViteConfig {
+  const { app, mode, serverMode, inputs, status, logger, configs } = context
   const { cwd } = inputs
   const { env } = status
+  const { ssrCompose } = configs
   const [preferConfig, pluginApi] = !forceClient && status.ssr ? ssrOptions(context) : spaOptions(context)
 
   const albumVitePlugin: PluginOption = {
@@ -25,7 +26,8 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Vit
     }
   }
 
-  const baseConfig: InlineConfig = {
+  const options: InlineConfig = {
+    base: ssrCompose ? app : "./",
     root: cwd,
     server: {
       middlewareMode: true,
@@ -45,8 +47,8 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Vit
   }
 
   return {
-    name: "albumCoreOptions",
-    options: mergeConfig(baseConfig, vite.viteConfig)
+    name: "albumCoreConfig",
+    options
   }
 }
 

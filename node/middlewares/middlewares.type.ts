@@ -1,11 +1,12 @@
 import { InlineConfig, UserConfig } from "vite"
 
 export type ViteConfig = InlineConfig
+
 export type ViteUserConfig = UserConfig
 
-export type ViteConfigs = {
+export type PluginViteConfig = {
   name: string
-  options: ViteConfig | ViteUserConfig | InlineConfig | UserConfig
+  options: ViteUserConfig
 }
 
 export type MiddlewareConfigs = Map<string, { config: any[]; factory: (...config: any[]) => any }>

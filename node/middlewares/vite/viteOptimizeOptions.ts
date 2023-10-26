@@ -1,18 +1,19 @@
-import { mergeConfig, splitVendorChunkPlugin, UserConfig } from "vite"
+import type { PluginViteConfig, ViteUserConfig } from "../middlewares.type.js"
+
+import { mergeConfig, splitVendorChunkPlugin } from "vite"
 import viteCompressionPlugin from "vite-plugin-compression"
 import tsconfigPaths from "vite-tsconfig-paths"
 import { AlbumContext } from "../../context/AlbumContext.type.js"
-import { ViteConfigs } from "../middlewares.type.js"
 
-export function viteOptimizeOptions(context: AlbumContext, forceClient: boolean): ViteConfigs {
+export function viteOptimizeOptions(context: AlbumContext, forceClient: boolean): PluginViteConfig {
   const { mode } = context
   return {
-    name: "albumOptimizeOptions",
+    name: "albumOptimizeConfig",
     options: mergeConfig(commonOptions(context, forceClient), mode === "production" ? prodOptions(context, forceClient) : devOptions(context, forceClient))
   }
 }
 
-function commonOptions(context: AlbumContext, forceClient: boolean): UserConfig {
+function commonOptions(context: AlbumContext, forceClient: boolean): ViteUserConfig {
   const { inputs } = context
   return {
     plugins: [splitVendorChunkPlugin(), tsconfigPaths({ root: inputs.cwd })],
@@ -22,13 +23,13 @@ function commonOptions(context: AlbumContext, forceClient: boolean): UserConfig 
   }
 }
 
-function devOptions(context: AlbumContext, forceClient: boolean): UserConfig {
+function devOptions(context: AlbumContext, forceClient: boolean): ViteUserConfig {
   return {}
 }
 
-function prodOptions(context: AlbumContext, forceClient: boolean): UserConfig {
+function prodOptions(context: AlbumContext, forceClient: boolean): ViteUserConfig {
   const { status } = context
-  const config: UserConfig = {
+  const config: ViteUserConfig = {
     plugins: [],
     build: {
       sourcemap: false,

@@ -1,4 +1,4 @@
-import type { UserConfig as ViteConfig } from "vite"
+import type { ViteUserConfig } from "../../middlewares/middlewares.type.js"
 import type { ILogger } from "../../modules/logger/logger.type.js"
 import type { UserPlugins } from "./plugins.type.js"
 
@@ -51,6 +51,6 @@ export type UserConfig = {
   server?: UserConfigServer
   logger?: ILogger
   plugins?: UserPlugins[]
-  vite?: ViteConfig
+  vite?: ViteUserConfig
   start?: UserStart
 } & CustomConfig

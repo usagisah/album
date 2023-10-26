@@ -7,7 +7,7 @@ import { PluginContextParam } from "../../context/AlbumContext.type.js"
 import { resolveMiddlewareConfig } from "../../middlewares/resolveMiddlewareConfig.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import type { AlbumServerParams } from "../cli.type.js"
-import { printLogInfo } from "../helper/printLogInfo.js"
+import { printLogInfo } from "../lib/printLogInfo.js"
 
 export async function albumBuild(params?: AlbumServerParams) {
   const { app = "default" } = params ?? {}
@@ -89,7 +89,7 @@ async function buildSSR(context: AlbumContext) {
   const clientBuildConfig = await resolveMiddlewareConfig(context, true)
 
   await Promise.all([rm(clientOutDir, { force: true, recursive: true }), rm(ssrOutDir, { force: true, recursive: true })])
-  await viteBuild(ssrBuildConfig.viteConfigs)
-  console.log("\n\n")
   await viteBuild(clientBuildConfig.viteConfigs)
+  console.log("\n\n")
+  await viteBuild(ssrBuildConfig.viteConfigs)
 }

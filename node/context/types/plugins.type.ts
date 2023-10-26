@@ -1,7 +1,7 @@
 import type { INestApplication } from "@nestjs/common"
 import type EventEmitter from "events"
 import type { SpecialModule } from "../../client/client.type.js"
-import type { MiddlewareConfigs, ViteConfigs } from "../../middlewares/middlewares.type.js"
+import type { MiddlewareConfigs, PluginViteConfig } from "../../middlewares/middlewares.type.js"
 import type { AlbumSSRContext, AlbumSSROptions } from "../../modules/ssr/ssr.type.js"
 import type { DirStruct } from "../../utils/utils.js"
 import type { AlbumContext } from "../AlbumContext.js"
@@ -53,7 +53,6 @@ export type PluginInitClientParam = {
   result: {
     realClientInput: string
     realSSRInput: string
-    realSSRComposeInput: string | null
   }
 } & PluginParamsContext
 export type PluginInitClient = (param: PluginInitClientParam) => any
@@ -74,7 +73,7 @@ export type PluginServerConfigParam = {
   mode: AppMode
   status: AppStatus
   midConfigs: MiddlewareConfigs
-  viteConfigs: ViteConfigs[]
+  viteConfigs: PluginViteConfig[]
 } & PluginParamsContext
 export type PluginServerConfig = (param: PluginServerConfigParam) => any
 

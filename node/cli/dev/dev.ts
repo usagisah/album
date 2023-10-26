@@ -8,7 +8,8 @@ import type { ILogger } from "../../modules/logger/logger.type.js"
 import { processServer } from "../../server/processServer.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import type { AlbumServerParams } from "../cli.type.js"
-import { printLogInfo } from "../helper/printLogInfo.js"
+import { callSSRServerInit } from "../lib/callSSRServerInit.js"
+import { printLogInfo } from "../lib/printLogInfo.js"
 
 export async function albumDevServer(params?: AlbumServerParams) {
   let { app = "default" } = params ?? {}
@@ -54,6 +55,7 @@ export async function albumDevServer(params?: AlbumServerParams) {
     })
     await processServer(serverApp, context)
     await serverApp.listen(configs.serverConfig.port)
+    await callSSRServerInit(context)
     await printLogInfo({
       type: "onServerStart",
       context,

@@ -30,7 +30,6 @@ export type AppInputs = {
   realClientInput: string
   ssrInput: string
   realSSRInput: string
-  realSSRComposeInput: string
   
   ssrComposeModuleRootInput: string
   ssrComposeProjectsInput: SsrComposeProjectsInput
