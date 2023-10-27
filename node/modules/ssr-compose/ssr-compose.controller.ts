@@ -20,6 +20,7 @@ export class SsrComposeController {
 
   @Post("*")
   async ssrRemoteEntry(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>, @Body() props: any) {
+    debugger
     if (!Object.hasOwn(headers, "album-remote-source")) {
       return res.status(404).send({ code: 404, messages: "非法 ssr-remote 资源请求" })
     }

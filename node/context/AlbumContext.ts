@@ -3,7 +3,7 @@ import type { ViteDevServer } from "vite"
 import type { AlBumServerMode } from "../cli/cli.type.js"
 import type { ViteUserConfig } from "../middlewares/middlewares.type.js"
 import type { ILogger } from "../modules/logger/logger.type.js"
-import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, EnvValue, PluginFindEntriesParam, Plugins, ServerConfig, SsrComposeProjectsInput, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
+import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, PluginFindEntriesParam, Plugins, ServerConfig, SsrComposeProjectsInput, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
 
 import chokidar from "chokidar"
 import { build as esbuild } from "esbuild"
@@ -12,7 +12,7 @@ import { existsSync, readdirSync, rmSync, statSync } from "fs"
 import { resolve } from "path"
 import { SERVER_EXIT, SERVER_RESTART } from "../constants/constants.js"
 import { Logger } from "../modules/logger/logger.js"
-import { DirStruct, PromiseAll, callPluginWithCatch, findEndEntryPath, isArray, isFunction, isNumber, isPlainObject, isString } from "../utils/utils.js"
+import { DirStruct, PromiseAll, callPluginWithCatch, findEndEntryPath, isArray, isBoolean, isFunction, isNumber, isPlainObject, isString } from "../utils/utils.js"
 import { createEmptyEnvValue, transformEnvValue } from "./env/env.js"
 import { StartConfig } from "./types/startConfig.type.js"
 
@@ -86,10 +86,8 @@ export class AlbumContext {
       }
 
       await this.normalizeStartConfig(userConfig.start)
-      const [envConfig] = await PromiseAll([transformEnvValue(userConfig.env), this.normalizeClientConfig(userConfig.app), this.normalizeServerConfig(userConfig.server)])
+      await PromiseAll([this.registryEnv(userConfig.env), this.normalizeClientConfig(userConfig.app), this.normalizeServerConfig(userConfig.server)])
       await this.normalizeSSRCompose(userConfig.ssrCompose)
-
-      this.status.env = this.registryEnv(envConfig, this.configs.clientConfig.env)
       this.mountOutputs()
       this.tryWatcher()
 
@@ -178,7 +176,7 @@ export class AlbumContext {
       throw "配置错误 config.start 配置必须是一个对象"
     }
 
-    const { root } = userStartConfig
+    const { root, ssr } = userStartConfig
     const { cwd } = this.inputs
     if (root) {
       if (!isString(root)) {
@@ -197,12 +195,14 @@ export class AlbumContext {
       this.inputs.startInput = startInput
       this.inputs.ssrComposeModuleRootInput = startInput
     } else {
-      const targetDir = this.configs.ssrCompose || this.app !== "default" ? "dist" : this.app
+      const targetDir = this.configs.ssrCompose || this.app === "default" ? "dist" : this.app
       const distPath = resolve(cwd, targetDir)
       const startInput = existsSync(distPath) ? distPath : cwd
       this.inputs.startInput = startInput
       this.inputs.ssrComposeModuleRootInput = startInput
     }
+
+    this.status.ssr = isBoolean(ssr) ? ssr : false
   }
 
   async normalizeClientConfig(clientConfig: any) {
@@ -344,15 +344,15 @@ export class AlbumContext {
         const clientInput = resolve(ssrComposeModuleRootInput, name, "client")
         const serverInput = resolve(ssrComposeModuleRootInput, name, "server")
         if (!existsSync(clientInput) || !existsSync(serverInput)) continue
-
         const mainServerInput = await findEndEntryPath({
-          cwd: ssrComposeModuleRootInput,
+          cwd: serverInput,
           presets: ["./"],
           suffixes: ["main.ssr"]
         })
         if (!mainServerInput) continue
         projectInputs.set(name.toLowerCase(), { clientInput, serverInput, mainServerInput })
       }
+      this.configs.ssrCompose = {}
       return
     }
 
@@ -367,20 +367,17 @@ export class AlbumContext {
     this.configs.ssrCompose = {}
   }
 
-  registryEnv(env: EnvValue, userEnv: EnvValue) {
-    const _env = {
-      ...env.common,
-      ...userEnv.common,
-      ...env[this.mode],
-      ...userEnv[this.mode]
-    }
+  async registryEnv(envConfig: any) {
+    const env = await transformEnvValue(envConfig)
+    const _env = { ...env.common, ...env[this.mode] }
     for (const key in _env) {
       process.env[key] = env[key]
     }
-    return _env
+    this.status.env = _env
   }
 
   mountOutputs() {
+    if (this.serverMode === "start") return
     const outputs = { clientOutDir: "", ssrOutDir: "" }
     const { cwd } = this.inputs
     const baseOutDir = resolve(cwd, "dist")
@@ -395,10 +392,7 @@ export class AlbumContext {
   }
 
   tryWatcher() {
-    if (!["dev"].includes(this.serverMode)) {
-      return
-    }
-
+    if (!["dev"].includes(this.serverMode)) return
     const modulePath = this.configs.clientConfig.module?.modulePath
     const configPath = resolve(this.inputs.cwd, "album.config.ts")
     const watcher = chokidar.watch([configPath].concat(modulePath ? [modulePath] : []), {

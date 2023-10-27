@@ -71,18 +71,18 @@ export class SsrController {
         const { req, res } = options.ssrOptions
         const { prefix } = req.albumOptions
         if (!ssrComposeProjectsInput.has(prefix)) {
-          if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender
+          if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender(options)
           return res.status(404).send("")
         }
-        return (await import(ssrComposeProjectsInput.get(prefix).mainServerInput)).ssrRender
+        return (await import(ssrComposeProjectsInput.get(prefix).mainServerInput)).ssrRender(options)
       }
       this.onSsrRenderError = () => {}
       return
     }
 
     if (serverMode !== "start") {
-      this.ssrRender = async (...params: any[]) => {
-        return (await viteDevServer.ssrLoadModule(realSSRInput)).ssrRender(...params)
+      this.ssrRender = async options => {
+        return (await viteDevServer.ssrLoadModule(realSSRInput)).ssrRender(options)
       }
       this.onSsrRenderError = (e: Error) => viteDevServer.ssrFixStacktrace(e)
       return

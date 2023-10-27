@@ -25,7 +25,8 @@ export async function ssrComposeMiddleware(app: INestApplication<any>, midConfig
           return next()
         }
 
-        const pathname = url.pathname.slice(prefix.length)
+        let pathname = url.pathname.slice(prefix.length)
+        if (pathname.length === 0) pathname = "/"
         req.albumOptions = { prefix, pathname }
         if (pathname === "/manifest.json") return res.status(404).send("not founded")
         return serverStatic(ssrComposeProjectsInput.get(prefix).clientInput, options)(req, res, next)

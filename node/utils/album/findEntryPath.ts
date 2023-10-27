@@ -34,7 +34,7 @@ export async function findEndEntryPath(props: FindExtEntryPath): Promise<null | 
     for (const file of readdirSync(dirPath, { encoding: "utf-8", withFileTypes: true })) {
       for (const suffix of suffixes) {
         const { name, ext } = pathParse(file.name)
-        if (file.isFile() && (ext.length > 1 ? name.endsWith("." + suffix) : name === suffix)) {
+        if (file.isFile() && ext.length > 1 && (name === suffix || name.endsWith("." + suffix))) {
           return resolve(dirPath, file.name)
         }
       }

@@ -38,9 +38,12 @@ export type UserConfigServer = {
   port?: number
 } & CustomConfigServer
 
+export type UserStartSSR = {}
+
 export interface CustomUserStart {}
 export type UserStart = {
   root?: string
+  ssr?: UserStartSSR
 } & CustomUserStart
 
 export interface CustomConfig {}
