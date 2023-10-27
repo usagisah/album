@@ -27,7 +27,7 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
   }
 
   const options: InlineConfig = {
-    base: ssrCompose ? app : "./",
+    base: serverMode === "start" && ssrCompose ? "/" + app : "./",
     root: cwd,
     server: {
       middlewareMode: true,

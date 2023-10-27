@@ -50,9 +50,9 @@ export let useServerData: <T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>)
 export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 
 export interface CreateRemoteAppLoader {}
-export let createRemoteAppLoader: CreateRemoteAppLoader = () => {
+export let createRemoteAppLoader: CreateRemoteAppLoader = (props: any) => {
   const g: any = globalThis
-  if (g?.window?.__$_album_ssr_compose) return g.window.__$_album_ssr_compose
+  if (g?.window?.__$_album_ssr_compose) return g.window.__$_album_ssr_compose.createRemoteAppLoader(props)
   throw new Error(`the createRemoteAppLoader hasn't been registered`)
 }
 

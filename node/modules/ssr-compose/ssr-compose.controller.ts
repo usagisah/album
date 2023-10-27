@@ -89,19 +89,12 @@ export class SsrComposeController {
     const { viteDevServer } = vite
     if (serverMode === "start") {
       return (this.loadRenderFactory = async prefix => {
-        if (ssrComposeProjectsInput.has(prefix)) {
-          return (await import(ssrComposeProjectsInput.get(prefix).serverInput)).renderRemoteComponent
-        }
-        if (ssrComposeProjectsInput.has("error")) {
-          return (await import(ssrComposeProjectsInput.get("error").serverInput)).renderRemoteComponent
-        }
+        if (ssrComposeProjectsInput.has(prefix)) return await import(ssrComposeProjectsInput.get(prefix).serverInput)
+        if (ssrComposeProjectsInput.has("error")) return await import(ssrComposeProjectsInput.get("error").serverInput)
         return () => ({})
       })
     }
-
-    this.loadRenderFactory = async () => {
-      return (await viteDevServer.ssrLoadModule(realSSRInput)).renderRemoteComponent
-    }
+    this.loadRenderFactory = async () => viteDevServer.ssrLoadModule(realSSRInput)
   }
 }
 
