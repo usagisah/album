@@ -5,7 +5,7 @@ import type { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SS
 
 import { Body, Controller, Headers, Post, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
-import { parse as pathParse } from "path"
+import { parse as pathParse, resolve } from "path"
 import { mergeConfig, build as viteBuild } from "vite"
 import { isPlainObject } from "../../utils/utils.js"
 import { AlbumContextService } from "../context/album-context.service.js"
@@ -20,7 +20,6 @@ export class SsrComposeController {
 
   @Post("*")
   async ssrRemoteEntry(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>, @Body() props: any) {
-    debugger
     if (!Object.hasOwn(headers, "album-remote-source")) {
       return res.status(404).send("")
     }
@@ -111,10 +110,10 @@ function checkRemoteProps(value: unknown) {
 }
 
 export function createSsrComposeOptions(ctx: AlbumContext) {
-  const { inputs, vite } = ctx
+  const { serverMode, inputs, vite, configs } = ctx
   const { viteConfig } = vite
   return {
-    moduleRoot: inputs.ssrComposeModuleRootInput,
+    moduleRoot: serverMode === "start" ? inputs.startInput : resolve(configs.clientConfig.module.modulePath, "../"),
     viteComponentBuild: createViteComponentBuild(viteConfig)
   }
 }

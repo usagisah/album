@@ -36,7 +36,6 @@ export class AlbumContext {
     realSSRInput: null,
 
     // ssr-compose
-    ssrComposeModuleRootInput: null,
     ssrComposeProjectsInput: null
   }
   outputs: AppOutputs = {
@@ -193,13 +192,11 @@ export class AlbumContext {
         throw "配置错误 config.start.root 配置路径不存在"
       }
       this.inputs.startInput = startInput
-      this.inputs.ssrComposeModuleRootInput = startInput
     } else {
       const targetDir = this.configs.ssrCompose || this.app === "default" ? "dist" : this.app
       const distPath = resolve(cwd, targetDir)
       const startInput = existsSync(distPath) ? distPath : cwd
       this.inputs.startInput = startInput
-      this.inputs.ssrComposeModuleRootInput = startInput
     }
 
     this.status.ssr = isBoolean(ssr) ? ssr : false
@@ -248,14 +245,14 @@ export class AlbumContext {
     }
 
     const userRouterConfig = isPlainObject(conf.router) ? conf.router : {}
+    let basename: string = isString(userRouterConfig.basename) ? userRouterConfig.basename : ""
+    if (!basename.startsWith("/")) basename = "/" + basename
     const _clientConfig: ClientConfig = {
       main: "",
       mainSSR: null,
       module: null,
       env: null,
-      router: {
-        basename: isString(userRouterConfig.basename) ? userRouterConfig.basename : ""
-      }
+      router: { basename }
     }
 
     const userConfigModule = conf.module ?? {}
@@ -334,15 +331,20 @@ export class AlbumContext {
   }
 
   async normalizeSSRCompose(ssrCompose: UserSSRCompose) {
+    if (!ssrCompose) return
+    if (!isPlainObject(ssrCompose)) {
+      throw "配置错误 config.ssrCompose 配置必须是一个对象"
+    }
+
     if (this.serverMode === "start") {
-      const { ssrComposeModuleRootInput } = this.inputs
+      const { startInput } = this.inputs
       const projectInputs: SsrComposeProjectsInput = (this.inputs.ssrComposeProjectsInput = new Map())
-      for (const fileInfo of readdirSync(ssrComposeModuleRootInput, { withFileTypes: true })) {
-        const { name } = fileInfo
+      for (const fileInfo of readdirSync(startInput, { withFileTypes: true })) {
         if (!fileInfo.isDirectory()) continue
 
-        const clientInput = resolve(ssrComposeModuleRootInput, name, "client")
-        const serverInput = resolve(ssrComposeModuleRootInput, name, "server")
+        const { name } = fileInfo
+        const clientInput = resolve(startInput, name, "client")
+        const serverInput = resolve(startInput, name, "server")
         if (!existsSync(clientInput) || !existsSync(serverInput)) continue
         const mainServerInput = await findEndEntryPath({
           cwd: serverInput,
@@ -354,17 +356,24 @@ export class AlbumContext {
       }
       this.configs.ssrCompose = {}
       return
+    } else {
+      const { router } = this.configs.clientConfig
+      if (this.app !== "error") router.basename = `/${this.app}${router.basename}`
+      if (router.basename.length > 1 && router.basename.endsWith("/")) router.basename = router.basename.slice(0, -1)
+
+      const modulePath = this.configs.clientConfig.module?.modulePath
+      if (!modulePath) throw "找不到模块级别根目录, ssr-compose 下必须存在合法的模块级别根目录"
+
+      const projectInputs: SsrComposeProjectsInput = (this.inputs.ssrComposeProjectsInput = new Map())
+      const root = resolve(modulePath, "../")
+      for (const fileInfo of readdirSync(root, { withFileTypes: true })) {
+        if (!fileInfo.isDirectory()) continue
+
+        const { name } = fileInfo
+        projectInputs.set(name.toLowerCase(), {} as any)
+      }
+      this.configs.ssrCompose = {}
     }
-
-    if (!ssrCompose) return
-
-    if (!isPlainObject(ssrCompose)) {
-      throw "配置错误 config.ssrCompose 配置必须是一个对象"
-    }
-
-    const modulePath = this.configs.clientConfig.module?.modulePath
-    this.inputs.ssrComposeModuleRootInput = modulePath ? resolve(modulePath, "../") : null
-    this.configs.ssrCompose = {}
   }
 
   async registryEnv(envConfig: any) {

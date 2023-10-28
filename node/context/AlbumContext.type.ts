@@ -31,7 +31,6 @@ export type AppInputs = {
   ssrInput: string
   realSSRInput: string
   
-  ssrComposeModuleRootInput: string
   ssrComposeProjectsInput: SsrComposeProjectsInput
 }
 
