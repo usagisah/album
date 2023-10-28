@@ -27,7 +27,7 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
   }
 
   const options: InlineConfig = {
-    base: serverMode === "start" && ssrCompose ? "/" + app : "./",
+    base: ssrCompose ? "/" + app : "./",
     root: cwd,
     server: {
       middlewareMode: true,
@@ -39,6 +39,9 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
               binaryInterval: 1000,
               useFsEvents: true
             }
+    },
+    define: {
+      __APP_ID__: `"${app}"`
     },
     logLevel: "info",
     customLogger: serverMode === "build" ? null : createViteLogger(logger),

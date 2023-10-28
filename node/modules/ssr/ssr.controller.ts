@@ -25,7 +25,7 @@ export class SsrController {
         context: new Map(),
         api: plugins.event,
         result: {
-          ssrOptions: { pathname: req.albumOptions.pathname, req, res, headers: { ...headers } },
+          ssrOptions: { req, res, headers: { ...headers } },
           context: {
             mode: albumContext.mode,
             serverMode: albumContext.serverMode,

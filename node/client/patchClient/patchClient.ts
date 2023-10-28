@@ -5,7 +5,7 @@ import { ClientManager } from "../client.type.js"
 import { buildSpecialModules } from "../helper/buildSpecialModule.js"
 
 export async function patchClient(context: AlbumContext, client: ClientManager) {
-  const { inputs, plugins, status, configs, logger, manager } = context
+  const { app, serverMode, inputs, plugins, status, configs, logger, manager } = context
 
   const _specialModules = await buildSpecialModules(context)
   const { specialModules } = await callPluginWithCatch<PluginSpecialModuleParam>(
@@ -23,6 +23,8 @@ export async function patchClient(context: AlbumContext, client: ClientManager) 
     {
       context: new Map(),
       api: plugins.event,
+      app,
+      serverMode,
       status,
       clientConfig: configs.clientConfig,
       inputs,

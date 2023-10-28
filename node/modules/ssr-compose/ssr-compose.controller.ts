@@ -22,10 +22,10 @@ export class SsrComposeController {
   async ssrRemoteEntry(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>, @Body() props: any) {
     debugger
     if (!Object.hasOwn(headers, "album-remote-source")) {
-      return res.status(404).send({ code: 404, messages: "非法 ssr-remote 资源请求" })
+      return res.status(404).send("")
     }
     if (!checkRemoteProps(props)) {
-      return res.status(404).send({ code: 404, messages: "非法 ssr-remote 资源请求" })
+      return res.status(404).send("")
     }
 
     const albumContext = await this.context.getContext()
@@ -34,16 +34,15 @@ export class SsrComposeController {
 
     try {
       const { renderRemoteComponent } = await this.loadRenderFactory(req.albumOptions.prefix)
-      if (!renderRemoteComponent) return res.status(404).send({ code: 404, messages: "该服务不支持 ssr-compose" })
+      if (!renderRemoteComponent) return res.status(404).send("")
 
       const ssrComposeOptions = createSsrComposeOptions(albumContext)
-      if (!ssrComposeOptions.moduleRoot) return res.status(404).send({ code: 404, messages: "not founded" })
+      if (!ssrComposeOptions.moduleRoot) return res.status(404).send("")
 
       const ssrContextProps: AlbumSSRContextProps = {
         serverDynamicData: {},
         serverRouteData: {},
         ssrSlideProps: {
-          pathname: req.albumOptions.pathname,
           headers,
           inputs,
           logger,

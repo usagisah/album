@@ -1,12 +1,13 @@
 import type { INestApplication } from "@nestjs/common"
 import type EventEmitter from "events"
+import type { AlBumServerMode } from "../../cli/cli.type.js"
 import type { SpecialModule } from "../../client/client.type.js"
 import type { MiddlewareConfigs, PluginViteConfig } from "../../middlewares/middlewares.type.js"
 import type { AlbumSSRContext, AlbumSSROptions } from "../../modules/ssr/ssr.type.js"
 import type { DirStruct } from "../../utils/utils.js"
 import type { AlbumContext } from "../AlbumContext.js"
 import type { AppInputs, AppMode, AppStatus, ClientConfig, ClientConfigModule, ClientConfigRouter } from "../AlbumContext.type.js"
-import { SSRCompose } from "./ssr-compose.type.js"
+import type { SSRCompose } from "./ssr-compose.type.js"
 import type { UserConfig, UserConfigApp } from "./userConfig.type.js"
 
 export type PluginParamsContext = {
@@ -44,6 +45,8 @@ export type PluginSpecialModule = (param: PluginSpecialModuleParam) => any
 
 // 用于生成客户端文件
 export type PluginInitClientParam = {
+  app: string
+  serverMode: AlBumServerMode
   status: AppStatus
   clientConfig: ClientConfig
   inputs: AppInputs
@@ -59,6 +62,8 @@ export type PluginInitClient = (param: PluginInitClientParam) => any
 
 // 模块发生改变，热更新客户端文件
 export type PluginPatchClientParam = {
+  app: string
+  serverMode: AlBumServerMode
   status: AppStatus
   clientConfig: ClientConfig
   inputs: AppInputs
