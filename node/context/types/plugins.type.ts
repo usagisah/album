@@ -3,7 +3,6 @@ import type EventEmitter from "events"
 import type { AlBumServerMode } from "../../cli/cli.type.js"
 import type { SpecialModule } from "../../client/client.type.js"
 import type { MiddlewareConfigs, PluginViteConfig } from "../../middlewares/middlewares.type.js"
-import type { AlbumSSRContext, AlbumSSROptions } from "../../modules/ssr/ssr.type.js"
 import type { DirStruct } from "../../utils/utils.js"
 import type { AlbumContext } from "../AlbumContext.js"
 import type { AppInputs, AppMode, AppStatus, ClientConfig, ClientConfigModule, ClientConfigRouter } from "../AlbumContext.type.js"
@@ -91,15 +90,8 @@ export type PluginServerParam = {
 } & PluginParamsContext
 export type PluginServer = (param: PluginServerParam) => any
 
-// 进入 ssrController 后，执行 ssrEntry 逻辑前
-// 用于动态混入信息
-export type PluginOnSSREnterParam = {
-  result: {
-    ssrOptions: AlbumSSROptions
-    context: AlbumSSRContext
-  }
-} & PluginParamsContext
-export type PluginOnSSREnter = (param: PluginOnSSREnterParam) => any
+export type PluginBuildEndParam = {} & PluginParamsContext
+export type PluginBuildEnd = (param: PluginBuildEndParam) => any
 
 // 阶段性日志，可以混入信息，也可以阻断打印
 export type PluginOnLogParam =
@@ -134,7 +126,7 @@ export type UserPlugins = {
   patchClient?: PluginPatchClient
   serverConfig?: PluginServerConfig
   server?: PluginServer
-  onSSREnter?: PluginOnSSREnter
+  buildEnd?: PluginBuildEnd
   onStageLog?: PluginOnLog
 }
 

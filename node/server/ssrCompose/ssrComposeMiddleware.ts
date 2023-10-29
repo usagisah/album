@@ -17,16 +17,17 @@ export async function ssrComposeMiddleware(app: INestApplication<any>, midConfig
       return function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
         const { pathname, prefix, url } = normalizeMidRequestOptions(req.path, ssrComposeProjectsInput)
         req.albumOptions = { pathname, prefix }
-
-        if (pathname === "/manifest.json") return res.status(404).send("")
+        if (!ssrComposeProjectsInput.has(prefix) || pathname === "/manifest.json") return res.status(404).send("")
         req.url = url
         return serverStatic(ssrComposeProjectsInput.get(prefix).clientInput, options)(req, res, next)
       }
     }
   } else {
     app.use(function (req: Request, res: Response, next: NextFunction) {
-      const { pathname, prefix } = normalizeMidRequestOptions(req.originalUrl, ssrComposeProjectsInput)
+      const { pathname, prefix, url } = normalizeMidRequestOptions(req.originalUrl, ssrComposeProjectsInput)
       req.albumOptions = { pathname, prefix }
+      if (!ssrComposeProjectsInput.has(prefix)) return res.status(404).send("")
+      req.url = url
       next()
     })
   }

@@ -3,7 +3,7 @@ import { resolve } from "path"
 import { build as viteBuild } from "vite"
 import { processClient } from "../../client/processClient.js"
 import { AlbumContext } from "../../context/AlbumContext.js"
-import { PluginContextParam } from "../../context/AlbumContext.type.js"
+import { PluginBuildEndParam, PluginContextParam } from "../../context/AlbumContext.type.js"
 import { resolveMiddlewareConfig } from "../../middlewares/resolveMiddlewareConfig.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import type { AlbumServerParams } from "../cli.type.js"
@@ -62,6 +62,14 @@ export async function albumBuild(params?: AlbumServerParams) {
     ]
   })
   await (ssr ? buildSSR(context) : buildClient(context))
+  await callPluginWithCatch<PluginBuildEndParam>(
+    plugins.hooks.buildEnd,
+    {
+      context: new Map(),
+      api: plugins.event
+    },
+    e => logger.error("PluginBuildEnd", e, "album")
+  )
   await printLogInfo({
     type: "onBuildEnd",
     context,

@@ -1,14 +1,15 @@
 import type { AlbumContext } from "../../context/AlbumContext.type.js"
 import type { ViteConfig } from "../../middlewares/middlewares.type.js"
-import type { AlbumSSRContextProps } from "../ssr/ssr.type.js"
 import type { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
 
 import { Body, Controller, Headers, Post, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
+import { existsSync } from "fs"
 import { parse as pathParse, resolve } from "path"
 import { mergeConfig, build as viteBuild } from "vite"
 import { isPlainObject } from "../../utils/utils.js"
 import { AlbumContextService } from "../context/album-context.service.js"
+import { createSsrContextOptions } from "../ssr/ssr.controller.js"
 
 @Controller()
 export class SsrComposeController {
@@ -28,51 +29,36 @@ export class SsrComposeController {
     }
 
     const albumContext = await this.context.getContext()
-    const { mode, inputs, logger, serverMode, outputs } = albumContext
-    const sourcePath = req.path
+    const { logger } = albumContext
+    const { prefix, pathname } = req.albumOptions
+    const sourcePath = prefix + pathname
 
     try {
       const { renderRemoteComponent } = await this.loadRenderFactory(req.albumOptions.prefix)
       if (!renderRemoteComponent) return res.status(404).send("")
 
-      const ssrComposeOptions = createSsrComposeOptions(albumContext)
-      if (!ssrComposeOptions.moduleRoot) return res.status(404).send("")
-
-      const ssrContextProps: AlbumSSRContextProps = {
-        serverDynamicData: {},
-        serverRouteData: {},
-        ssrSlideProps: {
-          headers,
-          inputs,
-          logger,
-          meta: {},
-          mode,
-          outputs,
-          params: {},
-          query: req.query,
-          req,
-          serverMode
-        }
+      const ctlOptions = { req, res, headers }
+      const ssrRenderOptions = {
+        serverContext: albumContext,
+        ctlOptions,
+        ssrContextOptions: createSsrContextOptions(ctlOptions, albumContext),
+        ssrComposeOptions: createSsrComposeOptions(albumContext)
       }
       const ssrComposeContextProps: SSRComposeContextProps = {
         sources: {},
-        ssrComposeOptions,
         renderRemoteComponent(renderProps) {
           const renderOptions: SSRComposeRenderRemoteComponentOptions = {
             renderProps,
-            ssrContextProps,
+            ssrRenderOptions,
             ssrComposeContextProps
           }
           return renderRemoteComponent(renderOptions)
         }
       }
       const renderOptions: SSRComposeRenderRemoteComponentOptions = {
-        renderProps: {
-          props,
-          sourcePath
-        },
-        ssrContextProps,
-        ssrComposeContextProps
+        renderProps: { props, sourcePath },
+        ssrComposeContextProps,
+        ssrRenderOptions
       }
       const result: SSRComposeRenderRemoteComponentReturn = await renderRemoteComponent(renderOptions)
       return res.send({ code: 200, messages: "", result })
@@ -110,16 +96,23 @@ function checkRemoteProps(value: unknown) {
 }
 
 export function createSsrComposeOptions(ctx: AlbumContext) {
-  const { serverMode, inputs, vite, configs } = ctx
+  const { serverMode, vite } = ctx
   const { viteConfig } = vite
-  return {
-    moduleRoot: serverMode === "start" ? inputs.startInput : resolve(configs.clientConfig.module.modulePath, "../"),
-    viteComponentBuild: createViteComponentBuild(viteConfig)
-  }
+  return serverMode === "start"
+    ? {
+        viteComponentBuild: () => {
+          throw "viteComponentBuild 只能在开发阶段被调用"
+        },
+        existsProject: createStartExistsProject(ctx)
+      }
+    : {
+        viteComponentBuild: createViteComponentBuild(viteConfig),
+        existsProject: createDevExistsProject(ctx)
+      }
 }
 
 function createViteComponentBuild(viteConfig: ViteConfig) {
-  return async function viteComponentBuild({ input, outDir }: any) {
+  return async ({ input, outDir }: any) => {
     const config = mergeConfig(viteConfig, {
       mode: "development",
       logLevel: "error",
@@ -141,5 +134,31 @@ function createViteComponentBuild(viteConfig: ViteConfig) {
       }
     } as ViteConfig)
     await viteBuild(config)
+  }
+}
+
+function createStartExistsProject(ctx: AlbumContext) {
+  const { inputs } = ctx
+  const { ssrComposeCoordinateInput } = inputs
+  return (prefix: string, sourcePath: string) => {
+    let value = ssrComposeCoordinateInput.get(prefix)
+    if (!value) value = ssrComposeCoordinateInput.get("error")
+    if (!value) return null
+
+    const _value = value.coordinate[sourcePath]
+    if (!_value) return null
+
+    return value
+  }
+}
+
+function createDevExistsProject(ctx: AlbumContext): any {
+  const { inputs, configs } = ctx
+  const { ssrComposeProjectsInput } = inputs
+  const { modulePath } = configs.clientConfig.module
+  return (prefix: string, sourcePath: string) => {
+    if (!ssrComposeProjectsInput.has(prefix)) return null
+    const devFilepath = resolve(modulePath, "../", sourcePath)
+    return existsSync(resolve(devFilepath)) ? { devFilepath } : null
   }
 }

@@ -16,5 +16,5 @@ export function normalizeMidRequestOptions(path: string, ssrComposeProjectsInput
   }
 
   url.pathname = pathname
-  return { pathname, prefix, url: url.toString() }
+  return { pathname, prefix, url: url.toString().slice(placeholderHost.length) }
 }

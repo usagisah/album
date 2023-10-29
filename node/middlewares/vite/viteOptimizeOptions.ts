@@ -51,7 +51,8 @@ function prodOptions(context: AlbumContext, forceClient: boolean): ViteUserConfi
     config.plugins.push(
       (viteCompressionPlugin as any)({
         deleteOriginFile: false,
-        threshold: 10240
+        threshold: 10240,
+        verbose: false
       })
     )
   }

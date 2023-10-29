@@ -1,10 +1,10 @@
-import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
 import type { Request, Response } from "express"
-import { PluginOnSSREnterParam } from "../../context/AlbumContext.type.js"
-import { callPluginWithCatch } from "../../utils/utils.js"
+import type { AlbumContext } from "../../context/AlbumContext.type.js"
+import type { AlbumSSRContextOptions, AlbumSSRRenderOptions, CtlOptions } from "./ssr.type.js"
+
+import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
 import { AlbumContextService } from "../context/album-context.service.js"
 import { createSsrComposeOptions } from "../ssr-compose/ssr-compose.controller.js"
-import type { AlbumSSRRenderOptions } from "./ssr.type.js"
 
 @Controller()
 export class SsrController {
@@ -18,34 +18,15 @@ export class SsrController {
   @Get("*")
   async ssr(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>) {
     const albumContext = await this.context.getContext()
-    const { logger, plugins, configs } = albumContext
-    const { result } = await callPluginWithCatch<PluginOnSSREnterParam>(
-      plugins.hooks.onSSREnter,
-      {
-        context: new Map(),
-        api: plugins.event,
-        result: {
-          ssrOptions: { req, res, headers: { ...headers } },
-          context: {
-            mode: albumContext.mode,
-            serverMode: albumContext.serverMode,
-            logger: logger,
-            viteDevServer: albumContext.vite.viteDevServer,
-            inputs: { ...albumContext.inputs },
-            outputs: { ...albumContext.outputs },
-            ssrCompose: configs.ssrCompose ? { ...configs.ssrCompose } : null,
-            meta: {}
-          }
-        }
-      },
-      e => logger.error("PluginOnSSREnter", e, "album")
-    )
+    const { ssrCompose } = albumContext.configs
 
     try {
+      const ctlOptions = { req, res, headers }
       await this.ssrRender({
-        context: result.context,
-        ssrOptions: result.ssrOptions,
-        ssrComposeOptions: configs.ssrCompose ? createSsrComposeOptions(albumContext) : null
+        serverContext: albumContext,
+        ctlOptions,
+        ssrContextOptions: createSsrContextOptions(ctlOptions, albumContext),
+        ssrComposeOptions: ssrCompose ? createSsrComposeOptions(albumContext) : null
       })
     } catch (e: any) {
       res.status(500).send("服务器错误")
@@ -68,7 +49,7 @@ export class SsrController {
     if (configs.ssrCompose && serverMode === "start") {
       const errorPage = ssrComposeProjectsInput.get("error")
       this.ssrRender = async (options: AlbumSSRRenderOptions) => {
-        const { req, res } = options.ssrOptions
+        const { req, res } = options.ctlOptions
         const { prefix } = req.albumOptions
         if (!ssrComposeProjectsInput.has(prefix)) {
           if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender(options)
@@ -86,6 +67,23 @@ export class SsrController {
       }
       this.onSsrRenderError = (e: Error) => viteDevServer.ssrFixStacktrace(e)
       return
+    }
+  }
+}
+
+export function createSsrContextOptions(ctl: CtlOptions, ctx: AlbumContext): AlbumSSRContextOptions {
+  return {
+    serverDynamicData: {},
+    serverRouteData: {},
+    ssrSlideProps: {
+      req: ctl.req,
+      headers: ctl.req.headers as any,
+      query: ctl.req.query,
+      params: {},
+      mode: ctx.mode,
+      serverMode: ctx.serverMode,
+      inputs: { ...ctx.inputs },
+      logger: ctx.logger
     }
   }
 }

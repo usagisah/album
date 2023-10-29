@@ -1,4 +1,6 @@
+import { SSRComposeCoordinateValue } from "../../../context/AlbumContext.type.js"
+
 export type SSRComposeOptions = {
-  moduleRoot: string
   viteComponentBuild: (props: { input: string; outDir: string }) => Promise<void>
+  existsProject: (prefix: string, sourcePath: string) => SSRComposeCoordinateValue | null
 }

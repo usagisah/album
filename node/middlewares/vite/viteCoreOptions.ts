@@ -27,7 +27,6 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
   }
 
   const options: InlineConfig = {
-    base: ssrCompose ? `/${app}` : "./",
     root: cwd,
     server: {
       middlewareMode: true,
@@ -41,7 +40,8 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
             }
     },
     define: {
-      __APP_ID__: `"${app}"`
+      __app_id__: `"${app}"`,
+      __base__: ssrCompose && serverMode === "start" ? `"${app}"` : "\"\""
     },
     logLevel: "info",
     customLogger: serverMode === "build" ? null : createViteLogger(logger),
@@ -117,6 +117,7 @@ function ssrOptions(context: AlbumContext): [InlineConfig, PluginOption] {
   const devConfig: InlineConfig = {
     appType: "custom",
     build: {
+      ssrManifest: true,
       ssr: true,
       outDir: ssrOutDir,
       rollupOptions: {
@@ -127,6 +128,7 @@ function ssrOptions(context: AlbumContext): [InlineConfig, PluginOption] {
   const prodConfig: InlineConfig = {
     appType: "custom",
     build: {
+      ssrManifest: true,
       ssr: true,
       outDir: ssrOutDir,
       rollupOptions: {

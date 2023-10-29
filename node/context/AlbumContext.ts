@@ -3,12 +3,12 @@ import type { ViteDevServer } from "vite"
 import type { AlBumServerMode } from "../cli/cli.type.js"
 import type { ViteUserConfig } from "../middlewares/middlewares.type.js"
 import type { ILogger } from "../modules/logger/logger.type.js"
-import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, PluginFindEntriesParam, Plugins, ServerConfig, SsrComposeProjectsInput, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
+import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, PluginFindEntriesParam, Plugins, SSRComposeCoordinateInput, ServerConfig, SsrComposeProjectsInput, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
 
 import chokidar from "chokidar"
 import { build as esbuild } from "esbuild"
 import { EventEmitter } from "events"
-import { existsSync, readdirSync, rmSync, statSync } from "fs"
+import { existsSync, readFileSync, readdirSync, rmSync, statSync } from "fs"
 import { resolve } from "path"
 import { SERVER_EXIT, SERVER_RESTART } from "../constants/constants.js"
 import { Logger } from "../modules/logger/logger.js"
@@ -36,7 +36,8 @@ export class AlbumContext {
     realSSRInput: null,
 
     // ssr-compose
-    ssrComposeProjectsInput: null
+    ssrComposeProjectsInput: null,
+    ssrComposeCoordinateInput: null
   }
   outputs: AppOutputs = {
     clientOutDir: null,
@@ -149,7 +150,7 @@ export class AlbumContext {
       patchClient: [],
       serverConfig: [],
       server: [],
-      onSSREnter: [],
+      buildEnd: [],
       onStageLog: []
     }
     const keys = Object.getOwnPropertyNames(_plugins)
@@ -339,6 +340,7 @@ export class AlbumContext {
     if (this.serverMode === "start") {
       const { startInput } = this.inputs
       const projectInputs: SsrComposeProjectsInput = (this.inputs.ssrComposeProjectsInput = new Map())
+      const coordinateInputs: SSRComposeCoordinateInput = (this.inputs.ssrComposeCoordinateInput = new Map())
       for (const fileInfo of readdirSync(startInput, { withFileTypes: true })) {
         if (!fileInfo.isDirectory()) continue
 
@@ -352,8 +354,16 @@ export class AlbumContext {
           suffixes: ["main.ssr"]
         })
         if (!mainServerInput) continue
-        projectInputs.set(name.toLowerCase(), { clientInput, serverInput, mainServerInput })
+
+        const _name = name.toLowerCase()
+        projectInputs.set(_name, { clientInput, serverInput, mainServerInput })
+        coordinateInputs.set(_name, {
+          manifest: JSON.parse(readFileSync(resolve(startInput, name, "client/manifest.json"), "utf-8")),
+          ssrManifest: JSON.parse(readFileSync(resolve(startInput, name, "server/ssr-manifest.json"), "utf-8")),
+          coordinate: JSON.parse(readFileSync(resolve(startInput, name, "coordinate.json"), "utf-8"))
+        })
       }
+
       this.configs.ssrCompose = {}
       return
     } else {
