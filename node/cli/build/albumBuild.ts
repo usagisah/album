@@ -11,7 +11,7 @@ import { printLogInfo } from "../lib/printLogInfo.js"
 
 export async function albumBuild(params?: AlbumServerParams) {
   const { app = "default" } = params ?? {}
-  const [contextErrors, context] = await new AlbumContext(app, "build", "production").normalize()
+  const [contextErrors, context] = await new AlbumContext(app, "build", "production").build()
   const {
     mode,
     status: { ssr },

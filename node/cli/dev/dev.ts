@@ -14,7 +14,7 @@ export async function albumDevServer(params?: AlbumServerParams) {
   let { app = "default" } = params ?? {}
   let _logger: ILogger
   try {
-    const [contextErrors, context] = await new AlbumContext(app, "dev", "development").normalize()
+    const [contextErrors, context] = await new AlbumContext(app, "dev", "development").build()
     const { logger, mode, status, configs, plugins } = context
     for (const e of contextErrors) {
       logger.error(e, "AlbumContext", "album")

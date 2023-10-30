@@ -17,7 +17,6 @@ export type SpecialModule = {
   routeFilePath: string
   files: SpecialModuleFile[]
   children: SpecialModule[]
-  meta: Map<string, any>
 }
 
 export type ClientManager = {

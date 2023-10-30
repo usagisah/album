@@ -36,12 +36,6 @@ export type PluginContextParam = {
 } & PluginParamsContext
 export type PluginContext = (param: PluginContextParam) => any
 
-// 拿到生成完成的约定式模块原结构，用于注入元信息
-export type PluginSpecialModuleParam = {
-  specialModules: SpecialModule[]
-} & PluginParamsContext
-export type PluginSpecialModule = (param: PluginSpecialModuleParam) => any
-
 // 用于生成客户端文件
 export type PluginInitClientParam = {
   app: string
@@ -121,7 +115,6 @@ export type UserPlugins = {
   config?: PluginConfig
   findEntries?: PluginFindEntries
   context?: PluginContext
-  specialModule?: PluginSpecialModule
   initClient?: PluginInitClient
   patchClient?: PluginPatchClient
   serverConfig?: PluginServerConfig

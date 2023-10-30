@@ -39,8 +39,7 @@ async function resolveModules(params: ParseRouterParams) {
     routePath: "",
     routeFilePath: "",
     files: [],
-    children: [],
-    meta: new Map()
+    children: []
   }
 
   const files = await readdir(modulePath, {

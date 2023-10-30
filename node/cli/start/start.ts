@@ -13,7 +13,7 @@ export async function albumStartServer(params?: AlbumServerParams) {
   let { app = "default" } = params ?? {}
   let _logger: ILogger
   try {
-    const [contextErrors, context] = await new AlbumContext(app, "start", "production").normalize()
+    const [contextErrors, context] = await new AlbumContext(app, "start", "production").build()
     const { logger, configs, plugins } = context
     const { port } = configs.serverConfig
     for (const e of contextErrors) {

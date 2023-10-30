@@ -7,7 +7,7 @@ export type UserConfigEnv = {
   common?: (Record<string, string> | string)[]
   production?: (Record<string, string> | string)[]
   development?: (Record<string, string> | string)[]
-}
+} & CustomConfigEnv
 
 export interface CustomUserConfigAppRouter {}
 export type UserConfigAppRouter = {
@@ -31,7 +31,9 @@ export type UserConfigApp = {
 } & CustomConfigApp
 
 export interface CustomUserSSRCompose {}
-export type UserSSRCompose = {} & CustomUserSSRCompose
+export type UserSSRCompose = {
+  dependencies: string[]
+} & CustomUserSSRCompose
 
 export interface CustomConfigServer {}
 export type UserConfigServer = {

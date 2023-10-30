@@ -63,7 +63,7 @@ export class AlbumContext {
   vite: { viteConfig: ViteUserConfig; viteDevServer: ViteDevServer | null } = { viteConfig: null, viteDevServer: null }
   errors: any[] = []
 
-  async normalize(): Promise<[any[], AlbumContext]> {
+  async build(): Promise<[any[], AlbumContext]> {
     try {
       this.mountBasicInputs()
 
@@ -145,7 +145,6 @@ export class AlbumContext {
       config: [],
       findEntries: [],
       context: [],
-      specialModule: [],
       initClient: [],
       patchClient: [],
       serverConfig: [],

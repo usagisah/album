@@ -1,23 +1,13 @@
 import { existsSync } from "fs"
 import { AlbumContext } from "../../context/AlbumContext.js"
-import { PluginInitClientParam, PluginSpecialModuleParam } from "../../context/AlbumContext.type.js"
+import { PluginInitClientParam } from "../../context/AlbumContext.type.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import { ClientManager } from "../client.type.js"
 import { buildSpecialModules } from "../helper/buildSpecialModule.js"
 
 export async function initClient(context: AlbumContext, client: ClientManager) {
   const { app, serverMode, inputs, plugins, status, configs, logger, manager } = context
-  const _specialModules = await buildSpecialModules(context)
-  const { specialModules } = await callPluginWithCatch<PluginSpecialModuleParam>(
-    plugins.hooks.specialModule,
-    {
-      context: new Map(),
-      api: plugins.event,
-      specialModules: _specialModules
-    },
-    e => logger.error("PluginSpecialModule", e, "album")
-  )
-
+  const specialModules = await buildSpecialModules(context)
   const { result: initClientResult } = await callPluginWithCatch<PluginInitClientParam>(
     plugins.hooks.initClient,
     {
