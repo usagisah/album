@@ -32,7 +32,14 @@ export type UserConfigApp = {
 
 export interface CustomUserSSRCompose {}
 export type UserSSRCompose = {
-  dependencies: string[]
+  dependencies?: (
+    | string
+    | {
+        [moduleName: string]: {
+          [subModuleName: string]: {}
+        }
+      }
+  )[]
 } & CustomUserSSRCompose
 
 export interface CustomConfigServer {}

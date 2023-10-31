@@ -3,7 +3,7 @@ import type { ViteDevServer } from "vite"
 import type { AlBumServerMode } from "../cli/cli.type.js"
 import type { ViteUserConfig } from "../middlewares/middlewares.type.js"
 import type { ILogger } from "../modules/logger/logger.type.js"
-import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, PluginFindEntriesParam, Plugins, SSRComposeCoordinateInput, ServerConfig, SsrComposeProjectsInput, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
+import type { AppConfigs, AppInputs, AppManager, AppMode, AppOutputs, AppStatus, ClientConfig, PluginFindEntriesParam, Plugins, SSRComposeCoordinateInput, SSRComposeDependencies, ServerConfig, SsrComposeProjectsInput, UserConfig, UserSSRCompose } from "./AlbumContext.type.js"
 
 import chokidar from "chokidar"
 import { build as esbuild } from "esbuild"
@@ -37,7 +37,8 @@ export class AlbumContext {
 
     // ssr-compose
     ssrComposeProjectsInput: null,
-    ssrComposeCoordinateInput: null
+    ssrComposeCoordinateInput: null,
+    ssrComposeDependencies: null
   }
   outputs: AppOutputs = {
     clientOutDir: null,
@@ -335,11 +336,15 @@ export class AlbumContext {
     if (!isPlainObject(ssrCompose)) {
       throw "配置错误 config.ssrCompose 配置必须是一个对象"
     }
+    if (ssrCompose.dependencies && (isArray(!ssrCompose.dependencies) || ssrCompose.dependencies.filter(v => !isString(v) && !isPlainObject(v)).length > 0)) {
+      throw "配置错误 config.ssrCompose.dependencies 必须是一个字符串数组"
+    }
 
     if (this.serverMode === "start") {
       const { startInput } = this.inputs
       const projectInputs: SsrComposeProjectsInput = (this.inputs.ssrComposeProjectsInput = new Map())
       const coordinateInputs: SSRComposeCoordinateInput = (this.inputs.ssrComposeCoordinateInput = new Map())
+      const dependencies: SSRComposeDependencies = (this.inputs.ssrComposeDependencies = {})
       for (const fileInfo of readdirSync(startInput, { withFileTypes: true })) {
         if (!fileInfo.isDirectory()) continue
 
@@ -354,6 +359,14 @@ export class AlbumContext {
         })
         if (!mainServerInput) continue
 
+        try {
+          const _dependencies = JSON.parse(readFileSync(resolve(startInput, name, ".ssr-compose-dependencies/manifest.json"), "utf-8"))
+          for (const key in _dependencies) {
+            if (Reflect.has(dependencies, key)) continue
+            dependencies[key] = _dependencies[key]
+          }
+        } catch {}
+
         const _name = name.toLowerCase()
         projectInputs.set(_name, { clientInput, serverInput, mainServerInput })
         coordinateInputs.set(_name, {
@@ -362,9 +375,6 @@ export class AlbumContext {
           coordinate: JSON.parse(readFileSync(resolve(startInput, name, "coordinate.json"), "utf-8"))
         })
       }
-
-      this.configs.ssrCompose = {}
-      return
     } else {
       const { router } = this.configs.clientConfig
       if (this.app !== "error") router.basename = `/${this.app}${router.basename}`
@@ -377,12 +387,12 @@ export class AlbumContext {
       const root = resolve(modulePath, "../")
       for (const fileInfo of readdirSync(root, { withFileTypes: true })) {
         if (!fileInfo.isDirectory()) continue
-
         const { name } = fileInfo
         projectInputs.set(name.toLowerCase(), {} as any)
       }
-      this.configs.ssrCompose = {}
     }
+
+    this.configs.ssrCompose = {}
   }
 
   async registryEnv(envConfig: any) {

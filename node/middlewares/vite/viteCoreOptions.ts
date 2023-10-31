@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "fs"
 import { relative, resolve } from "path"
-import { InlineConfig, PluginOption, createLogger } from "vite"
+import { InlineConfig, PluginOption, createLogger, mergeConfig } from "vite"
 import { AlbumContext } from "../../context/AlbumContext.js"
 import { ILogger } from "../../modules/logger/logger.type.js"
 import { PluginViteConfig } from "../middlewares.type.js"
@@ -12,8 +12,8 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
   const { ssrCompose } = configs
   const [preferConfig, pluginApi] = !forceClient && status.ssr ? ssrOptions(context) : spaOptions(context)
 
-  const albumVitePlugin: PluginOption = {
-    name: "album-plugin",
+  const basePlugins: PluginOption = {
+    name: "album:base",
     configResolved(config) {
       Object.assign(config.env, env)
     }
@@ -21,13 +21,20 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
   for (const key of Object.getOwnPropertyNames(pluginApi)) {
     if (key === "name") continue
     const pg = pluginApi[key]
-    albumVitePlugin[key] = (...props: any[]) => {
+    basePlugins[key] = (...props: any[]) => {
       return pg(...props)
     }
   }
 
-  const options: InlineConfig = {
-    base: ssrCompose && serverMode === "build" ? `/${app}` : "/",
+  let base = "/"
+  let defineBase = '""'
+  if (ssrCompose && serverMode === "build") {
+    base = `/${app}`
+    defineBase = `"/${app}"`
+  }
+
+  const baseConfig: InlineConfig = {
+    base,
     root: cwd,
     server: {
       middlewareMode: true,
@@ -42,17 +49,16 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Plu
     },
     define: {
       __app_id__: `"${app}"`,
-      __base__: ssrCompose && serverMode === "build" ? `"/${app}"` : "\"\""
+      __base__: ssrCompose && serverMode === "build" ? `"/${app}"` : '""'
     },
-    logLevel: "info",
+    logLevel: serverMode === "build" ? "error" : "info",
     customLogger: serverMode === "build" ? null : createViteLogger(logger),
-    plugins: [albumVitePlugin],
-    ...preferConfig
+    plugins: [basePlugins]
   }
 
   return {
     name: "albumCoreConfig",
-    options
+    options: mergeConfig(baseConfig, preferConfig)
   }
 }
 

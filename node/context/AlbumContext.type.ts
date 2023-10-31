@@ -2,7 +2,7 @@ import type { ClientManager } from "../client/client.type.js"
 import type { ServerManager } from "../server/server.type.js"
 import type { DirStruct } from "../utils/utils.js"
 import type { ClientConfig, Env, ServerConfig } from "./AlbumContext.type.js"
-import { SSRCompose, SSRComposeCoordinateInput, SsrComposeProjectsInput } from "./types/ssr-compose.type.js"
+import { SSRCompose, SSRComposeCoordinateInput, SSRComposeDependencies, SsrComposeProjectsInput } from "./types/ssr-compose.type.js"
 import { StartConfig } from "./types/startConfig.type.js"
 import { UserConfig } from "./types/userConfig.type.js"
 
@@ -33,6 +33,7 @@ export type AppInputs = {
   
   ssrComposeProjectsInput: SsrComposeProjectsInput
   ssrComposeCoordinateInput: SSRComposeCoordinateInput
+  ssrComposeDependencies: SSRComposeDependencies
 }
 
 export type AppOutputs = {

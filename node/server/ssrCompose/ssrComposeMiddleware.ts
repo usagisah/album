@@ -6,16 +6,26 @@ import type { AlbumContext } from "../../context/AlbumContext.type.js"
 import type { MiddlewareConfigs } from "../../middlewares/middlewares.type.js"
 import { SsrComposeModule } from "../../modules/ssr-compose/ssr-compose.module.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
+import { readFile } from "fs/promises"
 
 export async function ssrComposeMiddleware(app: INestApplication<any>, midConfigs: MiddlewareConfigs, context: AlbumContext) {
   const { mode, inputs } = context
   const { ssrCompose } = context.configs
-  const { ssrComposeProjectsInput } = inputs
+  const { ssrComposeProjectsInput, ssrComposeDependencies } = inputs
 
   if (mode === "production") {
     midConfigs.get("serve-static").factory = function proxyServerStaticFactory(_, options: any) {
-      return function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
-        const { pathname, prefix, url } = normalizeMidRequestOptions(req.path, ssrComposeProjectsInput)
+      return async function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
+        const reqPath = req.path
+        const dependencyInfo = ssrComposeDependencies[reqPath.slice(1)]
+        if (dependencyInfo) {
+          const file = await readFile(dependencyInfo.filepath, "utf-8")
+          res.header("Content-Type", "application/javascript")
+          res.send(file)
+          return
+        }
+
+        const { pathname, prefix, url } = normalizeMidRequestOptions(reqPath, ssrComposeProjectsInput)
         req.albumOptions = { pathname, prefix }
         if (!ssrComposeProjectsInput.has(prefix) || pathname === "/manifest.json") return res.status(404).send("")
         req.url = url

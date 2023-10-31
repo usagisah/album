@@ -16,4 +16,13 @@ export type SSRComposeCoordinateValue = {
   devFilepath?: string
 }
 
+export type SSRComposeDependencies = Record<
+  string,
+  {
+    filename: string
+    filepath: string
+    isCjs?: boolean
+  }
+>
+
 export type SSRComposeCoordinateInput = Map<string, SSRComposeCoordinateValue>
