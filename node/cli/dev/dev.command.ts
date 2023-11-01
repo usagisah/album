@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs"
 import { resolve } from "path"
-import type { AlbumServerParams } from "../cli.type.js"
+import { AlbumServerParams } from "../cli.type.js"
 import { albumDevServer } from "./dev.js"
 
 export class DevCommand {

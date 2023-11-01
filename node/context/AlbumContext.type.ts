@@ -1,7 +1,7 @@
-import type { ClientManager } from "../client/client.type.js"
-import type { ServerManager } from "../server/server.type.js"
-import type { DirStruct } from "../utils/utils.js"
-import type { ClientConfig, Env, ServerConfig } from "./AlbumContext.type.js"
+import { ClientManager } from "../client/client.type.js"
+import { ServerManager } from "../server/server.type.js"
+import { DirStruct } from "../utils/utils.js"
+import { ClientConfig, Env, ServerConfig } from "./AlbumContext.type.js"
 import { SSRCompose, SSRComposeCoordinateInput, SSRComposeDependencies, SsrComposeProjectsInput } from "./types/ssr-compose.type.js"
 import { StartConfig } from "./types/startConfig.type.js"
 import { UserConfig } from "./types/userConfig.type.js"
@@ -30,7 +30,7 @@ export type AppInputs = {
   realClientInput: string
   ssrInput: string
   realSSRInput: string
-  
+
   ssrComposeProjectsInput: SsrComposeProjectsInput
   ssrComposeCoordinateInput: SSRComposeCoordinateInput
   ssrComposeDependencies: SSRComposeDependencies

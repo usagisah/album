@@ -1,6 +1,6 @@
-import type { ViteUserConfig } from "../../middlewares/middlewares.type.js"
-import type { ILogger } from "../../modules/logger/logger.type.js"
-import type { UserPlugins } from "./plugins.type.js"
+import { ViteUserConfig } from "../../middlewares/middlewares.type.js"
+import { ILogger } from "../../modules/logger/logger.type.js"
+import { UserPlugins } from "./plugins.type.js"
 
 export interface CustomConfigEnv {}
 export type UserConfigEnv = {

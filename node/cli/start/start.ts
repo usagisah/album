@@ -3,10 +3,10 @@ import { AlbumContext } from "../../context/AlbumContext.js"
 import { PluginContextParam } from "../../context/AlbumContext.type.js"
 import { AppModule } from "../../modules/app/app.module.js"
 import { Logger } from "../../modules/logger/logger.js"
-import type { ILogger } from "../../modules/logger/logger.type.js"
+import { ILogger } from "../../modules/logger/logger.type.js"
 import { processServer } from "../../server/processServer.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
-import type { AlbumServerParams } from "../cli.type.js"
+import { AlbumServerParams } from "../cli.type.js"
 import { printLogInfo } from "../lib/printLogInfo.js"
 
 export async function albumStartServer(params?: AlbumServerParams) {

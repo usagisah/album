@@ -169,7 +169,10 @@ export function withTransformCjsPlugin(config: ViteConfig, ssrComposeDependencie
         enforce: "post",
         transform(code, id) {
           if (applyFilesReg.test(id)) {
-            return transformSSRComposeImporters(code, external.filter(v => ssrComposeDependencies[v].isCjs))
+            return transformSSRComposeImporters(
+              code,
+              external.filter(v => ssrComposeDependencies[v].isCjs)
+            )
           }
         }
       }

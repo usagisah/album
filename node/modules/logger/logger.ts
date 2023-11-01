@@ -1,4 +1,4 @@
-import type { ILogger } from "./logger.type.js"
+import { ILogger } from "./logger.type.js"
 
 export class Logger implements ILogger {
   color = {

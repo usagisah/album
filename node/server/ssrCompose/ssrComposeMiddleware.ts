@@ -1,12 +1,12 @@
-import type { INestApplication } from "@nestjs/common"
+import { INestApplication } from "@nestjs/common"
 import { LazyModuleLoader } from "@nestjs/core"
-import type { NextFunction, Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
+import { readFile } from "fs/promises"
 import serverStatic from "serve-static"
-import type { AlbumContext } from "../../context/AlbumContext.type.js"
-import type { MiddlewareConfigs } from "../../middlewares/middlewares.type.js"
+import { AlbumContext } from "../../context/AlbumContext.type.js"
+import { MiddlewareConfigs } from "../../middlewares/middlewares.type.js"
 import { SsrComposeModule } from "../../modules/ssr-compose/ssr-compose.module.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
-import { readFile } from "fs/promises"
 
 export async function ssrComposeMiddleware(app: INestApplication<any>, midConfigs: MiddlewareConfigs, context: AlbumContext) {
   const { mode, inputs } = context

@@ -1,5 +1,5 @@
-import type { AlbumSSRContextOptions, ServerDynamicData } from "../../ssr/ssr.type.js"
-import type { SSRComposeContextProps } from "./SSRComposeContextProps.type.js"
+import { AlbumSSRContextOptions, ServerDynamicData } from "../../ssr/ssr.type.js"
+import { SSRComposeContextProps } from "./SSRComposeContextProps.type.js"
 
 export type SSRComposeRenderProps = {
   sourcePath: string

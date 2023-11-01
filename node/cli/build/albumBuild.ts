@@ -1,4 +1,4 @@
-import type { AlbumServerParams } from "../cli.type.js"
+import { AlbumServerParams } from "../cli.type.js"
 
 import { rm } from "fs/promises"
 import { resolve } from "path"

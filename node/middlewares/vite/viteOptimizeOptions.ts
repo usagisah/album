@@ -1,4 +1,4 @@
-import type { PluginViteConfig, ViteUserConfig } from "../middlewares.type.js"
+import { PluginViteConfig, ViteUserConfig } from "../middlewares.type.js"
 
 import { mergeConfig, splitVendorChunkPlugin } from "vite"
 import viteCompressionPlugin from "vite-plugin-compression"

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import type { AlbumContext } from "../../context/AlbumContext.js"
+import { AlbumContext } from "../../context/AlbumContext.js"
 
 @Injectable()
 export class AlbumContextService {

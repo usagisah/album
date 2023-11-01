@@ -1,8 +1,7 @@
-import type { INestApplication } from "@nestjs/common"
-import type { AlbumContext } from "../context/AlbumContext.js"
-
+import { INestApplication } from "@nestjs/common"
 import { LazyModuleLoader } from "@nestjs/core"
 import { createServer } from "vite"
+import { AlbumContext } from "../context/AlbumContext.js"
 import { PluginServerParam } from "../context/AlbumContext.type.js"
 import { resolveMiddlewareConfig } from "../middlewares/resolveMiddlewareConfig.js"
 import { AlbumContextService } from "../modules/context/album-context.service.js"

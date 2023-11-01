@@ -1,6 +1,6 @@
-import type { Request, Response } from "express"
-import type { AlbumContext } from "../../context/AlbumContext.type.js"
-import type { AlbumSSRContextOptions, AlbumSSRRenderOptions, CtlOptions } from "./ssr.type.js"
+import { Request, Response } from "express"
+import { AlbumContext } from "../../context/AlbumContext.type.js"
+import { AlbumSSRContextOptions, AlbumSSRRenderOptions, CtlOptions } from "./ssr.type.js"
 
 import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
 import { AlbumContextService } from "../context/album-context.service.js"

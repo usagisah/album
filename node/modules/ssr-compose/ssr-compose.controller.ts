@@ -1,6 +1,6 @@
-import type { AlbumContext } from "../../context/AlbumContext.type.js"
-import type { ViteConfig } from "../../middlewares/middlewares.type.js"
-import type { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
+import { AlbumContext } from "../../context/AlbumContext.type.js"
+import { ViteConfig } from "../../middlewares/middlewares.type.js"
+import { SSRComposeContextProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
 
 import { Body, Controller, Headers, Post, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"

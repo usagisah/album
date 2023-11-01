@@ -1,6 +1,6 @@
-import type { SSRComposeOptions } from "./SSRComposeOptions.type.js"
-import type { SSRComposeRenderProps, SSRComposeRenderRemoteComponentReturn } from "./SSRComposeRenderRemoteComponent.type.js"
-import type { SSRComposeSources } from "./SSRComposeSources.type.js"
+import { SSRComposeOptions } from "./SSRComposeOptions.type.js"
+import { SSRComposeRenderProps, SSRComposeRenderRemoteComponentReturn } from "./SSRComposeRenderRemoteComponent.type.js"
+import { SSRComposeSources } from "./SSRComposeSources.type.js"
 
 export type SSRComposeContextProps = {
   sources: SSRComposeSources

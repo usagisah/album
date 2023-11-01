@@ -1,8 +1,8 @@
 export type * from "./types/SSRComposeOptions.type.js"
 export type * from "./types/SSRComposeSources.type.js"
 
-import type { AlbumSSRRenderOptions, ServerDynamicData } from "../ssr/ssr.type.js"
-import type { SSRComposeSources } from "./ssr-compose.type.js"
+import { AlbumSSRRenderOptions, ServerDynamicData } from "../ssr/ssr.type.js"
+import { SSRComposeSources } from "./ssr-compose.type.js"
 
 export type SSRComposeRenderProps = {
   sourcePath: string

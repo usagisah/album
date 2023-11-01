@@ -1,4 +1,4 @@
-import type { AlbumServerParams } from "../cli.type.js"
+import { AlbumServerParams } from "../cli.type.js"
 import { albumStartServer } from "./start.js"
 
 export class StartCommand {

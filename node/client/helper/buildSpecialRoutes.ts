@@ -1,7 +1,7 @@
 import { Dirent } from "fs"
 import { readdir } from "fs/promises"
 import { basename, parse as pathParse, resolve } from "path"
-import type { SpecialModule, SpecialModuleFile } from "../client.type.js"
+import { SpecialModule, SpecialModuleFile } from "../client.type.js"
 
 type ParseRouterParams = {
   modulePath: string

@@ -1,4 +1,4 @@
-import type { AlbumContext } from "../../context/AlbumContext.js"
+import { AlbumContext } from "../../context/AlbumContext.js"
 import { PluginPatchClientParam } from "../../context/AlbumContext.type.js"
 import { callPluginWithCatch } from "../../utils/utils.js"
 import { ClientManager } from "../client.type.js"
