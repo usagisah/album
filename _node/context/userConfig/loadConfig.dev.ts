@@ -4,8 +4,10 @@ import { rm } from "fs/promises"
 import { resolve } from "path"
 import { isFunction, isPlainObject } from "../../utils/check/simple.js"
 import { NodeArgs } from "../../utils/command/args.js"
-import { AlbumDevContext, Mode } from "../context.type.js"
+import { Mode } from "../context.type.js"
 import { DevInputs } from "../inputs/inputs.type.js"
+import { checkUserConfig } from "./checkUserConfig.js"
+import { AlbumUserConfig } from "./userConfig.type.js"
 
 export type LoadConfigParams = {
   mode: Mode
@@ -24,7 +26,7 @@ export async function loadDevConfig({ mode, inputs, args }: LoadConfigParams) {
     platform: "node"
   })
 
-  let config: AlbumDevContext | null = null
+  let config: AlbumUserConfig | null = null
   try {
     let exports = (await import(output)).default
     if (isFunction(exports)) exports = exports(mode, args)
@@ -33,5 +35,7 @@ export async function loadDevConfig({ mode, inputs, args }: LoadConfigParams) {
   } finally {
     await rm(output, { force: true, recursive: true })
   }
+
+  if (config) checkUserConfig(config)
   return config
 }

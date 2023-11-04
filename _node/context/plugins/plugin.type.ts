@@ -10,13 +10,12 @@ import { DevInputs } from "../inputs/inputs.type.js"
 import { SSRCompose } from "../ssrCompose/ssrCompose.type.js"
 import { AlbumUserConfig, UserConfigApp } from "../userConfig/userConfig.type.js"
 
-export type PluginParamsContext = {
-  api: EventEmitter
-  context: Map<string, any>
+export type PluginGlobalOptions = {
+  events: EventEmitter
 }
 
 // 修改引用配置文件
-export type PluginConfig = (param: AlbumUserConfig) => any
+export type PluginConfig = (param: { config: AlbumUserConfig } & PluginGlobalOptions) => any
 
 // 查找入口文件
 export type PluginFindEntriesParam = {
@@ -29,13 +28,13 @@ export type PluginFindEntriesParam = {
     appConfig: UserConfigApp
     router: ClientConfigRouter
   }
-} & PluginParamsContext
+} & PluginGlobalOptions
 export type PluginFindEntries = (param: PluginFindEntriesParam) => any
 
 // 修改或读取全局唯一内部上下文
 export type PluginContextParam = {
   albumContext: AlbumDevContext
-} & PluginParamsContext
+} & PluginGlobalOptions
 export type PluginContext = (param: PluginContextParam) => any
 
 // 用于生成客户端文件
@@ -53,7 +52,7 @@ export type PluginInitClientParam = {
     realClientInput: string
     realSSRInput: string
   }
-} & PluginParamsContext
+} & PluginGlobalOptions
 export type PluginInitClient = (param: PluginInitClientParam) => any
 
 // 模块发生改变，热更新客户端文件
@@ -67,7 +66,7 @@ export type PluginPatchClientParam = {
   fileManager: DirStruct
   specialModules: SpecialModule[]
   ssrCompose: SSRCompose | null
-} & PluginParamsContext
+} & PluginGlobalOptions
 export type PluginPatchClient = (param: PluginPatchClientParam) => any
 
 // 这里能拿到内部存在的，中间件、vite 配置、模块，这些内容的 参数、执行函数 进行自定义修改
@@ -77,7 +76,7 @@ export type PluginServerConfigParam = {
   info: AlbumStaticInfo
   midConfigs: MiddlewareConfigs
   viteConfigs: PluginViteConfig[]
-} & PluginParamsContext
+} & PluginGlobalOptions
 export type PluginServerConfig = (param: PluginServerConfigParam) => any
 
 // 可以拿到 app，进行服务器设置
@@ -87,13 +86,13 @@ export type PluginServerParam = {
   env: Env
   info: AlbumStaticInfo
   app: INestApplication
-} & PluginParamsContext
+} & PluginGlobalOptions
 export type PluginServer = (param: PluginServerParam) => any
 
-export type PluginBuildEndParam = {} & PluginParamsContext
+export type PluginBuildEndParam = {} & PluginGlobalOptions
 export type PluginBuildEnd = (param: PluginBuildEndParam) => any
 
-export type AlbumUserPlugins = {
+export type AlbumUserPlugin = {
   name: string
   config?: PluginConfig
   findEntries?: PluginFindEntries
@@ -104,17 +103,3 @@ export type AlbumUserPlugins = {
   server?: PluginServer
   buildEnd?: PluginBuildEnd
 }
-
-export type Plugins = Record<
-  string,
-  {
-    config: PluginConfig
-    findEntries: PluginFindEntries
-    context: PluginContext
-    initClient: PluginInitClient
-    patchClient: PluginPatchClient
-    serverConfig: PluginServerConfig
-    server: PluginServer
-    buildEnd: PluginBuildEnd
-  }
->[]

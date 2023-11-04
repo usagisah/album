@@ -1,5 +1,6 @@
 import { UserConfig } from "vite"
-import { AlbumUserPlugins } from "../plugins/plugin.type.js"
+import { AlbumUserPlugin } from "../plugins/plugin.type.js"
+import { ILogger, LoggerParams } from "../../modules/logger/logger.type.js"
 
 export interface UserConfigEnv {
   common?: (Record<string, string> | string)[]
@@ -18,7 +19,6 @@ export interface UserConfigAppModule {
 
 export interface UserConfigApp {
   id?: any
-  env?: UserConfigEnv
   main?: string
   mainSSR?: string
   module?: UserConfigAppModule
@@ -26,14 +26,7 @@ export interface UserConfigApp {
 }
 
 export interface UserSSRCompose {
-  dependencies?: (
-    | string
-    | {
-        [moduleName: string]: {
-          [subModuleName: string]: {}
-        }
-      }
-  )[]
+  dependencies?: (string | Record<string, Record<string, {}>>)[]
 }
 
 export interface UserConfigServer {
@@ -42,17 +35,22 @@ export interface UserConfigServer {
 
 export interface UserStart {
   root?: string
-  ssr?: {}
+  ssr?: {
+    compose?: boolean
+  }
 }
 
-export interface CustomConfig {}
+export interface UserCustomLogger {
+  type: "custom"
+  logger: ILogger
+}
 export interface AlbumUserConfig {
   env?: UserConfigEnv[]
   app?: UserConfigApp[]
   ssrCompose?: UserSSRCompose
   server?: UserConfigServer
-  logger?: ILogger
-  plugins?: AlbumUserPlugins[]
+  logger?: UserCustomLogger | LoggerParams
+  plugins?: AlbumUserPlugin[]
   vite?: UserConfig
   start?: UserStart
 }

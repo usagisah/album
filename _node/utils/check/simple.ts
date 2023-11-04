@@ -1,3 +1,5 @@
+import { Fun } from "../types/types.js"
+
 export function isPlainObject<T extends Record<string, any> = Record<string, any>>(value: unknown): value is T {
   return Object.prototype.toString.call(value) === "[object Object]"
 }
@@ -13,7 +15,7 @@ export function isBoolean(value: unknown): value is boolean {
 export function isArray<T extends any[] = any>(value: unknown): value is T[] {
   return Array.isArray(value)
 }
-export function isFunction<T = any>(value: unknown): value is T {
+export function isFunction<T extends Fun>(value: unknown): value is T {
   return typeof value === "function"
 }
 export function isSymbol(value: unknown): value is symbol {
