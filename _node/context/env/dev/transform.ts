@@ -1,32 +1,28 @@
 import { build as esbuild } from "esbuild"
 import { resolve } from "path"
-import { isFunction, isPlainObject, isString } from "../../utils/check/simple.js"
-import { EnvValue } from "../_AlbumContext.type.js"
+import { isArray, isFunction, isPlainObject, isString } from "../../../utils/check/simple.js"
+import { createEmptyEnvValue } from "../createEmptyEnvValue.js"
+import { EnvValue } from "../env.type.js"
 
-export function createEmptyEnvValue() {
-  return { common: {}, development: {}, production: {} }
-}
-
-export async function transformEnvValue(env: unknown): Promise<EnvValue> {
+export async function transformEnvValue(cwd: string, env: unknown): Promise<EnvValue> {
   const emptyValue = createEmptyEnvValue()
   if (!env) return emptyValue
 
-  if (Array.isArray(env)) {
+  if (isArray(env)) {
     const common = {}
     const development = {}
     const production = {}
     for (const item of env) {
-      const res = await transformEnvValue(item)
+      const res = await transformEnvValue(cwd, item)
       Object.assign(common, res.common)
       Object.assign(development, res.development)
       Object.assign(production, res.production)
     }
-
     return { common, development, production }
   }
 
   if (isString(env)) {
-    const path = resolve(env)
+    const path = resolve(cwd, env)
     const output = path + ".mjs"
     await esbuild({
       entryPoints: [path],
@@ -34,13 +30,11 @@ export async function transformEnvValue(env: unknown): Promise<EnvValue> {
       platform: "node",
       outfile: output
     })
-    let envValue = emptyValue
+    env = emptyValue
     try {
       let exports = (await import(output)).default
-      envValue = isFunction(exports) ? exports() : exports
-    } catch {
-      envValue = emptyValue
-    }
+      env = isFunction(exports) ? (await exports()) : exports
+    } catch {}
   }
 
   if (isPlainObject(env)) {
@@ -49,6 +43,8 @@ export async function transformEnvValue(env: unknown): Promise<EnvValue> {
       development: toStringObject(env.development),
       production: toStringObject(env.production)
     }
+  } else {
+    env = createEmptyEnvValue()
   }
 
   return emptyValue
@@ -56,11 +52,7 @@ export async function transformEnvValue(env: unknown): Promise<EnvValue> {
 
 function toStringObject(obj: Record<string, unknown>): Record<string, string> {
   const res: Record<string, string> = {}
-
-  if (!isPlainObject(obj)) {
-    return res
-  }
-
+  if (!isPlainObject(obj)) return res
   for (const key of Object.getOwnPropertyNames(obj)) {
     res[key] = obj[key] + ""
   }

@@ -18,7 +18,7 @@ export interface UserConfigAppModule {
 }
 
 export interface UserConfigApp {
-  id?: any
+  id?: string
   main?: string
   mainSSR?: string
   module?: UserConfigAppModule

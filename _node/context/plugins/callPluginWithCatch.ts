@@ -1,4 +1,4 @@
-import { AlbumUserPlugin } from "../../context/context.type.js"
+import { AlbumUserPlugin } from "../context.type.js"
 
 type Keys = keyof Omit<AlbumUserPlugin, "name">
 type GetPluginParams<T> = T extends (params: infer P) => any? P : never

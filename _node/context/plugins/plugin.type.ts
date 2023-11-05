@@ -11,11 +11,17 @@ import { SSRCompose } from "../ssrCompose/ssrCompose.type.js"
 import { AlbumUserConfig, UserConfigApp } from "../userConfig/userConfig.type.js"
 
 export type PluginGlobalOptions = {
+  messages: Map<string, any>
   events: EventEmitter
 }
 
 // 修改引用配置文件
-export type PluginConfig = (param: { config: AlbumUserConfig } & PluginGlobalOptions) => any
+export type PluginConfigParams = {
+  mode: Mode
+  serverMode: ServerMode
+  config: AlbumUserConfig
+} & PluginGlobalOptions
+export type PluginConfig = (param: PluginConfigParams) => any
 
 // 查找入口文件
 export type PluginFindEntriesParam = {

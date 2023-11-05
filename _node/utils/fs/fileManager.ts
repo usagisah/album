@@ -88,9 +88,7 @@ export class DirStruct {
 
   async create(overwrite = false) {
     const exist = existsSync(this.#path)
-    if (!exist) {
-      await mkdir(this.#path)
-    }
+    if (!exist) await mkdir(this.#path)
     if (exist && overwrite) {
       await rm(this.#path, { recursive: true, force: true })
       await mkdir(this.#path)

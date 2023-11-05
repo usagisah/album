@@ -1,7 +1,9 @@
 import { Fun } from "../types/types.js"
 
+const s = Object.prototype.toString
+
 export function isPlainObject<T extends Record<string, any> = Record<string, any>>(value: unknown): value is T {
-  return Object.prototype.toString.call(value) === "[object Object]"
+  return s.call(value) === "[object Object]"
 }
 export function isString(value: unknown): value is string {
   return typeof value === "string"
@@ -31,37 +33,41 @@ export function isNull(value: unknown): value is null {
 }
 
 export function isRegExp(value: unknown): value is RegExp {
-  return Object.prototype.toString.call(value) === "[object RegExp]"
+  return s.call(value) === "[object RegExp]"
 }
 
 export function isDate(value: unknown): value is Date {
-  return Object.prototype.toString.call(value) === "[object Date]"
+  return s.call(value) === "[object Date]"
 }
 
 export function isError(value: unknown): value is Error {
-  return Object.prototype.toString.call(value) === "[object Error]"
+  return s.call(value) === "[object Error]"
 }
 
 export function isStrictEmpty(value: unknown) {
   return value === null || value === undefined || (isString(value) && value.trim() === "") || (isArray(value) && value.length === 0)
 }
 
-export function isEmpty(value: unknown) {
+export function isEmpty(value: unknown): value is null | undefined {
   return value === null || value === undefined
 }
 
-export function isMap<T extends Map<any, any> = Map<any, any>>(value: unknown): value is T {
-  return Object.prototype.toString.call(value) === "[object Map]"
+export function isMap<K = any, V = any>(value: unknown): value is Map<K, V> {
+  return s.call(value) === "[object Map]"
 }
 
-export function isSet<T extends Set<any> = Set<any>>(value: unknown): value is T {
-  return Object.prototype.toString.call(value) === "[object Set]"
+export function isSet<T = any>(value: unknown): value is Set<T> {
+  return s.call(value) === "[object Set]"
 }
 
-export function isWeakMap<T extends WeakMap<any, any> = WeakMap<any, any>>(value: unknown): value is T {
-  return Object.prototype.toString.call(value) === "[object WeakMap]"
+export function isWeakMap<T extends object = Record<string, any>, V = any>(value: unknown): value is WeakMap<T, V> {
+  return s.call(value) === "[object WeakMap]"
 }
 
-export function isWeakSet<T extends WeakSet<any> = WeakSet<any>>(value: unknown): value is T {
-  return Object.prototype.toString.call(value) === "[object WeakSet]"
+export function isWeakSet<T extends object = Record<string, any>>(value: unknown): value is WeakSet<T> {
+  return s.call(value) === "[object WeakSet]"
+}
+
+export function isSameType(v1: unknown, v2: unknown) {
+  return s.call(v1) === s.call(v2)
 }
