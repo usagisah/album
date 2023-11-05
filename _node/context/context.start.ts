@@ -18,15 +18,27 @@ import { createWatcher } from "./watcher/watcher.js"
 export async function createAlbumDevContext(params: CreateContextParams): Promise<AlbumDevContext> {
   let logger: ILogger = console
   try {
-    const { mode, serverMode, args } = params
+    const { appId, mode, serverMode, args } = params
     const inputs = buildDevInputs()
     const userConfig = (await loadConfig({ mode, args, inputs })) ?? ({} as AlbumUserConfig)
     logger = resolveLogger(userConfig.logger)
 
-    const { events, plugins } = normalizePlugins(userConfig.plugins)
-    await callPluginWithCatch("config", plugins, { events, messages: new Map(), mode, serverMode, config: userConfig }, e => logger.error("PluginConfig", e, "album"))
+    const pluginConfig = normalizePlugins(userConfig.plugins)
+    const { events, plugins } = pluginConfig
+    await callPluginWithCatch("config", plugins, { events, messages: new Map(), mode, serverMode, config: userConfig }, logger)
 
-    const [{ appFileManager, dumpFileManager }, env, clientConfig, serverConfig] = await waitPromiseAll([createFileManager(inputs), registryEnv(serverMode, inputs, userConfig.env), createClientConfig(inputs, userConfig.app), createServerConfig(userConfig.server)])
+    const [{ appFileManager, dumpFileManager }, env, clientConfig, serverConfig] = await waitPromiseAll([
+      createFileManager(inputs),
+      registryEnv(serverMode, inputs, userConfig.env),
+      createClientConfig({
+        appId,
+        inputs,
+        logger,
+        pluginConfig,
+        conf: userConfig.app
+      }),
+      createServerConfig(userConfig.server)
+    ])
     const ssrComposeConfig = await createSSRComposeConfig()
     const outputs = buildOutputs()
     const watcher = createWatcher(inputs, clientConfig)
@@ -34,20 +46,18 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
       info: {
         mode,
         serverMode,
-        ssr: !!clientConfig.mainSSR,
+        ssr: !!clientConfig.mainSSRInput,
         inputs,
         outputs,
         env
       },
+      logger,
       watcher,
-      plugin: {
-        events,
-        plugins
-      },
 
       appFileManager,
       dumpFileManager,
 
+      pluginConfig,
       clientConfig,
       serverConfig,
       ssrComposeConfig,

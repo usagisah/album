@@ -1,6 +1,6 @@
 import { UserConfig } from "vite"
-import { AlbumUserPlugin } from "../plugins/plugin.type.js"
 import { ILogger, LoggerParams } from "../../modules/logger/logger.type.js"
+import { AlbumUserPlugin } from "../plugins/plugin.type.js"
 
 export interface UserConfigEnv {
   common?: (Record<string, string> | string)[]
@@ -22,7 +22,7 @@ export interface UserConfigApp {
   main?: string
   mainSSR?: string
   module?: UserConfigAppModule
-  router?: UserConfigAppModule
+  router?: UserConfigAppRouter
 }
 
 export interface UserSSRCompose {

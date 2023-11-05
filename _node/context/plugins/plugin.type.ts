@@ -3,11 +3,11 @@ import EventEmitter from "events"
 import { ServerMode } from "../../cli/cli.type.js"
 import { SpecialModule } from "../../client/client.type.js"
 import { MiddlewareConfigs, PluginViteConfig } from "../../middlewares/middlewares.type.js"
+import { SSRComposeDevConfig } from "../../ssrCompose/ssrCompose.type.js"
 import { DirStruct } from "../../utils/fs/fileManager.js"
-import { AlbumDevContext, AlbumStaticInfo, ClientConfig, ClientConfigModule, ClientConfigRouter, Mode } from "../context.type.js"
+import { AlbumDevContext, AlbumStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context.type.js"
 import { Env } from "../env/env.type.js"
 import { DevInputs } from "../inputs/inputs.type.js"
-import { SSRCompose } from "../ssrCompose/ssrCompose.type.js"
 import { AlbumUserConfig, UserConfigApp } from "../userConfig/userConfig.type.js"
 
 export type PluginGlobalOptions = {
@@ -26,13 +26,13 @@ export type PluginConfig = (param: PluginConfigParams) => any
 // 查找入口文件
 export type PluginFindEntriesParam = {
   inputs: DevInputs
-  app: INestApplication
+  appId: string
   result: {
-    main: string
-    mainSSR: string
-    module: ClientConfigModule
+    main?: string
+    mainSSR?: string
+    module?: UserConfigAppModule
+    router?: UserConfigAppRouter
     appConfig: UserConfigApp
-    router: ClientConfigRouter
   }
 } & PluginGlobalOptions
 export type PluginFindEntries = (param: PluginFindEntriesParam) => any
@@ -53,7 +53,7 @@ export type PluginInitClientParam = {
   inputs: DevInputs
   fileManager: DirStruct
   specialModules: SpecialModule[]
-  ssrCompose: SSRCompose | null
+  ssrComposeConfig: SSRComposeDevConfig | null
   result: {
     realClientInput: string
     realSSRInput: string
@@ -71,7 +71,7 @@ export type PluginPatchClientParam = {
   inputs: DevInputs
   fileManager: DirStruct
   specialModules: SpecialModule[]
-  ssrCompose: SSRCompose | null
+  ssrComposeConfig: SSRComposeDevConfig | null
 } & PluginGlobalOptions
 export type PluginPatchClient = (param: PluginPatchClientParam) => any
 

@@ -1,66 +1,31 @@
 import { NestFactory } from "@nestjs/core"
-import { processClient } from "../../client/processClient.js"
-import { AlbumContext } from "../../context/_AlbumContext.js"
-import { PluginContextParam } from "../../context/_AlbumContext.type.js"
+import { createAlbumDevContext } from "../../context/context.dev.js"
+import { callPluginWithCatch } from "../../context/plugins/callPluginWithCatch.js"
 import { AppModule } from "../../modules/app/app.module.js"
-import { Logger } from "../../modules/logger/logger.js"
 import { ILogger } from "../../modules/logger/logger.type.js"
-import { processServer } from "../../server/processServer.js"
-import { callPluginWithCatch } from "../../utils/utils.js"
-import { AlbumServerParams } from "../cli.type.js"
-import { printLogInfo } from "../lib/printLogInfo.js"
+import { DevServerParams } from "../cli.type.js"
 
-export async function albumDevServer(params?: AlbumServerParams) {
-  let { app = "default" } = params ?? {}
-  let _logger: ILogger
+export async function albumDevServer(params: DevServerParams) {
+  let { appId = "default", args } = params ?? {}
+  let _logger: ILogger = console
   try {
-    const [contextErrors, context] = await new AlbumContext(app, "dev", "development").build()
-    const { logger, mode, status, configs, plugins } = context
-    for (const e of contextErrors) {
-      logger.error(e, "AlbumContext", "album")
-    }
-
-    await callPluginWithCatch<PluginContextParam>(
-      plugins.hooks.context,
-      {
-        context: new Map(),
-        api: plugins.event,
-        albumContext: context
-      },
-      e => logger.error("PluginContext", e, "album")
-    )
-    await printLogInfo({
-      type: "useConfig",
-      context,
-      messages: [
-        [
-          "dev config:",
-          {
-            app,
-            mode,
-            ssr: status.ssr,
-            router: { ...configs.clientConfig.router }
-          },
-          "album"
-        ]
-      ]
-    })
-
+    const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "dev" })
+    const { logger, info, pluginConfig, serverConfig } = context
+    const { plugins, events } = pluginConfig
+    const { mode, serverMode, ssr, ssrCompose } = info
+    const { port } = serverConfig
     _logger = logger
+
+    await callPluginWithCatch("context", plugins, { messages: new Map(), events, albumContext: context }, logger)
     await processClient(context)
-    const serverApp = await NestFactory.create(AppModule, {
-      logger,
-      cors: mode !== "production"
-    })
+    const serverApp = await NestFactory.create(AppModule, { logger, cors: true })
     await processServer(serverApp, context)
-    await serverApp.listen(configs.serverConfig.port)
-    await printLogInfo({
-      type: "onServerStart",
-      context,
-      messages: [[`listen port: http://localhost:${configs.serverConfig.port}`, "album"]]
-    })
+
+    logger.log(`dev config: `, { appId, mode, serverMode, ssr, ssrCompose }, "album")
+    await serverApp.listen(port)
+    logger.log(`listen port: http://localhost:${port}`, "album")
   } catch (e: any) {
-    ;(_logger ?? new Logger()).error(e, "album")
+    _logger.error(e, "album")
     throw e
   }
 }

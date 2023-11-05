@@ -33,7 +33,7 @@ export async function transformEnvValue(cwd: string, env: unknown): Promise<EnvV
     env = emptyValue
     try {
       let exports = (await import(output)).default
-      env = isFunction(exports) ? (await exports()) : exports
+      env = isFunction(exports) ? await exports() : exports
     } catch {}
   }
 

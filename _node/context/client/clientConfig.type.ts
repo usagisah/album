@@ -1,7 +1,5 @@
-import { EnvValue } from "../env/env.type.js"
-
 export type ClientConfigModule = {
-  moduleName: string
+  moduleName: string | null
   modulePath: string
 }
 
@@ -10,10 +8,8 @@ export type ClientConfigRouter = {
 }
 
 export type ClientConfig = {
-  main: string
-  mainSSR: string | null
-  module: ClientConfigModule
-  env: EnvValue
+  mainInput: string
+  mainSSRInput: string | null
+  module: ClientConfigModule | null
   router: ClientConfigRouter
-  [x: string]: any
 }

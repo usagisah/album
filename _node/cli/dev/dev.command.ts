@@ -1,12 +1,12 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs"
 import { resolve } from "path"
-import { AlbumServerParams } from "../cli.type.js"
+import { DevServerParams } from "../cli.type.js"
 import { albumDevServer } from "./dev.js"
 
 export class DevCommand {
   cwd = process.cwd()
 
-  constructor(public params: AlbumServerParams) {
+  constructor(public params: DevServerParams) {
     this.start()
   }
 
@@ -24,9 +24,9 @@ export class DevCommand {
   }
 
   async createPlaceholderEntry() {
-    const { app } = this.params
+    const { appId, args } = this.params
     const entry = resolve(this.cwd, "album.bootStrap.js")
-    writeFileSync(entry, `import { devServerBootStrap } from "album/cli";\ndevServerBootStrap({ app: "${app}" });`, "utf-8")
+    writeFileSync(entry, `import { devServerBootStrap } from "album/cli";\ndevServerBootStrap({ appId: "${appId}", args: ${JSON.stringify(args)} });`, "utf-8")
   }
 }
 
