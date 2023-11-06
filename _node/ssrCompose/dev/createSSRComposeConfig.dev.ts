@@ -9,7 +9,7 @@ type SSRComposeConfigParams = {
   clientConfig: ClientConfig
 }
 
-export async function createSSRComposeConfig({ appId, ssrCompose, clientConfig }: SSRComposeConfigParams): Promise<SSRComposeDevConfig | null> {
+export async function createSSRComposeDevConfig({ appId, ssrCompose, clientConfig }: SSRComposeConfigParams): Promise<SSRComposeDevConfig | null> {
   if (!ssrCompose) return null
 
   const { router, module } = clientConfig

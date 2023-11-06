@@ -1,5 +1,6 @@
 import { FSWatcher } from "chokidar"
 import EventEmitter from "events"
+import { ViteDevServer } from "vite"
 import { ServerMode } from "../cli/cli.type.js"
 import { ClientManager } from "../client/client.type.js"
 import { ILogger } from "../modules/logger/logger.type.js"
@@ -59,6 +60,8 @@ export type AlbumDevContext = {
   clientManager: ClientManager | null
   serverManager: ServerManager | null
   ssrComposeManager: null
+
+  viteDevServer: ViteDevServer | null
 }
 
 export type CreateContextParams = {

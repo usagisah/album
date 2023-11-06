@@ -1,6 +1,6 @@
 import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
-import { createSSRComposeConfig } from "../ssrCompose/dev/createSSRComposeConfig.js"
+import { createSSRComposeDevConfig } from "../ssrCompose/dev/createSSRComposeConfig.dev.js"
 import { waitPromiseAll } from "../utils/promises/waitPromiseAll.js"
 import { createClientConfig } from "./client/clientConfig.js"
 import { AlbumDevContext, AlbumStaticInfo, CreateContextParams } from "./context.type.js"
@@ -40,7 +40,7 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
       }),
       createServerConfig(userConfig.server)
     ])
-    const ssrComposeConfig = await createSSRComposeConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
+    const ssrComposeConfig = await createSSRComposeDevConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
     const ssr = !!clientConfig.mainSSRInput
     const info: AlbumStaticInfo = {
       appId,
@@ -69,7 +69,9 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
 
       clientManager: null,
       serverManager: null,
-      ssrComposeManager: null
+      ssrComposeManager: null,
+
+      viteDevServer: null
     }
   } catch (e) {
     logger.error(e, "album")

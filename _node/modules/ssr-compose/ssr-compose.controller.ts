@@ -12,7 +12,7 @@ import { AlbumContextService } from "../context/album-context.service.js"
 import { createSsrContextOptions } from "../ssr/ssr.controller.js"
 
 @Controller()
-export class SsrComposeController {
+export class SSRComposeController {
   loadRenderFactory: (prefix: string) => Promise<any>
 
   constructor(private context: AlbumContextService) {

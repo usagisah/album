@@ -1,6 +1,6 @@
 import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
-import { createSSRComposeConfig } from "../ssrCompose/dev/createSSRComposeConfig.js"
+import { createSSRComposeConfig } from "../ssrCompose/dev/createSSRComposeConfig.dev.js"
 import { waitPromiseAll } from "../utils/promises/waitPromiseAll.js"
 import { createClientConfig } from "./client/clientConfig.js"
 import { AlbumDevContext, CreateContextParams } from "./context.type.js"

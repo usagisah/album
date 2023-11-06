@@ -1,72 +1,74 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs"
+import { existsSync, readFileSync, writeFileSync } from "fs"
+import { mkdir, rm } from "fs/promises"
 import { basename, parse, resolve } from "path"
 import { Package, exports } from "resolve.exports"
 import { build as viteBuild } from "vite"
-import { AlbumContext, SSRComposeDependencies } from "../../context/_AlbumContext.type.js"
-import { isString } from "../../utils/utils.js"
+import { AlbumDevContext } from "../../context/context.type.js"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
+import { isString } from "../../utils/check/simple.js"
 import { analysisCjsModule } from "./analysisCjsModule.js"
 
 type DependenciesList = {
+  params: { moduleName: string; subModuleName: string; fullModuleName: string }[]
   external: string[]
-  props: { moduleName: string; subModuleName: string; fullModuleName: string }[]
   outDir: string
-  context: AlbumContext
+  context: AlbumDevContext
 }
 
-export async function buildSSRComposeDependencies(context: AlbumContext) {
-  const { dependencies } = context.configs.userConfig?.ssrCompose
-  if (!dependencies) return
-
-  const { inputs, outputs } = context
+export async function buildSSRComposeDependencies(context: AlbumDevContext) {
+  const dependencies = context.userConfig!.ssrCompose!.dependencies!
+  const { inputs, outputs } = context.info
   const { ssrOutDir } = outputs
-  const ssrComposeDependencies: SSRComposeDependencies = (inputs.ssrComposeDependencies = {})
-  const outDir = resolve(ssrOutDir, "../.ssr-compose-dependencies")
-  rmSync(outDir, { force: true, recursive: true })
-  mkdirSync(outDir, { recursive: true })
+  const ssrComposeDependencies: SSRComposeDependencies = {}
+  const outDir = resolve(ssrOutDir!, "../.ssr-compose-dependencies")
 
-  const list: DependenciesList = {
-    external: [],
-    props: [],
-    context,
-    outDir
-  }
+  await rm(outDir, { force: true, recursive: true })
+  await mkdir(outDir, { recursive: true })
+
+  const list: DependenciesList = { external: [], params: [], context, outDir }
+  const existed = (d: string) => list.external.some(v => v === d)
   for (const item of dependencies) {
     if (isString(item)) {
+      if (existed(item)) continue
+
       list.external.push(item)
-      list.props.push({ moduleName: item, subModuleName: "", fullModuleName: item })
+      list.params.push({ moduleName: item, subModuleName: "", fullModuleName: item })
     } else {
       for (const moduleName of Object.getOwnPropertyNames(item)) {
         for (const subModuleName of Object.getOwnPropertyNames(item[moduleName])) {
           const fullModuleName = moduleName + "/" + subModuleName
+          if (existed(fullModuleName)) continue
+
           list.external.push(fullModuleName)
-          list.props.push({ moduleName, subModuleName: "/" + subModuleName, fullModuleName })
+          list.params.push({ moduleName, subModuleName: "/" + subModuleName, fullModuleName })
         }
       }
     }
   }
 
-  await Promise.all(list.props.map(async (_, index) => buildDependency(list, index)))
+  await Promise.all(list.params.map(async (_, index) => buildDependency(list, index, ssrComposeDependencies)))
   writeFileSync(resolve(outDir, "manifest.json"), JSON.stringify(ssrComposeDependencies), "utf-8")
 }
 
 function findExports(pkg: Package, module: string) {
-  let value: string
+  let value: string | undefined
   try {
     const res = exports(pkg, module)
     if (res) value = res[0]
   } catch {}
   if (!value) value = pkg.module
   if (!value) value = pkg.main
-  if (value.startsWith("/")) value = "." + value
+  if (value && value.startsWith("/")) value = "." + value
   return value
 }
 
-async function buildDependency(list: DependenciesList, index: number) {
-  const { context, outDir, external, props } = list
-  const { moduleName, subModuleName, fullModuleName } = props[index]
+async function buildDependency(list: DependenciesList, index: number, ssrComposeDependencies: SSRComposeDependencies) {
+  const { context, outDir, external, params } = list
+  const { moduleName, subModuleName, fullModuleName } = params[index]
 
-  const { cwd, ssrComposeDependencies } = context.inputs
+  const { cwd } = context.info.inputs
   const pkgPath = resolve(cwd, "node_modules", moduleName, "package.json")
+
   if (Reflect.has(ssrComposeDependencies, fullModuleName)) return
   if (!existsSync(pkgPath)) throw `找不到 ssrCompose.${fullModuleName} 的依赖，请确保配置合法，并正确添加依赖`
 
@@ -89,7 +91,7 @@ async function buildDependency(list: DependenciesList, index: number) {
       rollupOptions: {
         external
       },
-      minify: false
+      minify: true
     },
     define: { "process.env.NODE_ENV": `"production"` }
   })

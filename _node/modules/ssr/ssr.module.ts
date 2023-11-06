@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common"
-import { SsrController } from "./ssr.controller.js"
+import { SSRController } from "./ssr.controller.js"
 
 @Module({
-  controllers: [SsrController]
+  controllers: [SSRController]
 })
-export class SsrModule {}
+export class SSRModule {}

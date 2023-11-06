@@ -7,7 +7,7 @@ import { AlbumContextService } from "../context/album-context.service.js"
 import { createSsrComposeOptions } from "../ssr-compose/ssr-compose.controller.js"
 
 @Controller()
-export class SsrController {
+export class SSRController {
   ssrRender: (options: AlbumSSRRenderOptions) => Promise<any>
   onSsrRenderError: any
 

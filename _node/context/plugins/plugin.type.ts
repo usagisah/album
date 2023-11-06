@@ -5,7 +5,6 @@ import { SpecialModule } from "../../client/client.type.js"
 import { AlbumServerExpressConfig, AlbumServerViteConfig } from "../../middlewares/middlewares.type.js"
 import { DirStruct } from "../../utils/fs/fileManager.js"
 import { AlbumDevContext, AlbumStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context.type.js"
-import { Env } from "../env/env.type.js"
 import { DevInputs } from "../inputs/inputs.type.js"
 import { AlbumUserConfig, UserConfigApp } from "../userConfig/userConfig.type.js"
 
@@ -77,8 +76,6 @@ export type PluginServerConfig = (param: PluginServerConfigParam) => any
 // 可以拿到 app，进行服务器设置
 // 和 PluginServerConfig 的区别在于，有些模式会跳过这个，例如build，因为打包时不需要起服务
 export type PluginServerParam = {
-  mode: Mode
-  env: Env
   info: AlbumStaticInfo
   app: INestApplication
 } & PluginGlobalOptions
