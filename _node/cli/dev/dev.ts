@@ -4,6 +4,8 @@ import { callPluginWithCatch } from "../../context/plugins/callPluginWithCatch.j
 import { AppModule } from "../../modules/app/app.module.js"
 import { ILogger } from "../../modules/logger/logger.type.js"
 import { DevServerParams } from "../cli.type.js"
+import { processClient } from "../../client/processClient.js"
+import { processDevServer } from "../../server/processServer.dev.js"
 
 export async function albumDevServer(params: DevServerParams) {
   let { appId = "default", args } = params ?? {}
@@ -19,7 +21,7 @@ export async function albumDevServer(params: DevServerParams) {
     await callPluginWithCatch("context", plugins, { messages: new Map(), events, albumContext: context }, logger)
     await processClient(context)
     const serverApp = await NestFactory.create(AppModule, { logger, cors: true })
-    await processServer(serverApp, context)
+    await processDevServer(serverApp, context)
 
     logger.log(`dev config: `, { appId, mode, serverMode, ssr, ssrCompose }, "album")
     await serverApp.listen(port)

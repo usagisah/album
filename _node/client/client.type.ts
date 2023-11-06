@@ -1,24 +1,26 @@
 export type SpecialModuleFile = {
   type: "file"
-  filePath: string
-  fileName: string
-  fullName: string
-  fileExt: string
+  filepath: string
+  filename: string
+  appName: string
+  ext: string
 }
 
 export type SpecialModule = {
   type: "module"
-  filePath: string
-  fileName: string
-  page: SpecialModuleFile
-  router: SpecialModuleFile | null
-  action: SpecialModuleFile | null
-  routePath: string
-  routeFilePath: string
+  filepath: string
+  filename: string
   files: SpecialModuleFile[]
   children: SpecialModule[]
+
+  pageFile: SpecialModuleFile
+  routerFile: SpecialModuleFile | null
+  actionFile: SpecialModuleFile | null
+  routePath: string
 }
 
 export type ClientManager = {
   specialModules: SpecialModule[]
+  realClientInput: string
+  realSSRInput: string | null
 }

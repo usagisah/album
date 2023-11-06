@@ -1,5 +1,5 @@
 export type ClientConfigModule = {
-  moduleName: string | null
+  moduleName: string
   modulePath: string
 }
 

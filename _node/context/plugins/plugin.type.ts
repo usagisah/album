@@ -45,33 +45,25 @@ export type PluginContext = (param: PluginContextParam) => any
 
 // 用于生成客户端文件
 export type PluginInitClientParam = {
-  app: string
-  serverMode: ServerMode
-  env: Env
   info: AlbumStaticInfo
   clientConfig: ClientConfig
-  inputs: DevInputs
-  fileManager: DirStruct
+  appFileManager: DirStruct
+  dumpFileManager: DirStruct
   specialModules: SpecialModule[]
-  ssrComposeConfig: SSRComposeDevConfig | null
   result: {
-    realClientInput: string
-    realSSRInput: string
+    realClientInput: string | null
+    realSSRInput: string | null
   }
 } & PluginGlobalOptions
 export type PluginInitClient = (param: PluginInitClientParam) => any
 
 // 模块发生改变，热更新客户端文件
 export type PluginPatchClientParam = {
-  app: string
-  serverMode: ServerMode
-  env: Env
   info: AlbumStaticInfo
   clientConfig: ClientConfig
-  inputs: DevInputs
-  fileManager: DirStruct
+  appFileManager: DirStruct
+  dumpFileManager: DirStruct
   specialModules: SpecialModule[]
-  ssrComposeConfig: SSRComposeDevConfig | null
 } & PluginGlobalOptions
 export type PluginPatchClient = (param: PluginPatchClientParam) => any
 

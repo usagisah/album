@@ -44,6 +44,7 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
     const watcher = createWatcher(inputs, clientConfig)
     return {
       info: {
+        appId,
         mode,
         serverMode,
         ssr: !!clientConfig.mainSSRInput,

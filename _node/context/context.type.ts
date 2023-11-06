@@ -27,6 +27,7 @@ export * from "./userConfig/userConfig.type.js"
 export type Mode = "development" | "production"
 
 export type AlbumStaticInfo = {
+  appId: string
   ssr: boolean
   ssrCompose: boolean
   mode: Mode

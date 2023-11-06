@@ -8,6 +8,10 @@ export function isPlainObject<T extends Record<string, any> = Record<string, any
 export function isString(value: unknown): value is string {
   return typeof value === "string"
 }
+export function isStringEmpty(value: unknown): boolean {
+  return typeof value === "string" && value.length === 0
+}
+
 export function isNumber(value: unknown): value is number {
   return typeof value === "number"
 }
