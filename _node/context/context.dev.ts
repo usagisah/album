@@ -3,7 +3,7 @@ import { ILogger } from "../modules/logger/logger.type.js"
 import { createSSRComposeConfig } from "../ssrCompose/dev/createSSRComposeConfig.js"
 import { waitPromiseAll } from "../utils/promises/waitPromiseAll.js"
 import { createClientConfig } from "./client/clientConfig.js"
-import { AlbumDevContext, CreateContextParams } from "./context.type.js"
+import { AlbumDevContext, AlbumStaticInfo, CreateContextParams } from "./context.type.js"
 import { registryEnv } from "./env/dev/env.dev.js"
 import { createFileManager } from "./fileManager/fileManager.js"
 import { buildDevInputs } from "./inputs/dev/buildInputs.dev.js"
@@ -35,24 +35,26 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
         inputs,
         logger,
         pluginConfig,
-        conf: userConfig.app
+        conf: userConfig.app,
+        ssrCompose: !!userConfig.ssrCompose
       }),
       createServerConfig(userConfig.server)
     ])
     const ssrComposeConfig = await createSSRComposeConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
-    const outputs = buildOutputs()
+    const ssr = !!clientConfig.mainSSRInput
+    const info: AlbumStaticInfo = {
+      appId,
+      mode,
+      serverMode,
+      ssr,
+      ssrCompose: !!ssrComposeConfig,
+      inputs,
+      outputs: buildOutputs(appId, ssr, inputs),
+      env
+    }
     const watcher = createWatcher(inputs, clientConfig)
     return {
-      info: {
-        appId,
-        mode,
-        serverMode,
-        ssr: !!clientConfig.mainSSRInput,
-        ssrCompose: !!ssrComposeConfig,
-        inputs,
-        outputs,
-        env
-      },
+      info,
       logger,
       watcher,
 

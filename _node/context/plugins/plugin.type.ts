@@ -2,8 +2,7 @@ import { INestApplication } from "@nestjs/common"
 import EventEmitter from "events"
 import { ServerMode } from "../../cli/cli.type.js"
 import { SpecialModule } from "../../client/client.type.js"
-import { MiddlewareConfigs, PluginViteConfig } from "../../middlewares/middlewares.type.js"
-import { SSRComposeDevConfig } from "../../ssrCompose/ssrCompose.type.js"
+import { AlbumServerExpressConfig, AlbumServerViteConfig } from "../../middlewares/middlewares.type.js"
 import { DirStruct } from "../../utils/fs/fileManager.js"
 import { AlbumDevContext, AlbumStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context.type.js"
 import { Env } from "../env/env.type.js"
@@ -69,11 +68,9 @@ export type PluginPatchClient = (param: PluginPatchClientParam) => any
 
 // 这里能拿到内部存在的，中间件、vite 配置、模块，这些内容的 参数、执行函数 进行自定义修改
 export type PluginServerConfigParam = {
-  mode: Mode
-  env: Env
   info: AlbumStaticInfo
-  midConfigs: MiddlewareConfigs
-  viteConfigs: PluginViteConfig[]
+  midConfigs: AlbumServerExpressConfig[]
+  viteConfigs: AlbumServerViteConfig[]
 } & PluginGlobalOptions
 export type PluginServerConfig = (param: PluginServerConfigParam) => any
 

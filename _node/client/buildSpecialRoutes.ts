@@ -65,7 +65,7 @@ export async function resolveModules(params: ParseRouterParams) {
     filepath: modulePath,
     files,
     children: [],
-  
+
     pageFile: res.pageFile,
     routerFile: res.routerFile,
     actionFile: res.actionFile,

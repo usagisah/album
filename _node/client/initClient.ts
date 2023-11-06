@@ -28,7 +28,7 @@ export async function initClient(context: AlbumDevContext): Promise<ClientManage
     },
     logger
   )
-  
+
   let { realClientInput, realSSRInput } = result
   if (isStringEmpty(realClientInput) || !existsSync(realClientInput!)) throw `client 客户端真实指向入口(client)不存在(${realClientInput})`
   if (ssr && (isStringEmpty(realSSRInput) || !existsSync(realSSRInput!))) throw `client 客户端真实指向入口(SSR)不存在(${realSSRInput})`

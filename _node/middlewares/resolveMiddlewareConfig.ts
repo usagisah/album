@@ -1,0 +1,24 @@
+import { AlbumDevContext } from "../context/context.type.js"
+import { callPluginWithCatch } from "../context/plugins/callPluginWithCatch.js"
+import { expressOptimizeConfigs } from "./express/expressOptimizeConfig.js"
+import { mergeMultipleViteConfig } from "./vite/mergeMultipleViteConfig.js"
+import { viteCoreOptions } from "./vite/viteCoreConfig.js"
+import { viteOptimizeOptions } from "./vite/viteOptimizeConfig.js"
+
+export async function resolveMiddlewareConfig(context: AlbumDevContext, forceClient = false) {
+  const { info, pluginConfig, userConfig, logger } = context
+  const { plugins, events } = pluginConfig
+  const { midConfigs, viteConfigs } = await callPluginWithCatch(
+    "serverConfig",
+    plugins,
+    {
+      messages: new Map(),
+      events,
+      info,
+      midConfigs: expressOptimizeConfigs(context),
+      viteConfigs: [viteCoreOptions(context, forceClient), viteOptimizeOptions(context, forceClient), { name: "userViteConfig", config: userConfig.vite ?? {} }]
+    },
+    logger
+  )
+  return { midConfigs, viteConfigs: mergeMultipleViteConfig(viteConfigs) }
+}

@@ -1,8 +1,3 @@
 import { UserConfig } from "vite"
-
-export type PluginViteConfig = {
-  name: string
-  options: UserConfig
-}
-
-export type MiddlewareConfigs = Map<string, { config: any[]; factory: (...config: any[]) => any }>
+export type AlbumServerViteConfig = { name: string; config: UserConfig }
+export type AlbumServerExpressConfig = { enable: boolean; name: string; config: any[]; factory: (...config: any[]) => any }
