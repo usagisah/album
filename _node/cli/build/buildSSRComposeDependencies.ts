@@ -1,28 +1,24 @@
-import { stringify } from "@ungap/structured-clone/json"
 import { readFileSync } from "fs"
-import { mkdir, rm, writeFile } from "fs/promises"
+import { mkdir, rm } from "fs/promises"
 import { hasCJSSyntax } from "mlly"
 import { basename, parse, resolve } from "path"
 import { build as viteBuild } from "vite"
 import { AlbumDevContext } from "../../context/context.type.js"
-import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
 import { resolveLibPath } from "../../utils/path/resolveLibPath.js"
 
 export async function buildSSRComposeDependencies(context: AlbumDevContext) {
   const _dependencies = context.userConfig!.ssrCompose!.dependencies!
   const { inputs, outputs } = context.info
   const { cwd } = inputs
-  const { ssrOutDir } = outputs
-  const outDir = resolve(ssrOutDir!, "../.ssr-compose-dependencies")
+  const { outDir } = outputs
+  const depOutDir = resolve(outDir!, ".ssr-compose-dependencies")
 
-  await rm(outDir, { force: true, recursive: true })
-  await mkdir(outDir, { recursive: true })
+  await rm(depOutDir, { force: true, recursive: true })
+  await mkdir(depOutDir, { recursive: true })
 
   const dependencies = [...new Set(_dependencies)]
-  const ssrComposeDependenciesData = await Promise.all(dependencies.map(async libName => buildDependency(resolve(cwd, "node_modules", libName), outDir, dependencies)))
-  const ssrComposeDependencies: SSRComposeDependencies = new Map(ssrComposeDependenciesData)
-  await writeFile(resolve(outDir, "manifest.json"), stringify(ssrComposeDependencies), "utf-8")
-  return ssrComposeDependencies
+  const ssrComposeDependenciesData = await Promise.all(dependencies.map(async libName => buildDependency(resolve(cwd, "node_modules", libName), depOutDir, dependencies)))
+  return new Map(ssrComposeDependenciesData)
 }
 
 async function buildDependency(libPath: string, outDir: string, external: string[]) {

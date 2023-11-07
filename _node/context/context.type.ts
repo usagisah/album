@@ -59,7 +59,6 @@ export type AlbumDevContext = {
 
   clientManager: ClientManager | null
   serverManager: ServerManager | null
-  ssrComposeManager: null
 
   viteDevServer: ViteDevServer | null
 }

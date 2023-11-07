@@ -1,5 +1,5 @@
 import { resolve } from "path"
-import { DevInputs } from "../inputs.type.js"
+import { DevInputs } from "./inputs.type.js"
 
 export function buildDevInputs(): DevInputs {
   const cwd = process.cwd()

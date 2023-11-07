@@ -1,5 +1,6 @@
 import { UserConfig } from "vite"
-import { ILogger, LoggerParams } from "../../modules/logger/logger.type.js"
+import { LoggerParams } from "../../modules/logger/logger.type.js"
+import { Env } from "../env/env.type.js"
 import { AlbumUserPlugin } from "../plugins/plugin.type.js"
 
 export interface UserConfigEnv {
@@ -40,17 +41,28 @@ export interface UserStart {
   }
 }
 
-export interface UserCustomLogger {
-  type: "custom"
-  logger: ILogger
-}
 export interface AlbumUserConfig {
   env?: UserConfigEnv[]
   app?: UserConfigApp[]
   ssrCompose?: UserSSRCompose
   server?: UserConfigServer
-  logger?: UserCustomLogger | LoggerParams
+  logger?: LoggerParams
   plugins?: AlbumUserPlugin[]
   vite?: UserConfig
   start?: UserStart
+}
+
+export interface StartCacheUserConfig {
+  info: {
+    env: Env
+    ssr: boolean
+    ssrCompose: boolean
+  }
+  clientConfig: {
+    router: string
+  }
+  serverConfig: {
+    port: number
+  }
+  logger: LoggerParams | undefined
 }

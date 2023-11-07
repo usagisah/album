@@ -1,23 +1,17 @@
 import { existsSync } from "fs"
-import { isFunction, isPlainObject } from "../../../utils/check/simple.js"
-import { NodeArgs } from "../../../utils/command/args.js"
-import { Mode } from "../../context.type.js"
-import { DevInputs } from "../../inputs/inputs.type.js"
+import { resolve } from "path"
+import { SSRComposeDependencies } from "../../../ssrCompose/ssrCompose.type.js"
+import { isPlainObject } from "../../../utils/check/simple.js"
+import { StartCacheUserConfig } from "../userConfig.type.js"
 
-export type LoadConfigParams = {
-  mode: Mode
-  inputs: DevInputs
-  args: NodeArgs
-}
-export async function loadStartConfig({ mode, inputs, args }: LoadConfigParams) {
-  const { albumConfigInput } = inputs
-  if (!existsSync(albumConfigInput)) return null
+type Config = StartCacheUserConfig & { ssrComposeDependencies?: SSRComposeDependencies }
 
-  let config: any = null
-  try {
-    let exports = (await import(albumConfigInput)).default
-    if (isFunction(exports)) exports = exports(mode, args)
-    if (isPlainObject(exports)) config = exports
-  } catch {}
+export async function loadConfig() {
+  const configPath = resolve(process.cwd(), "album.config.js")
+  if (!existsSync(configPath)) throw "找不到生产配置文件"
+
+  const config: Config = await import(configPath).then(m => m.default)
+  if (!isPlainObject(config)) throw "似乎到了个不是一个合法的配置文件"
+
   return config
 }

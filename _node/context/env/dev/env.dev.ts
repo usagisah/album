@@ -6,7 +6,7 @@ import { transformEnvValue } from "./transform.js"
 
 export async function registryEnv(serverMode: ServerMode, inputs: DevInputs, env?: UserConfigEnv[]) {
   const { common, development, production } = await transformEnvValue(inputs.cwd, env)
-  const record: Env = { ...common, ...development }
+  const record: Env = { ...common, ...(serverMode === "build" ? production : development) }
   for (const k of Object.getOwnPropertyNames(record)) {
     process.env[k] = record[k]
   }

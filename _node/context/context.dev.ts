@@ -6,8 +6,8 @@ import { createClientConfig } from "./client/clientConfig.js"
 import { AlbumDevContext, AlbumStaticInfo, CreateContextParams } from "./context.type.js"
 import { registryEnv } from "./env/dev/env.dev.js"
 import { createFileManager } from "./fileManager/fileManager.js"
-import { buildDevInputs } from "./inputs/dev/buildInputs.dev.js"
-import { buildOutputs } from "./outputs/dev/buildOutputs.js"
+import { buildDevInputs } from "./inputs/buildInputs.dev.js"
+import { buildOutputs } from "./outputs/buildOutputs.dev.js"
 import { callPluginWithCatch } from "./plugins/callPluginWithCatch.js"
 import { normalizePlugins } from "./plugins/plugins.js"
 import { createServerConfig } from "./server/serverConfig.js"
@@ -21,7 +21,7 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
     const { appId, mode, serverMode, args } = params
     const inputs = buildDevInputs()
     const userConfig = (await loadConfig({ mode, args, inputs })) ?? ({} as AlbumUserConfig)
-    logger = resolveLogger(userConfig.logger)
+    logger = new Logger(userConfig.logger ?? {})
 
     const pluginConfig = normalizePlugins(userConfig.plugins)
     const { events, plugins } = pluginConfig
@@ -69,7 +69,6 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
 
       clientManager: null,
       serverManager: null,
-      ssrComposeManager: null,
 
       viteDevServer: null
     }
@@ -77,10 +76,4 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
     logger.error(e, "album")
     throw e
   }
-}
-
-function resolveLogger(value: any): ILogger {
-  if (!value) return new Logger({})
-  if (value.type === "custom") value
-  return new Logger(value)
 }

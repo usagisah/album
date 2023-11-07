@@ -1,56 +1,38 @@
 import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
-import { createSSRComposeConfig } from "../ssrCompose/dev/createSSRComposeConfig.dev.js"
 import { waitPromiseAll } from "../utils/promises/waitPromiseAll.js"
 import { createClientConfig } from "./client/clientConfig.js"
-import { AlbumDevContext, CreateContextParams } from "./context.type.js"
-import { registryEnv } from "./env/dev/env.dev.js"
+import { AlbumDevContext, AlbumStaticInfo, CreateContextParams } from "./context.type.js"
+import { registryEnv } from "./env/start/env.start.js"
 import { createFileManager } from "./fileManager/fileManager.js"
-import { buildDevInputs } from "./inputs/dev/buildInputs.dev.js"
-import { buildOutputs } from "./outputs/dev/buildOutputs.js"
+import { buildOutputs } from "./outputs/buildOutputs.dev.js"
 import { callPluginWithCatch } from "./plugins/callPluginWithCatch.js"
-import { normalizePlugins } from "./plugins/plugins.js"
 import { createServerConfig } from "./server/serverConfig.js"
-import { loadConfig } from "./userConfig/dev/loadConfig.dev.js"
+import { loadConfig } from "./userConfig/start/loadConfig.start.js"
 import { AlbumUserConfig } from "./userConfig/userConfig.type.js"
 import { createWatcher } from "./watcher/watcher.js"
 
-export async function createAlbumDevContext(params: CreateContextParams): Promise<AlbumDevContext> {
+export async function createAlbumStartContext(params: CreateContextParams) {
   let logger: ILogger = console
   try {
     const { appId, mode, serverMode, args } = params
-    const inputs = buildDevInputs()
-    const userConfig = (await loadConfig({ mode, args, inputs })) ?? ({} as AlbumUserConfig)
-    logger = resolveLogger(userConfig.logger)
+    const cwd = process.cwd()
+    const cacheConfig = await loadConfig()
+    logger = resolveLogger(cacheConfig.logger)
 
-    const pluginConfig = normalizePlugins(userConfig.plugins)
-    const { events, plugins } = pluginConfig
-    await callPluginWithCatch("config", plugins, { events, messages: new Map(), mode, serverMode, config: userConfig }, logger)
-
-    const [{ appFileManager, dumpFileManager }, env, clientConfig, serverConfig] = await waitPromiseAll([
-      createFileManager(inputs),
-      registryEnv(serverMode, inputs, userConfig.env),
-      createClientConfig({
-        appId,
-        inputs,
-        logger,
-        pluginConfig,
-        conf: userConfig.app
-      }),
-      createServerConfig(userConfig.server)
-    ])
-    const ssrComposeConfig = await createSSRComposeConfig()
-    const outputs = buildOutputs()
-    const watcher = createWatcher(inputs, clientConfig)
+    const env = registryEnv(cacheConfig.info.env)
+    const ssrComposeConfig = await createSSRComposeStartConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
+    const info: AlbumStaticInfo = {
+      appId,
+      mode,
+      serverMode,
+      ssr: cacheConfig.info.ssr,
+      ssrCompose: cacheConfig.info.ssrCompose,
+      cwd,
+      env
+    }
     return {
-      info: {
-        mode,
-        serverMode,
-        ssr: !!clientConfig.mainSSRInput,
-        inputs,
-        outputs,
-        env
-      },
+      info,
       logger,
       watcher,
 
@@ -65,7 +47,9 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
 
       clientManager: null,
       serverManager: null,
-      ssrComposeManager: null
+      ssrComposeManager: null,
+
+      viteDevServer: null
     }
   } catch (e) {
     logger.error(e, "album")
