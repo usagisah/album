@@ -8,6 +8,7 @@ import { AlbumDevContext } from "../../context/context.type.js"
 import { callPluginWithCatch } from "../../context/plugins/callPluginWithCatch.js"
 import { resolveMiddlewareConfig } from "../../middlewares/resolveMiddlewareConfig.js"
 import { ILogger } from "../../modules/logger/logger.type.js"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
 import { DevServerParams } from "../cli.type.js"
 import { buildSSRComposeDependencies } from "./buildSSRComposeDependencies.js"
 import { withTransformCjsPlugin } from "./transformSSRComposeImporters.js"
@@ -78,23 +79,24 @@ async function buildSSR(context: AlbumDevContext) {
   const { outputs } = info
   const { clientOutDir, ssrOutDir } = outputs
   const ssrBuildConfig = await resolveMiddlewareConfig(context)
-  const clientBuildConfig = await resolveMiddlewareConfig(context, true)
+  const { viteConfigs } = await resolveMiddlewareConfig(context, true)
 
   await Promise.all([rm(clientOutDir, rmOptions), rm(ssrOutDir!, rmOptions)])
 
+  let ssrComposeDependencies: SSRComposeDependencies | undefined
   if (userConfig?.ssrCompose?.dependencies?.length) {
     logger.log(`发现 ssr-compose 共享依赖，正在生成，请耐心等待...`, "album")
-    await buildSSRComposeDependencies(context)
+    ssrComposeDependencies = await buildSSRComposeDependencies(context)
     logger.log(`生成 ssr-compose 共享依赖成功`, "album")
   } else {
     logger.log("ssr-compose 共享依赖为 0, 跳过生成共享依赖")
   }
 
   logger.log("正在打包客户端，请耐心等待...", "album")
-  await viteBuild(withTransformCjsPlugin(clientBuildConfig.viteConfigs, inputs.ssrComposeDependencies))
+  await viteBuild(ssrComposeDependencies ? withTransformCjsPlugin(viteConfigs, ssrComposeDependencies) : viteConfigs)
   logger.log("打包客户端(client)成功", "album")
 
   logger.log("正在打包服务端，请耐心等待...", "album")
-  await viteBuild(ssrBuildConfig.viteConfigs)
+  await viteBuild(viteConfigs)
   logger.log("打包服务端(ssr/server)成功", "album")
 }

@@ -26,7 +26,7 @@ export interface UserConfigApp {
 }
 
 export interface UserSSRCompose {
-  dependencies?: (string | Record<string, Record<string, {}>>)[]
+  dependencies?: string[]
 }
 
 export interface UserConfigServer {

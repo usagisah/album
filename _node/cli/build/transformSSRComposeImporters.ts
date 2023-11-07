@@ -1,20 +1,37 @@
 import { parse, traverse } from "@babel/core"
 import MS from "magic-string"
-import { mergeConfig } from "vite"
-import { SSRComposeDependencies } from "../../context/_AlbumContext.type.js"
-import { ViteConfig } from "../../middlewares/middlewares.type.js"
+import { InlineConfig, UserConfig, mergeConfig } from "vite"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
+import { makeLegalIdentifier } from "../../utils/modules/makeLegalIdentifier.js"
 
-const reservedWords$1 = "break case class catch const continue debugger default delete do else export extends finally for function if import in instanceof let new return super switch this throw try typeof var void while with yield enum await implements package protected static interface private public"
-const builtins$1 = "arguments Infinity NaN undefined null true false eval uneval isFinite isNaN parseFloat parseInt decodeURI decodeURIComponent encodeURI encodeURIComponent escape unescape Object Function Boolean Symbol Error EvalError InternalError RangeError ReferenceError SyntaxError TypeError URIError Number Math Date String RegExp Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array Map Set WeakMap WeakSet SIMD ArrayBuffer DataView JSON Promise Generator GeneratorFunction Reflect Proxy Intl"
-const forbiddenIdentifiers = new Set(`${reservedWords$1} ${builtins$1}`.split(" "))
-forbiddenIdentifiers.add("")
-
-const makeLegalIdentifier = function makeLegalIdentifier(str: string) {
-  let identifier = str.replace(/-(\w)/g, (_, letter) => letter.toUpperCase()).replace(/[^$_a-zA-Z0-9]/g, "_")
-  if (/\d/.test(identifier[0]) || forbiddenIdentifiers.has(identifier)) {
-    identifier = `_${identifier}`
+const applyFilesReg = /\.(js|ts|jsx|tsx)$/
+export function withTransformCjsPlugin(config: UserConfig, ssrComposeDependencies: SSRComposeDependencies) {
+  const external: string[] = []
+  const cjsExternal: string[] = []
+  ssrComposeDependencies.forEach((value, id) => {
+    external.push(id)
+    if (value.isCjs) cjsExternal.push(id)
+  })
+  const cjsConfig: InlineConfig = {
+    build: {
+      rollupOptions: {
+        external
+      }
+    },
+    plugins:
+      cjsExternal.length > 0
+        ? [
+            {
+              name: "album:ssr-compose-cjs",
+              enforce: "post",
+              transform(code, id) {
+                if (applyFilesReg.test(id)) return transformSSRComposeImporters(code, cjsExternal)
+              }
+            }
+          ]
+        : undefined
   }
-  return identifier || "_"
+  return mergeConfig(config, cjsConfig)
 }
 
 function createMakeLegalName() {
@@ -28,7 +45,7 @@ function createMakeLegalName() {
 function transformSSRComposeImporters(code: string, cjsModules: string[]) {
   const str = new MS(code)
   const makeLegalName = createMakeLegalName()
-  traverse(parse(code, { plugins: ["@babel/plugin-syntax-jsx", ["@babel/plugin-syntax-typescript", { isTSX: true }]] }), {
+  traverse(parse(code, { plugins: ["@babel/plugin-syntax-jsx", ["@babel/plugin-syntax-typescript", { isTSX: true }]] })!, {
     ExportAllDeclaration({ node }) {
       const importedName = node.source.value
       if (!cjsModules.includes(importedName)) return
@@ -41,8 +58,8 @@ function transformSSRComposeImporters(code: string, cjsModules: string[]) {
       if (!cjsModules.includes(importedName) || node.specifiers.length === 0) return
 
       const cjsModuleName = makeLegalName(importedName, false)
-      const importNames = []
-      const exportNames = []
+      const importNames: { importedName: string; localName: string }[] = []
+      const exportNames: {}[] = []
 
       let defaultExports = ""
       for (const spec of node.specifiers) {
@@ -90,19 +107,20 @@ function transformSSRComposeImporters(code: string, cjsModules: string[]) {
       }
 
       const { start, end } = node
-      str.overwrite(start, end, lines.join("; ") + ";\n")
+      str.overwrite(start!, end!, lines.join("; ") + ";\n")
     },
     ImportDeclaration({ node }) {
       const importedName = node.source.value
       if (!cjsModules.includes(importedName)) return
 
-      const { start, end } = node
+      const s = node.start!
+      const e = node.end!
       if (!node.specifiers.length) {
-        str.overwrite(start, end, `import "/${importedName}"`)
+        str.overwrite(s, e, `import "/${importedName}"`)
         return
       }
 
-      const importNames = []
+      const importNames: { importedName: string; localName: string }[] = []
       for (const spec of node.specifiers) {
         // import {} from ""
         if (spec.type === "ImportSpecifier" && spec.imported.type === "Identifier") {
@@ -139,43 +157,15 @@ function transformSSRComposeImporters(code: string, cjsModules: string[]) {
           lines.push(`const ${localName} = ${cjsModuleName}["${importedName}"]`)
         }
       })
-      str.overwrite(start, end, lines.join("; ") + ";\n")
+      str.overwrite(s, e, lines.join("; ") + ";\n")
     },
     CallExpression({ node }) {
       if (node.callee.type !== "Import" || node.arguments[0].type !== "StringLiteral") return
 
       const importedName = node.arguments[0].value
       if (!cjsModules.includes(importedName)) return
-
-      str.appendLeft(node.end, ".then(m => m.default && m.default.__esModule ? m.default : ({ ...m.default, default: m.default }))")
+      str.appendLeft(node.end!, ".then(m => m.default && m.default.__esModule ? m.default : ({ ...m.default, default: m.default }))")
     }
   })
   return str.toString()
-}
-
-const applyFilesReg = /\.(js|ts|jsx|tsx)$/
-export function withTransformCjsPlugin(config: ViteConfig, ssrComposeDependencies: SSRComposeDependencies) {
-  const external = Object.getOwnPropertyNames(ssrComposeDependencies)
-  return mergeConfig(config, {
-    name: "album:ssr-compose-cjs",
-    build: {
-      rollupOptions: {
-        external
-      }
-    },
-    plugins: [
-      {
-        name: "album:ssr-compose-cjs",
-        enforce: "post",
-        transform(code, id) {
-          if (applyFilesReg.test(id)) {
-            return transformSSRComposeImporters(
-              code,
-              external.filter(v => ssrComposeDependencies[v].isCjs)
-            )
-          }
-        }
-      }
-    ]
-  } as ViteConfig)
 }

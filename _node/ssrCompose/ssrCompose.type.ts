@@ -33,7 +33,7 @@ export type SSRComposeCoordinateValue = {
   devFilepath?: string
 }
 
-export type SSRComposeDependencies = Record<
+export type SSRComposeDependencies = Map<
   string,
   {
     filename: string

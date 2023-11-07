@@ -1,11 +1,9 @@
 import { existsSync } from "fs"
 import { lstat, readlink } from "fs/promises"
-import { resolve } from "path"
 
-export async function resolveRealPath(path: string, cwd?: string) {
+export async function resolveRealPath(path: string) {
   if (!existsSync(path)) throw "resolveRealPath.path 指定路径不存在"
-  const realPath = await _resolveRealPath(path)
-  return cwd ? resolve(cwd ?? "", realPath) : realPath
+  return _resolveRealPath(path)
 }
 
 async function _resolveRealPath(path: string) {
