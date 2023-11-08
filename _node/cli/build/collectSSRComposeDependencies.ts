@@ -1,12 +1,13 @@
 import { readFileSync } from "fs"
 import { mkdir, rm } from "fs/promises"
 import { hasCJSSyntax } from "mlly"
-import { basename, parse, resolve } from "path"
+import { resolve } from "path"
 import { build as viteBuild } from "vite"
 import { AlbumDevContext } from "../../context/context.type.js"
+import { makeLegalIdentifier } from "../../utils/modules/makeLegalIdentifier.js"
 import { resolveLibPath } from "../../utils/path/resolveLibPath.js"
 
-export async function buildSSRComposeDependencies(context: AlbumDevContext) {
+export async function collectSSRComposeDependencies(context: AlbumDevContext) {
   const _dependencies = context.userConfig!.ssrCompose!.dependencies!
   const { inputs, outputs } = context.info
   const { cwd } = inputs
@@ -21,25 +22,19 @@ export async function buildSSRComposeDependencies(context: AlbumDevContext) {
   return new Map(ssrComposeDependenciesData)
 }
 
-async function buildDependency(libPath: string, outDir: string, external: string[]) {
+async function buildDependency(libPath: string, depOutDir: string, external: string[]) {
   const pathInfo = await resolveLibPath(libPath)
   if (!pathInfo) throw `找不到该共享依赖(${libPath})的入口`
 
   const { refPath, refFullPath } = pathInfo
-  const outfile = resolve(outDir, refPath.replace("/", "_") + ".js")
+  const filename = makeLegalIdentifier(refPath)
   await viteBuild({
     logLevel: "error",
     build: {
-      lib: {
-        entry: refFullPath,
-        formats: ["es"],
-        fileName: parse(outfile).name
-      },
+      lib: { entry: refFullPath, formats: ["es"], fileName: filename },
       emptyOutDir: false,
-      outDir,
-      rollupOptions: {
-        external
-      },
+      outDir: depOutDir,
+      rollupOptions: { external },
       minify: true
     },
     define: { "process.env.NODE_ENV": `"production"` }
@@ -47,9 +42,8 @@ async function buildDependency(libPath: string, outDir: string, external: string
   return [
     refPath,
     {
-      filename: basename(outfile),
-      filepath: outfile,
-      isCjs: hasCJSSyntax(readFileSync(refPath, "utf-8"))
+      filename,
+      cjs: hasCJSSyntax(readFileSync(refPath, "utf-8"))
     }
   ] as const
 }

@@ -10,7 +10,7 @@ export type SSRComposeDevProjectInputs = Map<
   | {
       type: "start"
       clientInput: string
-      serverInput: string
+      ssrInput: string
       mainServerInput: string
     }
 >
@@ -27,7 +27,7 @@ export type SSRComposeStartProjectsInput = Map<
   string,
   {
     clientInput: string
-    serverInput: string
+    ssrInput: string
     mainServerInput: string
   }
 >

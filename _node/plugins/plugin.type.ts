@@ -1,12 +1,12 @@
 import { INestApplication } from "@nestjs/common"
 import EventEmitter from "events"
-import { ServerMode } from "../../cli/cli.type.js"
-import { SpecialModule } from "../../client/client.type.js"
-import { AlbumServerExpressConfig, AlbumServerViteConfig } from "../../middlewares/middlewares.type.js"
-import { DirStruct } from "../../utils/fs/fileManager.js"
-import { AlbumDevContext, AlbumDevStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context.type.js"
-import { DevInputs } from "../inputs/inputs.type.js"
-import { AlbumUserConfig, UserConfigApp } from "../userConfig/userConfig.type.js"
+import { ServerMode } from "../cli/cli.type.js"
+import { SpecialModule } from "../client/client.type.js"
+import { AlbumDevContext, AlbumDevStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context/context.type.js"
+import { DevInputs } from "../context/inputs/inputs.type.js"
+import { AlbumUserConfig, UserConfigApp } from "../context/userConfig/userConfig.type.js"
+import { AlbumServerExpressConfig, AlbumServerViteConfig } from "../middlewares/middlewares.type.js"
+import { DirStruct } from "../utils/fs/fileManager.js"
 
 export type PluginGlobalOptions = {
   messages: Map<string, any>

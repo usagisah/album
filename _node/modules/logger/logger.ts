@@ -12,7 +12,7 @@ export class Logger implements ILogger {
   private colors = { info: green, warn: yellow, error: red, debug: magenta }
   private logger: any
 
-  constructor(params: LoggerParams) {
+  constructor(params: LoggerParams = {}) {
     if (Logger.logger) return Logger.logger
     const { level = "info", enableConsole = true, consoleFormat, enableFile = false, fileOptions } = params
     const _transports: any[] = []

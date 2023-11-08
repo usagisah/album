@@ -10,9 +10,9 @@ export function buildOutputs(appId: string, ssr: boolean, inputs: DevInputs): De
   if (ssr) {
     const outDir = (outputs.outDir = resolve(baseOutDir, targetDir))
     outputs.clientOutDir = resolve(outDir, "client")
-    outputs.ssrOutDir = resolve(outDir, "server")
+    outputs.ssrOutDir = resolve(outDir, "ssr")
   } else {
-    outputs.clientOutDir = resolve(baseOutDir, targetDir)
+    outputs.outDir = outputs.clientOutDir = resolve(baseOutDir, targetDir)
   }
   return outputs
 }

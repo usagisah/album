@@ -1,8 +1,8 @@
 import { UserConfig } from "vite"
 import { LoggerParams } from "../../modules/logger/logger.type.js"
+import { AlbumUserPlugin } from "../../plugins/plugin.type.js"
 import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
 import { Env } from "../env/env.type.js"
-import { AlbumUserPlugin } from "../plugins/plugin.type.js"
 import { UserDevStartConfig } from "../start/start.type.js"
 
 export interface UserConfigEnv {
@@ -45,6 +45,10 @@ export interface AlbumUserConfig {
   plugins?: AlbumUserPlugin[]
   vite?: UserConfig
   start?: UserDevStartConfig
+}
+
+export interface CacheSSRCompose {
+  dependencies?: Map<string, { filename: string; cjs: boolean }>
 }
 
 export interface StartCacheUserConfig {

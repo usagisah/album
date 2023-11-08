@@ -1,25 +1,24 @@
-import { existsSync } from "fs"
+import { existsSync, statSync } from "fs"
 import { readFile, readdir } from "fs/promises"
 import { resolve } from "path"
+import { CacheSSRCompose } from "../../context/context.type.js"
 import { resolveFilePath } from "../../utils/path/resolvePath.js"
 import { SSRComposeCoordinateInput, SSRComposeDependencies, SSRComposeStartProjectsInput } from "../ssrCompose.type.js"
 
-export async function createSSRComposeConfig(root: string) {
+export async function createSSRComposeConfig(root: string, cacheSSRCompose: CacheSSRCompose) {
   const projectInputs: SSRComposeStartProjectsInput = new Map()
   const coordinateInputs: SSRComposeCoordinateInput = new Map()
   const dependenciesInputs: SSRComposeDependencies = new Map()
+
   for (const fileInfo of await readdir(root, { withFileTypes: true })) {
     if (!fileInfo.isDirectory()) continue
 
     const { name } = fileInfo
     const clientInput = resolve(root, name, "client")
-    const serverInput = resolve(root, name, "server")
-    if (!existsSync(clientInput) || !existsSync(serverInput)) continue
-    const mainServerInput = await resolveFilePath({
-      root: serverInput,
-      prefixes: ["./"],
-      suffixes: ["main.ssr"]
-    })
+    const ssrInput = resolve(root, name, "ssr")
+    if (!existsSync(clientInput) || !statSync(clientInput).isDirectory() || !existsSync(ssrInput) || !statSync(ssrInput).isDirectory()) continue
+
+    const mainServerInput = await resolveFilePath({ root: ssrInput, prefixes: ["./"], suffixes: ["main.ssr"] })
     if (!mainServerInput) continue
 
     try {
@@ -31,7 +30,7 @@ export async function createSSRComposeConfig(root: string) {
     } catch {}
 
     const _name = name.toLowerCase()
-    projectInputs.set(_name, { clientInput, serverInput, mainServerInput })
+    projectInputs.set(_name, { clientInput, ssrInput, mainServerInput })
 
     const [clientManifestFile, ssrManifestFile, coordinateFile] = await Promise.all([readFile(resolve(root, name, "client/manifest.json"), "utf-8"), readFile(resolve(root, name, "server/ssr-manifest.json"), "utf-8"), readFile(resolve(root, name, "coordinate.json"), "utf-8")])
     coordinateInputs.set(_name, {

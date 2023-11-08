@@ -16,7 +16,7 @@ export type LoadConfigParams = {
 }
 export async function loadConfig({ mode, inputs, args }: LoadConfigParams) {
   const { cwd, albumConfigInput } = inputs
-  if (!existsSync(albumConfigInput)) return null
+  if (!existsSync(albumConfigInput)) return {}
 
   const output = resolve(cwd, "_$_album.config.mjs")
   await esbuild({
@@ -26,7 +26,7 @@ export async function loadConfig({ mode, inputs, args }: LoadConfigParams) {
     platform: "node"
   })
 
-  let config: AlbumUserConfig | null = null
+  let config: AlbumUserConfig = {}
   try {
     let exports = (await import(output)).default
     if (isFunction(exports)) exports = exports(mode, args)

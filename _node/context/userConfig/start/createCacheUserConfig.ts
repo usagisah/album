@@ -1,3 +1,4 @@
+import { stringify } from "@ungap/structured-clone/json"
 import { SSRComposeDependencies } from "../../../ssrCompose/ssrCompose.type.js"
 import { AlbumDevContext, StartCacheUserConfig } from "../../context.type.js"
 import { buildStartConfig } from "../../start/buildStartConfig.js"
@@ -13,7 +14,7 @@ export function createCacheUserConfig(context: AlbumDevContext, ssrComposeDepend
     clientConfig: { router: basename },
     serverConfig: { port },
     ssrCompose: {
-      dependencies: ssrComposeDependencies
+      dependencies: ssrComposeDependencies && stringify(ssrComposeDependencies)
     },
     start: buildStartConfig(context),
     logger

@@ -1,4 +1,5 @@
 import { watch } from "chokidar"
+import { ClientConfig } from "../../context/context.type.js"
 import { DevInputs } from "../inputs/inputs.type.js"
 
 export function createWatcher({ albumConfigInput }: DevInputs, { module }: ClientConfig) {

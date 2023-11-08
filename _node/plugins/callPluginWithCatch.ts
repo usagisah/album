@@ -1,5 +1,5 @@
-import { ILogger } from "../../modules/logger/logger.type.js"
-import { AlbumUserPlugin } from "../context.type.js"
+import { ILogger } from "../modules/logger/logger.type.js"
+import { AlbumUserPlugin } from "./plugin.type.js"
 
 type Keys = keyof Omit<AlbumUserPlugin, "name">
 type GetPluginParams<T> = T extends (params: infer P) => any ? P : never
