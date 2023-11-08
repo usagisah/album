@@ -1,8 +1,8 @@
-import { AlbumServerParams } from "../cli.type.js"
+import { DevServerParams } from "../cli.type.js"
 import { albumBuild } from "./albumBuild.js"
 
 export class BuildCommand {
-  constructor(public params: AlbumServerParams) {
+  constructor(public params: DevServerParams) {
     this.start()
   }
 

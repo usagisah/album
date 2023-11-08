@@ -8,7 +8,7 @@ export function buildOutputs(appId: string, ssr: boolean, inputs: DevInputs): De
   const baseOutDir = resolve(cwd, "dist")
   const targetDir = appId === "default" ? "" : appId
   if (ssr) {
-    const outDir = outputs.outDir = resolve(baseOutDir, targetDir)
+    const outDir = (outputs.outDir = resolve(baseOutDir, targetDir))
     outputs.clientOutDir = resolve(outDir, "client")
     outputs.ssrOutDir = resolve(outDir, "server")
   } else {

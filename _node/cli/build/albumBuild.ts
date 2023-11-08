@@ -11,8 +11,8 @@ import { ILogger } from "../../modules/logger/logger.type.js"
 import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
 import { DevServerParams } from "../cli.type.js"
 import { buildSSRComposeDependencies } from "./buildSSRComposeDependencies.js"
-import { withTransformCjsPlugin } from "./transformSSRComposeImporters.js"
 import { buildStartConfig } from "./buildStartConfig.js"
+import { withTransformCjsPlugin } from "./transformSSRComposeImporters.js"
 
 export async function albumBuild(params: DevServerParams) {
   let { appId = "default", args } = params
@@ -98,5 +98,4 @@ async function buildSSR(context: AlbumDevContext) {
   logger.log("打包服务端(ssr/server)成功", "album")
 
   logger.log("正在生产生产配置文件，请耐心等待", "album")
-  
 }

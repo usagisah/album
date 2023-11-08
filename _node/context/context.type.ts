@@ -69,7 +69,6 @@ export type AlbumDevContext = {
 
 export type AlbumStartStaticInfo = {
   serverMode: "start"
-  appId: string
   mode: Mode
   ssr: boolean
   ssrCompose: boolean
@@ -85,4 +84,3 @@ export type AlbumStartContext = {
   ssrComposeConfig: SSRComposeStartConfig
   userConfig: StartCacheUserConfig
 }
-

@@ -2,15 +2,14 @@ import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
 import { createSSRComposeConfig } from "../ssrCompose/start/createSSRComposeConfig.start.js"
 import { resolveFilePath } from "../utils/path/resolvePath.js"
-import { AlbumStartContext, AlbumStartStaticInfo, CreateContextParams } from "./context.type.js"
+import { AlbumStartContext, AlbumStartStaticInfo } from "./context.type.js"
 import { registryEnv } from "./env/start/env.start.js"
 import { checkStartConfig } from "./start/checkStartConfig.js"
 import { loadConfig } from "./userConfig/start/loadConfig.start.js"
 
-export async function createAlbumStartContext(params: CreateContextParams): Promise<AlbumStartContext> {
+export async function createAlbumContext(): Promise<AlbumStartContext> {
   let logger: ILogger = console
   try {
-    const { appId, mode } = params
     const cwd = process.cwd()
     const cacheConfig = await loadConfig()
     logger = resolveLogger(cacheConfig.logger)
@@ -27,8 +26,7 @@ export async function createAlbumStartContext(params: CreateContextParams): Prom
     }
     const info: AlbumStartStaticInfo = {
       serverMode: "start",
-      appId,
-      mode,
+      mode: "production",
       ssr: cacheConfig.info.ssr,
       ssrCompose: cacheConfig.info.ssrCompose,
       env: registryEnv(cacheConfig.info.env),
