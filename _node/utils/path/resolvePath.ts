@@ -4,18 +4,19 @@ import { resolve } from "path"
 export type ResolveFilePathParams = {
   root?: string
   prefixes?: string[]
-  name: string
+  name?: string
   suffixes?: string[]
   exts?: string[]
   realPath?: boolean
 }
 
-export async function resolveFilePath(params: ResolveFilePathParams) {
-  const { root = process.cwd(), name, prefixes = ["./", "src"], suffixes = [""], exts = [".js", ".mjs"], realPath } = params
+export async function resolveFilePath(params: ResolveFilePathParams): Promise<null | string> {
+  const { root = process.cwd(), name = "", prefixes = ["./", "src"], suffixes, exts = [".js", ".mjs"], realPath } = params
+  if (!name && (!suffixes || suffixes.length === 0)) return null
   for (const prefix of prefixes) {
     for (const ext of exts) {
-      for (const suffix of suffixes) {
-        const filePath = resolve(root, prefix, name + normalizeSuffix(suffix) + ext)
+      for (const suffix of buildSuffixes(suffixes)) {
+        const filePath = resolve(root, prefix, name + suffix + ext)
         if (existsSync(filePath)) {
           if (realPath) return (await import("./resolveRealPath.js")).resolveRealPath(filePath)
           return filePath
@@ -30,15 +31,16 @@ export type ResolveDirPathParams = {
   root?: string
   prefixes?: string[]
   suffixes?: string[]
-  name: string
+  name?: string
   realPath?: boolean
 }
 
 export async function resolveDirPath(params: ResolveDirPathParams) {
-  const { root = process.cwd(), name, prefixes = ["./", "src"], suffixes = [""], realPath } = params ?? {}
+  const { root = process.cwd(), name = "", prefixes = ["./", "src"], suffixes, realPath } = params ?? {}
+  if (!name && (!suffixes || suffixes.length === 0)) return null
   for (const prefix of prefixes) {
-    for (const suffix of suffixes) {
-      const dirPath = resolve(root, prefix, name + normalizeSuffix(suffix))
+    for (const suffix of buildSuffixes(suffixes)) {
+      const dirPath = resolve(root, prefix, name + suffix)
       if (existsSync(dirPath)) {
         if (realPath) return (await import("./resolveRealPath.js")).resolveRealPath(dirPath)
         return dirPath
@@ -48,6 +50,7 @@ export async function resolveDirPath(params: ResolveDirPathParams) {
   return null
 }
 
-function normalizeSuffix(suffix?: string) {
-  return suffix ? (suffix.startsWith(".") ? suffix : "." + suffix) : ""
+function buildSuffixes(suffix?: string[]) {
+  if (!suffix) return [""]
+  return [...suffix, ...suffix.map(v => (v.startsWith(".") ? suffix.slice(1) : `.${v}`))]
 }

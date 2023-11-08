@@ -1,55 +1,47 @@
 import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
-import { waitPromiseAll } from "../utils/promises/waitPromiseAll.js"
-import { createClientConfig } from "./client/clientConfig.js"
-import { AlbumDevContext, AlbumStaticInfo, CreateContextParams } from "./context.type.js"
+import { createSSRComposeConfig } from "../ssrCompose/start/createSSRComposeConfig.start.js"
+import { resolveFilePath } from "../utils/path/resolvePath.js"
+import { AlbumStartContext, AlbumStartStaticInfo, CreateContextParams } from "./context.type.js"
 import { registryEnv } from "./env/start/env.start.js"
-import { createFileManager } from "./fileManager/fileManager.js"
-import { buildOutputs } from "./outputs/buildOutputs.dev.js"
-import { callPluginWithCatch } from "./plugins/callPluginWithCatch.js"
-import { createServerConfig } from "./server/serverConfig.js"
+import { checkStartConfig } from "./start/checkStartConfig.js"
 import { loadConfig } from "./userConfig/start/loadConfig.start.js"
-import { AlbumUserConfig } from "./userConfig/userConfig.type.js"
-import { createWatcher } from "./watcher/watcher.js"
 
-export async function createAlbumStartContext(params: CreateContextParams) {
+export async function createAlbumStartContext(params: CreateContextParams): Promise<AlbumStartContext> {
   let logger: ILogger = console
   try {
-    const { appId, mode, serverMode, args } = params
+    const { appId, mode } = params
     const cwd = process.cwd()
     const cacheConfig = await loadConfig()
     logger = resolveLogger(cacheConfig.logger)
 
-    const env = registryEnv(cacheConfig.info.env)
-    const ssrComposeConfig = await createSSRComposeStartConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
-    const info: AlbumStaticInfo = {
+    const { root } = await checkStartConfig(cwd, cacheConfig.start)
+    let ssrInput: string | null = null
+    if (cacheConfig.info.ssr && !cacheConfig.info.ssrCompose) {
+      ssrInput = await resolveFilePath({
+        root,
+        prefixes: ["server", "./", "ssr"],
+        suffixes: ["main.ssr"]
+      })
+      if (!ssrInput) throw "找不到 ssr 的入口文件，请检查目录配置格式是否正确"
+    }
+    const info: AlbumStartStaticInfo = {
+      serverMode: "start",
       appId,
       mode,
-      serverMode,
       ssr: cacheConfig.info.ssr,
       ssrCompose: cacheConfig.info.ssrCompose,
-      cwd,
-      env
+      env: registryEnv(cacheConfig.info.env),
+      inputs: { cwd, root, ssrInput }
     }
+    const ssrComposeConfig = await createSSRComposeConfig(root)
+
     return {
       info,
       logger,
-      watcher,
-
-      appFileManager,
-      dumpFileManager,
-
-      pluginConfig,
-      clientConfig,
-      serverConfig,
-      ssrComposeConfig,
-      userConfig,
-
-      clientManager: null,
-      serverManager: null,
-      ssrComposeManager: null,
-
-      viteDevServer: null
+      userConfig: cacheConfig,
+      serverConfig: { port: cacheConfig.serverConfig.port },
+      ssrComposeConfig
     }
   } catch (e) {
     logger.error(e, "album")

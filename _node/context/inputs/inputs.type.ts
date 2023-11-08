@@ -8,5 +8,5 @@ export type DevInputs = {
 export type StartInputs = {
   cwd: string
   root: string | null
-  albumConfigInput: string
+  ssrInput: string | null
 }

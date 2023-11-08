@@ -3,7 +3,7 @@ import { ILogger } from "../modules/logger/logger.type.js"
 import { createSSRComposeDevConfig } from "../ssrCompose/dev/createSSRComposeConfig.dev.js"
 import { waitPromiseAll } from "../utils/promises/waitPromiseAll.js"
 import { createClientConfig } from "./client/clientConfig.js"
-import { AlbumDevContext, AlbumStaticInfo, CreateContextParams } from "./context.type.js"
+import { AlbumDevContext, AlbumDevStaticInfo, CreateContextParams } from "./context.type.js"
 import { registryEnv } from "./env/dev/env.dev.js"
 import { createFileManager } from "./fileManager/fileManager.js"
 import { buildDevInputs } from "./inputs/buildInputs.dev.js"
@@ -42,7 +42,7 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
     ])
     const ssrComposeConfig = await createSSRComposeDevConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
     const ssr = !!clientConfig.mainSSRInput
-    const info: AlbumStaticInfo = {
+    const info: AlbumDevStaticInfo = {
       appId,
       mode,
       serverMode,
@@ -68,8 +68,6 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
       userConfig,
 
       clientManager: null,
-      serverManager: null,
-
       viteDevServer: null
     }
   } catch (e) {

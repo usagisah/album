@@ -1,7 +1,9 @@
 import { UserConfig } from "vite"
 import { LoggerParams } from "../../modules/logger/logger.type.js"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
 import { Env } from "../env/env.type.js"
 import { AlbumUserPlugin } from "../plugins/plugin.type.js"
+import { UserDevStartConfig } from "../start/start.type.js"
 
 export interface UserConfigEnv {
   common?: (Record<string, string> | string)[]
@@ -34,13 +36,6 @@ export interface UserConfigServer {
   port?: number
 }
 
-export interface UserStart {
-  root?: string
-  ssr?: {
-    compose?: boolean
-  }
-}
-
 export interface AlbumUserConfig {
   env?: UserConfigEnv[]
   app?: UserConfigApp[]
@@ -49,7 +44,7 @@ export interface AlbumUserConfig {
   logger?: LoggerParams
   plugins?: AlbumUserPlugin[]
   vite?: UserConfig
-  start?: UserStart
+  start?: UserDevStartConfig
 }
 
 export interface StartCacheUserConfig {
@@ -63,6 +58,12 @@ export interface StartCacheUserConfig {
   }
   serverConfig: {
     port: number
+  }
+  ssrCompose: {
+    dependencies?: SSRComposeDependencies
+  }
+  start: {
+    root: string
   }
   logger: LoggerParams | undefined
 }

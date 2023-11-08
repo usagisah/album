@@ -4,7 +4,7 @@ import { ServerMode } from "../../cli/cli.type.js"
 import { SpecialModule } from "../../client/client.type.js"
 import { AlbumServerExpressConfig, AlbumServerViteConfig } from "../../middlewares/middlewares.type.js"
 import { DirStruct } from "../../utils/fs/fileManager.js"
-import { AlbumDevContext, AlbumStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context.type.js"
+import { AlbumDevContext, AlbumDevStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context.type.js"
 import { DevInputs } from "../inputs/inputs.type.js"
 import { AlbumUserConfig, UserConfigApp } from "../userConfig/userConfig.type.js"
 
@@ -43,7 +43,7 @@ export type PluginContext = (param: PluginContextParam) => any
 
 // 用于生成客户端文件
 export type PluginInitClientParam = {
-  info: AlbumStaticInfo
+  info: AlbumDevStaticInfo
   clientConfig: ClientConfig
   appFileManager: DirStruct
   dumpFileManager: DirStruct
@@ -57,7 +57,7 @@ export type PluginInitClient = (param: PluginInitClientParam) => any
 
 // 模块发生改变，热更新客户端文件
 export type PluginPatchClientParam = {
-  info: AlbumStaticInfo
+  info: AlbumDevStaticInfo
   clientConfig: ClientConfig
   appFileManager: DirStruct
   dumpFileManager: DirStruct
@@ -67,7 +67,7 @@ export type PluginPatchClient = (param: PluginPatchClientParam) => any
 
 // 这里能拿到内部存在的，中间件、vite 配置、模块，这些内容的 参数、执行函数 进行自定义修改
 export type PluginServerConfigParam = {
-  info: AlbumStaticInfo
+  info: AlbumDevStaticInfo
   midConfigs: AlbumServerExpressConfig[]
   viteConfigs: AlbumServerViteConfig[]
 } & PluginGlobalOptions
@@ -76,7 +76,7 @@ export type PluginServerConfig = (param: PluginServerConfigParam) => any
 // 可以拿到 app，进行服务器设置
 // 和 PluginServerConfig 的区别在于，有些模式会跳过这个，例如build，因为打包时不需要起服务
 export type PluginServerParam = {
-  info: AlbumStaticInfo
+  info: AlbumDevStaticInfo
   app: INestApplication
 } & PluginGlobalOptions
 export type PluginServer = (param: PluginServerParam) => any
