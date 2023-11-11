@@ -10,8 +10,8 @@ import { ILogger } from "../../modules/logger/logger.type.js"
 import { callPluginWithCatch } from "../../plugins/callPluginWithCatch.js"
 import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
 import { DevServerParams } from "../cli.type.js"
+import { buildSSRComposeDependencies } from "./buildSSRComposeDependencies.js"
 import { buildStartConfig } from "./buildStartConfig.js"
-import { collectSSRComposeDependencies } from "./collectSSRComposeDependencies.js"
 import { withTransformCjsPlugin } from "./transformSSRComposeImporters.js"
 
 export async function albumBuild(params: DevServerParams) {
@@ -85,8 +85,8 @@ async function buildSSR(context: AlbumDevContext) {
 
   let ssrComposeDependencies: SSRComposeDependencies | undefined
   logger.log("正在创建缓存配置，请耐心等待...", "album")
-  if (userConfig?.ssrCompose?.dependencies?.length) ssrComposeDependencies = await collectSSRComposeDependencies(context)
-  await buildStartConfig(context, ssrComposeDependencies)
+  if (userConfig?.ssrCompose?.dependencies?.length) ssrComposeDependencies = await buildSSRComposeDependencies(context)
+  await buildStartConfig(context)
   logger.log("创建完成", "album")
 
   logger.log("正在打包客户端，请耐心等待...", "album")

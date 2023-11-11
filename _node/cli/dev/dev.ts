@@ -1,9 +1,9 @@
 import { NestFactory } from "@nestjs/core"
 import { processClient } from "../../client/processClient.js"
 import { createAlbumDevContext } from "../../context/context.dev.js"
-import { callPluginWithCatch } from "../../context/plugins/callPluginWithCatch.js"
 import { AppModule } from "../../modules/app/app.module.js"
 import { ILogger } from "../../modules/logger/logger.type.js"
+import { callPluginWithCatch } from "../../plugins/callPluginWithCatch.js"
 import { processServer } from "../../server/processServer.dev.js"
 import { DevServerParams } from "../cli.type.js"
 

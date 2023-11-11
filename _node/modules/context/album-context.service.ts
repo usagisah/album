@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common"
-import { AlbumContext } from "../../context/AlbumContext.js"
+import { AlbumContext } from "../../context/context.type.js"
 
 @Injectable()
 export class AlbumContextService {
-  private context: AlbumContext
+  private context: AlbumContext | null = null
   private pending: any[] = []
 
   async getContext() {
     if (!this.context) {
       return new Promise<AlbumContext>(r => {
         this.pending.push(() => {
-          r(this.context)
+          r(this.context!)
         })
       })
     }

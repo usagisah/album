@@ -29,6 +29,7 @@ export type SSRComposeStartProjectsInput = Map<
     clientInput: string
     ssrInput: string
     mainServerInput: string
+    [x: string]: any
   }
 >
 
@@ -36,8 +37,8 @@ export type SSRComposeDependencies = Map<
   string,
   {
     filename: string
-    filepath: string
-    isCjs?: boolean
+    filepath?: string
+    cjs: boolean
   }
 >
 

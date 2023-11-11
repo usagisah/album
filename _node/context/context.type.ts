@@ -83,3 +83,5 @@ export type AlbumStartContext = {
   ssrComposeConfig: SSRComposeStartConfig
   userConfig: StartCacheUserConfig
 }
+
+export type AlbumContext = AlbumDevContext | AlbumStartContext

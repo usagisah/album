@@ -1,5 +1,5 @@
 import { AlbumDevContext } from "../context/context.type.js"
-import { callPluginWithCatch } from "../context/plugins/callPluginWithCatch.js"
+import { callPluginWithCatch } from "../plugins/callPluginWithCatch.js"
 import { expressConfigs } from "./express/expressConfigs.js"
 import { mergeMultipleViteConfig } from "./vite/mergeMultipleViteConfig.js"
 import { viteCoreOptions } from "./vite/viteCoreConfig.js"

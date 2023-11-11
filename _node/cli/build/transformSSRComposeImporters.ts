@@ -10,7 +10,7 @@ export function withTransformCjsPlugin(config: UserConfig, ssrComposeDependencie
   const cjsExternal: string[] = []
   ssrComposeDependencies.forEach((value, id) => {
     external.push(id)
-    if (value.isCjs) cjsExternal.push(id)
+    if (value.cjs) cjsExternal.push(id)
   })
   const cjsConfig: InlineConfig = {
     build: {

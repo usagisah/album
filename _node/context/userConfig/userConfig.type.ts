@@ -1,7 +1,6 @@
 import { UserConfig } from "vite"
 import { LoggerParams } from "../../modules/logger/logger.type.js"
 import { AlbumUserPlugin } from "../../plugins/plugin.type.js"
-import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
 import { Env } from "../env/env.type.js"
 import { UserDevStartConfig } from "../start/start.type.js"
 
@@ -62,9 +61,6 @@ export interface StartCacheUserConfig {
   }
   serverConfig: {
     port: number
-  }
-  ssrCompose: {
-    dependencies?: SSRComposeDependencies
   }
   start: {
     root: string

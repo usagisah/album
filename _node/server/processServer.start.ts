@@ -13,7 +13,7 @@ export async function processServer(serverApp: INestApplication, context: AlbumS
 
   const contextService = serverApp.get(AlbumContextService)
   contextService.setContext(context)
-  await applySSRComposeStartMiddleware()
+  await applySSRComposeStartMiddleware(serverApp, context, midConfigs)
   for (const { enable, name, config, factory } of midConfigs) {
     if (!enable) continue
     try {

@@ -1,1 +1,44 @@
-export async function applySSRComposeStartMiddleware() {}
+import { INestApplication } from "@nestjs/common"
+import { LazyModuleLoader } from "@nestjs/core"
+import { NextFunction, Request, Response } from "express"
+import { readFile } from "fs/promises"
+import sirv from "sirv"
+import { AlbumStartContext } from "../../context/context.type.js"
+import { AlbumServerExpressConfig } from "../../middlewares/middlewares.type.js"
+import { SSRComposeModule } from "../../modules/ssr-compose/ssr-compose.module.js"
+import { normalizeMidRequestOptions } from "../normalizeMidRequestOptions.js"
+
+export async function applySSRComposeStartMiddleware(app: INestApplication, context: AlbumStartContext, midConfigs: AlbumServerExpressConfig[]) {
+  const { info, ssrComposeConfig } = context
+  const { ssrCompose } = info
+  if (!ssrCompose) return
+
+  await app.get(LazyModuleLoader).load(() => SSRComposeModule)
+
+  const { dependenciesInputs, coordinateInputs, projectInputs } = ssrComposeConfig
+  const sirvConfig = midConfigs.find(v => v.name === "sirv")!
+  sirvConfig.factory = function proxyServerStaticFactory(_, options: any) {
+    projectInputs.forEach(value => {
+      value.assetsService = sirv(value.clientInput, sirvConfig.config[1])
+    })
+
+    return async function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
+      const reqPath = req.path
+      const dependencyInfo = dependenciesInputs.get(reqPath.slice(1))
+      if (dependencyInfo) {
+        const file = await readFile(dependencyInfo.filepath!, "utf-8")
+        res.header("Content-Type", "application/javascript")
+        res.send(file)
+        return
+      }
+
+      const { pathname, prefix, url } = normalizeMidRequestOptions(reqPath, projectInputs)
+      const project = projectInputs.get(prefix)
+      if (!project) return res.status(404).send("")
+
+      req.albumOptions = { pathname, prefix }
+      req.url = url
+      return project.assetsService(req, res, next)
+    }
+  }
+}

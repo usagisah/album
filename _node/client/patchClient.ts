@@ -1,5 +1,5 @@
 import { AlbumDevContext } from "../context/context.type.js"
-import { callPluginWithCatch } from "../context/plugins/callPluginWithCatch.js"
+import { callPluginWithCatch } from "../plugins/callPluginWithCatch.js"
 import { buildSpecialModules } from "./buildSpecialModule.js"
 
 export async function patchClient(context: AlbumDevContext) {

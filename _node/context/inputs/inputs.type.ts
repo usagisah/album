@@ -8,5 +8,7 @@ export type DevInputs = {
 export type StartInputs = {
   cwd: string
   root: string | null
+  clientInput: string | null
   ssrInput: string | null
+  mainSSRInput: string | null
 }
