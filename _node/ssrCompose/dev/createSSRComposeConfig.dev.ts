@@ -23,7 +23,5 @@ export async function createSSRComposeConfig({ appId, ssrCompose, clientConfig }
     projectInputs.set(name.toLowerCase(), { type: "dev" })
   }
 
-  return {
-    projectInputs
-  }
+  return { projectInputs }
 }

@@ -1,35 +1,51 @@
 import { Request, Response } from "express"
-import { AlBumServerMode } from "../../cli/cli.type.js"
-import { AlbumContext, AppInputs, AppMode } from "../../context/AlbumContext.type.js"
+import { ServerMode } from "../../cli/cli.type.js"
+import { Env, Mode } from "../../context/context.type.js"
 import { ILogger } from "../logger/logger.type.js"
-import { SSRComposeOptions } from "../ssr-compose/ssr-compose.type.js"
+import { SSRComposeContext } from "../ssr-compose/ssr-compose.type.js"
 
-export type CtlOptions = {
+export type AlbumSSRServerData = Record<string, any>
+export type AlbumSSRServerDynamicData = Record<string, Record<string, any>>
+
+export type AlbumSSRInputs = {
+  cwd: string
+  root: string
+  clientEntryInput: string | null
+}
+
+export type AlbumSSRContext = {
+  // 上下文静态信息
+  mode: Mode
+  serverMode: ServerMode
+  ssr: boolean
+  ssrCompose: boolean
+  env: Env
+  inputs: AlbumSSRInputs
+  logger: ILogger
+
+  // 请求相关数据
+  query: Record<string, any>
+  params: Record<string, string>
   req: Request
   res: Response
   headers: Record<string, string>
-}
-
-export type ServerDynamicData = Record<string, Record<string, any>>
-
-export type AlbumSSRContextOptions = {
-  ssrSlideProps: {
-    req: Request
-    headers: Record<string, string>
-    mode: AppMode
-    serverMode: AlBumServerMode
-    logger: ILogger
-    inputs: AppInputs
-    query: Record<string, any>
-    params: Record<string, string>
+  albumOptions: {
+    pathname: string
+    prefix: string
   }
-  serverRouteData: Record<string, any>
-  serverDynamicData: ServerDynamicData
+
+  // 由插件负责的数据
+  serverRouteData: AlbumSSRServerData
+  serverDynamicData: AlbumSSRServerDynamicData
 }
 
 export type AlbumSSRRenderOptions = {
-  ctlOptions: CtlOptions
-  serverContext: AlbumContext
-  ssrContextOptions: AlbumSSRContextOptions
-  ssrComposeOptions: SSRComposeOptions | null
+  ssrContext: AlbumSSRContext
+  ssrComposeContext: SSRComposeContext | null
+}
+
+export type CtrlOptions = {
+  req: Request
+  res: Response
+  headers: Record<string, string>
 }

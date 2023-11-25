@@ -20,7 +20,10 @@ export type SSRComposeCoordinateValue = {
   coordinate: Record<string, string>
   manifest: Record<string, any>
   ssrManifest: Record<string, string[]>
-  devFilepath?: string
+}
+
+export type SSRComposeDevCoordinateValue = {
+  devFilepath: string
 }
 
 export type SSRComposeStartProjectsInput = Map<
