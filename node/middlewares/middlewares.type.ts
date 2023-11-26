@@ -1,12 +1,3 @@
-import { InlineConfig, UserConfig } from "vite"
-
-export type ViteConfig = InlineConfig
-
-export type ViteUserConfig = UserConfig
-
-export type PluginViteConfig = {
-  name: string
-  options: ViteUserConfig
-}
-
-export type MiddlewareConfigs = Map<string, { config: any[]; factory: (...config: any[]) => any }>
+import { UserConfig } from "vite"
+export type AlbumServerViteConfig = { name: string; config: UserConfig }
+export type AlbumServerExpressConfig = { enable: boolean; name: string; config: any[]; factory: (...config: any[]) => any }

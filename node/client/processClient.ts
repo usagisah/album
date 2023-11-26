@@ -1,33 +1,19 @@
-import { AlbumContext } from "../context/AlbumContext.js"
-import { ClientManager } from "./client.type.js"
-import { initClient } from "./initClient/initClient.js"
-import { patchClient } from "./patchClient/patchClient.js"
+import { AlbumDevContext } from "../context/context.type.js"
+import { initClient } from "./initClient.js"
+import { patchClient } from "./patchClient.js"
 
 const pageReg = /\.?(page|router|action)\.[a-z]+$/
 
-export async function processClient(context: AlbumContext) {
-  const { serverMode, watcher } = context
+export async function processClient(context: AlbumDevContext) {
+  const { watcher } = context
+  context.clientManager = await initClient(context)
 
-  if (serverMode === "start") return
-
-  const clientManager: ClientManager = { specialModules: [] }
-  await initClient(context, clientManager)
-
-  if (context.watcher) {
-    watcher.on("add", async path => {
-      if (pageReg.test(path)) {
-        await patchClient(context, clientManager)
-      }
-    })
-    watcher.on("unlink", async path => {
-      if (pageReg.test(path)) {
-        await patchClient(context, clientManager)
-      }
-    })
-    watcher.on("unlinkDir", async () => {
-      await patchClient(context, clientManager)
-    })
+  if (watcher) {
+    const patch = async (p: string) => {
+      if (pageReg.test(p)) await patchClient(context)
+    }
+    watcher.on("add", patch)
+    watcher.on("unlink", patch)
+    watcher.on("unlinkDir", () => patchClient(context))
   }
-
-  context.manager.clientManager = clientManager
 }

@@ -1,122 +1,101 @@
-import { AlbumServerParams } from "../cli.type.js"
-
+import { RmOptions } from "fs"
 import { rm } from "fs/promises"
 import { resolve } from "path"
 import { build as viteBuild } from "vite"
 import { processClient } from "../../client/processClient.js"
-import { AlbumContext } from "../../context/AlbumContext.js"
-import { PluginBuildEndParam, PluginContextParam } from "../../context/AlbumContext.type.js"
+import { createAlbumDevContext } from "../../context/context.dev.js"
+import { AlbumDevContext } from "../../context/context.type.js"
 import { resolveMiddlewareConfig } from "../../middlewares/resolveMiddlewareConfig.js"
-import { callPluginWithCatch } from "../../utils/utils.js"
-import { printLogInfo } from "../lib/printLogInfo.js"
+import { ILogger } from "../../modules/logger/logger.type.js"
+import { callPluginWithCatch } from "../../plugins/callPluginWithCatch.js"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
+import { DevServerParams } from "../cli.type.js"
 import { buildSSRComposeDependencies } from "./buildSSRComposeDependencies.js"
+import { buildStartConfig } from "./buildStartConfig.js"
 import { withTransformCjsPlugin } from "./transformSSRComposeImporters.js"
 
-export async function albumBuild(params?: AlbumServerParams) {
-  const { app = "default" } = params ?? {}
-  const [contextErrors, context] = await new AlbumContext(app, "build", "production").build()
-  const {
-    mode,
-    status: { ssr },
-    configs: { clientConfig },
-    logger,
-    plugins,
-    outputs: { clientOutDir, ssrOutDir }
-  } = context
-  for (const e of contextErrors) {
-    logger.error(e, "AlbumContext", "album")
-  }
+export async function albumBuild(params: DevServerParams) {
+  let { appId = "default", args } = params
+  let _logger: ILogger = console
+  try {
+    const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "dev" })
+    const { logger, info, pluginConfig, clientConfig } = context
+    const { plugins, events } = pluginConfig
+    const { mode, serverMode, ssr, ssrCompose, inputs, outputs } = info
+    const { cwd } = inputs
+    const { clientOutDir, ssrOutDir } = outputs
+    _logger = logger
 
-  await callPluginWithCatch<PluginContextParam>(
-    plugins.hooks.context,
-    {
-      context: new Map(),
-      api: plugins.event,
-      albumContext: context
-    },
-    e => logger.error("PluginContext", e, "album")
-  )
-  await processClient(context)
-  await printLogInfo({
-    type: "onBuildStart",
-    context,
-    messages: [
-      [
-        "build config:",
-        {
-          app,
-          mode,
-          ssr: {
-            enable: ssr,
-            ...(ssr
-              ? {
-                  serverInput: resolve(clientConfig.mainSSR),
-                  ssrOutDir
-                }
-              : {})
-          },
-          client: {
-            clientInput: resolve(clientConfig.main),
-            clientOutDir
-          }
+    await callPluginWithCatch("context", plugins, { messages: new Map(), events, albumContext: context }, logger)
+    await processClient(context)
+
+    logger.log(
+      "build config: ",
+      {
+        appId,
+        mode,
+        serverMode,
+        ssrCompose,
+        client: {
+          clientInput: resolve(cwd, clientConfig.mainInput),
+          clientOutDir
         },
-        "album"
-      ]
-    ]
-  })
-  await (ssr ? buildSSR(context) : buildClient(context))
-  await callPluginWithCatch<PluginBuildEndParam>(
-    plugins.hooks.buildEnd,
-    {
-      context: new Map(),
-      api: plugins.event
-    },
-    e => logger.error("PluginBuildEnd", e, "album")
-  )
-  await printLogInfo({
-    type: "onBuildEnd",
-    context,
-    messages: [["所有资源打包完毕", "album"]]
-  })
+        ssr: {
+          enable: ssr,
+          ...(ssr
+            ? {
+                serverInput: resolve(cwd, clientConfig.mainSSRInput!),
+                ssrOutDir
+              }
+            : {})
+        }
+      },
+      "album"
+    )
+
+    await (ssr ? buildSSR(context) : buildClient(context))
+    await callPluginWithCatch("buildEnd", plugins, { messages: new Map(), events }, logger)
+
+    logger.log("所有资源打包完毕", "album")
+  } catch (e) {
+    _logger.error(e, "album")
+    throw e
+  }
 }
 
-async function buildClient(context: AlbumContext) {
-  const {
-    outputs: { clientOutDir },
-    logger
-  } = context
-  await rm(clientOutDir, { force: true, recursive: true })
+const rmOptions: RmOptions = { force: true, recursive: true }
+async function buildClient(context: AlbumDevContext) {
+  const { info, logger } = context
+  const { clientOutDir } = info.outputs
+  await rm(clientOutDir, rmOptions)
 
   const clientBuildConfig = await resolveMiddlewareConfig(context)
   logger.log("正在打包客户端...", "album")
-  await viteBuild(clientBuildConfig.viteConfigs).catch(e => {
-    logger.error("打包客户端过程发现错误:", e, "album")
-    throw e
-  })
+  await viteBuild(clientBuildConfig.viteConfigs)
   logger.log("打包客户端成功", "album")
 }
 
-async function buildSSR(context: AlbumContext) {
-  const { logger, configs, inputs, outputs } = context
+async function buildSSR(context: AlbumDevContext) {
+  const { info, logger, userConfig } = context
+  const { outputs } = info
   const { clientOutDir, ssrOutDir } = outputs
-  const ssrBuildConfig = await resolveMiddlewareConfig(context)
-  const clientBuildConfig = await resolveMiddlewareConfig(context, true)
+  const { viteConfigs } = await resolveMiddlewareConfig(context, true)
 
-  await Promise.all([rm(clientOutDir, { force: true, recursive: true }), rm(ssrOutDir, { force: true, recursive: true })])
+  await Promise.all([rm(clientOutDir, rmOptions), rm(ssrOutDir!, rmOptions)])
 
-  if (configs.userConfig?.ssrCompose?.dependencies?.length) {
-    logger.log(`发现 ssr-compose 共享依赖，正在生成，请耐心等待...`, "album")
-    await buildSSRComposeDependencies(context)
-    logger.log(`生成 ssr-compose 共享依赖成功`, "album")
-  } else {
-    logger.log("ssr-compose 共享依赖为 0, 跳过生成共享依赖")
-  }
+  let ssrComposeDependencies: SSRComposeDependencies | undefined
+  logger.log("正在创建缓存配置，请耐心等待...", "album")
+  if (userConfig?.ssrCompose?.dependencies?.length) ssrComposeDependencies = await buildSSRComposeDependencies(context)
+  await buildStartConfig(context)
+  logger.log("创建完成", "album")
 
   logger.log("正在打包客户端，请耐心等待...", "album")
-  await viteBuild(withTransformCjsPlugin(clientBuildConfig.viteConfigs, inputs.ssrComposeDependencies))
+  await viteBuild(ssrComposeDependencies ? withTransformCjsPlugin(viteConfigs, ssrComposeDependencies) : viteConfigs)
   logger.log("打包客户端(client)成功", "album")
 
   logger.log("正在打包服务端，请耐心等待...", "album")
-  await viteBuild(ssrBuildConfig.viteConfigs)
+  await viteBuild(viteConfigs)
   logger.log("打包服务端(ssr/server)成功", "album")
+
+  logger.log("正在生产生产配置文件，请耐心等待", "album")
 }

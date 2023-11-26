@@ -1,89 +1,147 @@
-import { Request, Response } from "express"
-import { AlbumContext } from "../../context/AlbumContext.type.js"
-import { AlbumSSRContextOptions, AlbumSSRRenderOptions, CtlOptions } from "./ssr.type.js"
-
 import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
+import { Request, Response } from "express"
+import { AlbumDevContext, AlbumStartContext } from "../../context/context.type.js"
+import { Fun } from "../../utils/types/types.js"
 import { AlbumContextService } from "../context/album-context.service.js"
-import { createSsrComposeOptions } from "../ssr-compose/ssr-compose.controller.js"
+import { SSRComposeService } from "../ssr-compose/ssr-compose.service.js"
+import { SSRService } from "./ssr.service.js"
+import { AlbumSSRRenderOptions, CtrlOptions } from "./ssr.type.js"
 
 @Controller()
-export class SsrController {
-  ssrRender: (options: AlbumSSRRenderOptions) => Promise<any>
-  onSsrRenderError: any
+export class SSRController {
+  onSSRenderError?: Fun<[any]>
 
-  constructor(private context: AlbumContextService) {
-    this.initModule()
+  constructor(
+    private context: AlbumContextService,
+    private ssrService: SSRService,
+    private ssrComposeService: SSRComposeService
+  ) {
+    this.context.getContext().then((ctx: any) => {
+      ctx.info.serverMode === "start" ? this.initStartModule(ctx) : this.initDevModule(ctx)
+    })
+  }
+
+  private async ssrRender(opts: CtrlOptions) {
+    throw "未初始化的 album builtin ssrRender"
+  }
+
+  private ssrRenderError(reason: unknown, res: Response) {
+    throw "未初始化的 album builtin ssrRenderError"
   }
 
   @Get("*")
   async ssr(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>) {
-    const albumContext = await this.context.getContext()
-    const { ssrCompose } = albumContext.configs
-
-    try {
-      const ctlOptions = { req, res, headers }
-      await this.ssrRender({
-        serverContext: albumContext,
-        ctlOptions,
-        ssrContextOptions: createSsrContextOptions(ctlOptions, albumContext),
-        ssrComposeOptions: ssrCompose ? createSsrComposeOptions(albumContext) : null
-      })
-    } catch (e: any) {
-      res.status(500).send("服务器错误")
-      this.onSsrRenderError(e)
-      throw new Error(e, { cause: "ssr.controller" })
-    }
+    await this.ssrRender({ req, res, headers }).catch(e => this.ssrRenderError(e, res))
   }
 
-  async initModule() {
-    const { serverMode, vite, inputs, configs } = await this.context.getContext()
-    const { viteDevServer } = vite
-    const { realSSRInput, ssrComposeProjectsInput } = inputs
+  async initStartModule(ctx: AlbumStartContext) {
+    const { info, logger, ssrComposeConfig } = ctx
+    const { mode, serverMode, ssr, ssrCompose, inputs, env } = info
+    const { cwd, root } = inputs
+    const { projectInputs } = ssrComposeConfig
 
-    if (!configs.ssrCompose && serverMode === "start") {
-      this.ssrRender = (await import(realSSRInput)).ssrRender
-      this.onSsrRenderError = () => {}
-      return
-    }
+    let createOptions = this.ssrService.createSSRRenderOptions
+    if (!createOptions) {
+      createOptions = this.ssrService.createSSRRenderOptions = ({ req, res, headers }) => {
+        const userSSRRenderOptions: AlbumSSRRenderOptions = {
+          ssrContext: {
+            mode,
+            serverMode,
+            ssr,
+            ssrCompose,
+            env,
+            inputs: { cwd, root: root!, clientEntryInput: "" },
 
-    if (configs.ssrCompose && serverMode === "start") {
-      const errorPage = ssrComposeProjectsInput.get("error")
-      this.ssrRender = async (options: AlbumSSRRenderOptions) => {
-        const { req, res } = options.ctlOptions
-        const { prefix } = req.albumOptions
-        if (!ssrComposeProjectsInput.has(prefix)) {
-          if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender(options)
-          return res.status(404).send("")
+            req,
+            res,
+            headers,
+            albumOptions: req.albumOptions,
+            query: req.query,
+            params: {},
+            logger,
+
+            serverDynamicData: {},
+            serverRouteData: {}
+          },
+          ssrComposeContext: null
         }
-        return (await import(ssrComposeProjectsInput.get(prefix).mainServerInput)).ssrRender(options)
+        return userSSRRenderOptions
       }
-      this.onSsrRenderError = () => {}
+    }
+
+    this.ssrRenderError = (e, res) => {
+      res.status(500).send("服务器错误")
+      logger.error(e, "album")
+    }
+
+    if (!ssrCompose) {
+      this.ssrRender = async options => {
+        const userSSRRender = (await import(inputs.mainSSRInput!)).ssrRender
+        return userSSRRender(createOptions(options))
+      }
       return
     }
 
-    if (serverMode !== "start") {
-      this.ssrRender = async options => {
-        return (await viteDevServer.ssrLoadModule(realSSRInput)).ssrRender(options)
+    const errorPage = projectInputs.get("error")
+    this.ssrRender = async (options: CtrlOptions) => {
+      const { req, res } = options
+      const { prefix } = req.albumOptions
+      const userSSRRenderOptions = createOptions(options)
+      const userComposeContext = this.ssrComposeService.createSSRComposeContext()
+      userSSRRenderOptions.ssrComposeContext = userComposeContext
+
+      if (!projectInputs.has(prefix)) {
+        if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender(userSSRRenderOptions)
+        return res.status(404).send()
       }
-      this.onSsrRenderError = (e: Error) => viteDevServer.ssrFixStacktrace(e)
-      return
+      return (await import(projectInputs.get(prefix)!.mainServerInput)).ssrRender(userSSRRenderOptions)
     }
   }
-}
 
-export function createSsrContextOptions(ctl: CtlOptions, ctx: AlbumContext): AlbumSSRContextOptions {
-  return {
-    serverDynamicData: {},
-    serverRouteData: {},
-    ssrSlideProps: {
-      req: ctl.req,
-      headers: ctl.req.headers as any,
-      query: ctl.req.query,
-      params: {},
-      mode: ctx.mode,
-      serverMode: ctx.serverMode,
-      inputs: { ...ctx.inputs },
-      logger: ctx.logger
+  async initDevModule(ctx: AlbumDevContext) {
+    const { info, clientManager, viteDevServer, logger } = ctx
+    const { mode, serverMode, ssr, ssrCompose, env, inputs } = info
+    const { cwd, dumpInput } = inputs
+    const { realSSRInput, realClientInput } = clientManager!
+
+    this.ssrRender = async options => {
+      const userSSRRender = (await viteDevServer!.ssrLoadModule(realSSRInput!)).ssrRender
+
+      let createOptions = this.ssrService.createSSRRenderOptions
+      if (!createOptions) {
+        createOptions = this.ssrService.createSSRRenderOptions = ({ req, res, headers }) => {
+          const userSSRRenderOptions: AlbumSSRRenderOptions = {
+            ssrContext: {
+              mode,
+              serverMode,
+              ssr,
+              ssrCompose,
+              env,
+              inputs: { cwd, root: dumpInput, clientEntryInput: realClientInput },
+
+              req,
+              res,
+              headers,
+              albumOptions: req.albumOptions,
+              query: req.query,
+              params: {},
+              logger,
+
+              serverDynamicData: {},
+              serverRouteData: {}
+            },
+            ssrComposeContext: null
+          }
+          return userSSRRenderOptions
+        }
+      }
+
+      return userSSRRender(createOptions(options))
+    }
+    this.ssrRenderError = (e, res) => {
+      res.status(500).send("服务器错误")
+      viteDevServer!.ssrFixStacktrace(e as any)
+      logger.error(e, "album")
     }
   }
 }

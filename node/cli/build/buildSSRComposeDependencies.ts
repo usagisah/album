@@ -1,101 +1,54 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs"
-import { basename, parse, resolve } from "path"
-import { Package, exports } from "resolve.exports"
+import { stringify } from "@ungap/structured-clone/json"
+import { readFileSync } from "fs"
+import { mkdir, rm, writeFile } from "fs/promises"
+import { hasCJSSyntax } from "mlly"
+import { resolve } from "path"
 import { build as viteBuild } from "vite"
-import { AlbumContext, SSRComposeDependencies } from "../../context/AlbumContext.type.js"
-import { isString } from "../../utils/utils.js"
-import { analysisCjsModule } from "./analysisCjsModule.js"
+import { AlbumDevContext } from "../../context/context.type.js"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
+import { makeLegalIdentifier } from "../../utils/modules/makeLegalIdentifier.js"
+import { resolveLibPath } from "../../utils/path/resolveLibPath.js"
 
-type DependenciesList = {
-  external: string[]
-  props: { moduleName: string; subModuleName: string; fullModuleName: string }[]
-  outDir: string
-  context: AlbumContext
+export async function buildSSRComposeDependencies(context: AlbumDevContext): Promise<SSRComposeDependencies> {
+  const dependencies = context.ssrComposeConfig!.dependencies
+  if (dependencies.length === 0) return new Map()
+
+  const { inputs, outputs } = context.info
+  const { cwd } = inputs
+  const { outDir } = outputs
+  const depOutDir = resolve(outDir!, ".ssr-compose-dependencies")
+
+  await rm(depOutDir, { force: true, recursive: true })
+  await mkdir(depOutDir, { recursive: true })
+
+  const ssrComposeDependenciesData = await Promise.all(dependencies.map(async libName => buildDependency(resolve(cwd, "node_modules", libName), depOutDir, dependencies)))
+  const manifest: SSRComposeDependencies = new Map(ssrComposeDependenciesData)
+  await writeFile(resolve(depOutDir, "manifest.json"), stringify(manifest), "utf-8")
+  return manifest
 }
 
-export async function buildSSRComposeDependencies(context: AlbumContext) {
-  const { dependencies } = context.configs.userConfig?.ssrCompose
-  if (!dependencies) return
+async function buildDependency(libPath: string, depOutDir: string, external: string[]) {
+  const pathInfo = await resolveLibPath(libPath)
+  if (!pathInfo) throw `找不到该共享依赖(${libPath})的入口`
 
-  const { inputs, outputs } = context
-  const { ssrOutDir } = outputs
-  const ssrComposeDependencies: SSRComposeDependencies = (inputs.ssrComposeDependencies = {})
-  const outDir = resolve(ssrOutDir, "../.ssr-compose-dependencies")
-  rmSync(outDir, { force: true, recursive: true })
-  mkdirSync(outDir, { recursive: true })
-
-  const list: DependenciesList = {
-    external: [],
-    props: [],
-    context,
-    outDir
-  }
-  for (const item of dependencies) {
-    if (isString(item)) {
-      list.external.push(item)
-      list.props.push({ moduleName: item, subModuleName: "", fullModuleName: item })
-    } else {
-      for (const moduleName of Object.getOwnPropertyNames(item)) {
-        for (const subModuleName of Object.getOwnPropertyNames(item[moduleName])) {
-          const fullModuleName = moduleName + "/" + subModuleName
-          list.external.push(fullModuleName)
-          list.props.push({ moduleName, subModuleName: "/" + subModuleName, fullModuleName })
-        }
-      }
-    }
-  }
-
-  await Promise.all(list.props.map(async (_, index) => buildDependency(list, index)))
-  writeFileSync(resolve(outDir, "manifest.json"), JSON.stringify(ssrComposeDependencies), "utf-8")
-}
-
-function findExports(pkg: Package, module: string) {
-  let value: string
-  try {
-    const res = exports(pkg, module)
-    if (res) value = res[0]
-  } catch {}
-  if (!value) value = pkg.module
-  if (!value) value = pkg.main
-  if (value.startsWith("/")) value = "." + value
-  return value
-}
-
-async function buildDependency(list: DependenciesList, index: number) {
-  const { context, outDir, external, props } = list
-  const { moduleName, subModuleName, fullModuleName } = props[index]
-
-  const { cwd, ssrComposeDependencies } = context.inputs
-  const pkgPath = resolve(cwd, "node_modules", moduleName, "package.json")
-  if (Reflect.has(ssrComposeDependencies, fullModuleName)) return
-  if (!existsSync(pkgPath)) throw `找不到 ssrCompose.${fullModuleName} 的依赖，请确保配置合法，并正确添加依赖`
-
-  const pkg: Package = JSON.parse(readFileSync(pkgPath, "utf-8"))
-  const entryPath = findExports(pkg, subModuleName.slice(1))
-  const fullEntryPath = resolve(cwd, "node_modules", moduleName, entryPath)
-  if (!entryPath || !existsSync(fullEntryPath)) throw `找不到 ssrCompose.${fullModuleName} 的依赖入口，请联系库作者解决`
-
-  const outfile = resolve(outDir, fullModuleName.replace("/", "_") + ".js")
+  const { refPath, refFullPath } = pathInfo
+  const filename = makeLegalIdentifier(refPath)
   await viteBuild({
     logLevel: "error",
     build: {
-      lib: {
-        entry: fullEntryPath,
-        formats: ["es"],
-        fileName: parse(outfile).name
-      },
+      lib: { entry: refFullPath, formats: ["es"], fileName: filename },
       emptyOutDir: false,
-      outDir,
-      rollupOptions: {
-        external
-      },
-      minify: false
+      outDir: depOutDir,
+      rollupOptions: { external },
+      minify: true
     },
     define: { "process.env.NODE_ENV": `"production"` }
   })
-  ssrComposeDependencies[fullModuleName] = {
-    filename: basename(outfile),
-    filepath: outfile,
-    isCjs: analysisCjsModule(readFileSync(fullEntryPath, "utf-8"))
-  }
+  return [
+    refPath,
+    {
+      filename,
+      cjs: hasCJSSyntax(readFileSync(refPath, "utf-8"))
+    }
+  ] as const
 }

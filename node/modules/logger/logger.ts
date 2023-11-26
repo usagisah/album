@@ -1,55 +1,89 @@
-import { ILogger } from "./logger.type.js"
+import { gray, green, magenta, red, yellow } from "colorette"
+import day from "dayjs"
+import { resolve } from "path"
+import { format as prettyFormat } from "pretty-format"
+import { createLogger, format, transports } from "winston"
+import "winston-daily-rotate-file"
+import { isFunction, isPlainObject } from "../../utils/check/simple.js"
+import { DailyRotateFileTransportOptions, ILogger, LoggerParams } from "./logger.type.js"
 
 export class Logger implements ILogger {
-  color = {
-    green: (text: string) => `\x1B[32m${text}\x1B[39m`,
-    yellow: (text: string) => `\x1B[33m${text}\x1B[39m`,
-    red: (text: string) => `\x1B[31m${text}\x1B[39m`,
-    bgRed: (t: string) => `\x1b[41m${t}\x1b[41m`,
-    bgGreen: (t: string) => `\x1b[42m${t}\x1b[42m`
+  static logger: Logger
+  private colors = { info: green, warn: yellow, error: red, debug: magenta }
+  private logger: any
+
+  constructor(params: LoggerParams = {}) {
+    if (Logger.logger) return Logger.logger
+    const { level = "info", enableConsole = true, consoleFormat, enableFile = false, fileOptions } = params
+    const _transports: any[] = []
+    if (enableConsole) {
+      _transports.push(
+        new transports.Console({
+          format:
+            consoleFormat ??
+            format.printf(info => {
+              const messages = [info.message, ...(info[Symbol.for("splat")] ?? [])]
+              const context = messages.length > 1 && typeof messages.at(-1) === "string" ? messages.pop() : null
+              return this.formatConsoleMessage(info.level, context, messages)
+            })
+        })
+      )
+    }
+    if (enableFile) {
+      let options = isPlainObject(fileOptions)
+        ? fileOptions
+        : {
+            level,
+            dirname: resolve(process.cwd(), "logs"),
+            filename: "assets.%DATE%.log",
+            datePattern: "YYYY-MM-DD",
+            maxSize: "1g",
+            zippedArchive: false,
+            maxFiles: "1d",
+            format: format.simple()
+          }
+      if (isFunction(fileOptions)) {
+        const res = fileOptions(options as any)
+        if (isPlainObject(res)) options = res
+      }
+      _transports.push(new transports.DailyRotateFile(options as DailyRotateFileTransportOptions))
+    }
+
+    this.logger = createLogger({
+      level,
+      transports: _transports
+    })
+    Logger.logger = this
   }
 
   log(message: any, ...optionalParams: any[]) {
-    this.formatMessage([message], optionalParams, "info", "green")
+    this.logger.info(message, ...optionalParams)
   }
 
   error(message: any, ...optionalParams: any[]) {
-    this.formatMessage([message], optionalParams, "error", "red")
+    this.logger.error(message, ...optionalParams)
   }
 
   warn(message: any, ...optionalParams: any[]) {
-    this.formatMessage([message], optionalParams, "warn", "yellow")
+    this.logger.warn(message, ...optionalParams)
   }
 
-  debug?(message: any, ...optionalParams: any[]) {
-    this.formatMessage([message], optionalParams, "debug", "bgRed")
+  debug(message: any, ...optionalParams: any[]) {
+    this.logger.debug(message, ...optionalParams)
   }
 
-  verbose?(message: any, ...optionalParams: any[]) {
-    this.formatMessage([message], optionalParams, "verbose", "bgGreen")
+  verbose(message: any, ...optionalParams: any[]) {
+    this.logger.verbose(message, ...optionalParams)
   }
 
-  formatMessage(messages: any[], params: any[], level: string, color: string) {
-    let context = ""
-    if (typeof params.at(-1) === "string") {
-      context = params.at(-1)
-      params = params.slice(0, -1)
-    }
-
-    this.printMessage(context, [...messages, ...params], level, color)
+  getColor(level: string) {
+    return this.colors[level] ?? gray
   }
 
-  printMessage(context: string, messages: any[], level: string, color: string) {
-    const msg = messages.join(" ")
-    const c = (this.color as any)[color]
-    const t = new Intl.DateTimeFormat("zh-CN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric"
-    }).format(new Date())
-    process.stdout.write(`${c("[" + level + "]")} ${this.color.red(t)} ${c("{" + context + "}")} -> ${c(msg)} \n`)
+  formatConsoleMessage(level: string, context: string | null, messages: string[]) {
+    const c = this.getColor(level)
+    const t = day().format("YYYY-MM-DD HH:mm:ss")
+    const m = messages.map(m => (typeof m === "string" ? m : prettyFormat(m)))
+    return `${c("[" + level + "]")} ${red(t)} ${context ? c("{" + context + "}") : ""} -> ${c(m)}`
   }
 }

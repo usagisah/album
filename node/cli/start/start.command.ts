@@ -1,13 +1,12 @@
-import { AlbumServerParams } from "../cli.type.js"
 import { albumStartServer } from "./start.js"
 
 export class StartCommand {
-  constructor(public params: AlbumServerParams) {
+  constructor() {
     this.start()
   }
 
   async start() {
-    albumStartServer(this.params).catch((e: any) => {
+    albumStartServer().catch((e: any) => {
       throw e
     })
   }

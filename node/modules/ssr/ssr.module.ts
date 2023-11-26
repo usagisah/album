@@ -1,7 +1,13 @@
 import { Module } from "@nestjs/common"
-import { SsrController } from "./ssr.controller.js"
+import { AlbumContextModule } from "../context/album-context.module.js"
+import { SSRComposeModule } from "../ssr-compose/ssr-compose.module.js"
+import { SSRController } from "./ssr.controller.js"
+import { SSRService } from "./ssr.service.js"
 
 @Module({
-  controllers: [SsrController]
+  imports: [AlbumContextModule, SSRComposeModule],
+  controllers: [SSRController],
+  providers: [SSRService],
+  exports: [SSRService]
 })
-export class SsrModule {}
+export class SSRModule {}
