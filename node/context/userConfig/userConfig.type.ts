@@ -65,5 +65,5 @@ export interface StartCacheUserConfig {
   start: {
     root: string
   }
-  logger: LoggerParams | undefined
+  logger?: LoggerParams
 }

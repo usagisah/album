@@ -4,16 +4,16 @@ export type SSRComposeDevConfig = {
 }
 
 export type SSRComposeDevProjectInputs = Map<string, {}>
-/* --------------  -------------- */
-
-export type SSRComposeCoordinateValue = {
-  coordinate: Record<string, string>
-  manifest: Record<string, any>
-  ssrManifest: Record<string, string[]>
-}
 
 export type SSRComposeDevCoordinateValue = {
   devFilepath: string
+}
+/* --------------  -------------- */
+
+export type SSRComposeStartCoordinateValue = {
+  coordinate: Record<string, string>
+  manifest: Record<string, any>
+  ssrManifest: Record<string, string[]>
 }
 
 export type SSRComposeStartProjectsInput = Map<
@@ -35,6 +35,7 @@ export type SSRComposeDependencies = Map<
   }
 >
 
+export type SSRComposeCoordinateValue = SSRComposeStartCoordinateValue | SSRComposeDevCoordinateValue
 export type SSRComposeCoordinateInput = Map<string, SSRComposeCoordinateValue>
 
 export type SSRComposeStartConfig = {

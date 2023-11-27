@@ -45,7 +45,7 @@
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "dev": "node ./scripts/dev.mjs",
-    "format": "prettier --write \"node/**/*.ts\" \"client/**/*.ts\" \"_node/**/*.ts\"",
+    "format": "prettier --write \"node/**/*.ts\" \"client/**/*.ts\"",
     "pub": "node ./scripts/publish.mjs"
   },
   "dependencies": {

@@ -4,6 +4,7 @@ import { Request, Response } from "express"
 import { existsSync } from "fs"
 import { parse, resolve } from "path"
 import { UserConfig, mergeConfig, build as viteBuild } from "vite"
+import { SSRComposeStartCoordinateValue } from "../../ssrCompose/ssrCompose.type.js"
 import { isPlainObject } from "../../utils/check/simple.js"
 import { AlbumContextService } from "../context/album-context.service.js"
 import { SSRService } from "../ssr/ssr.service.js"
@@ -55,6 +56,7 @@ export class SSRComposeController {
       this.composeService.createSSRComposeContext = () => {
         const ssrComposeContext: AlbumSSRComposeContext = {
           sources: {},
+          projectInputs,
           dependenciesMap: dependenciesToMap([...dependenciesInputs.keys()]),
           async renderRemoteComponent(renderProps, ctrl) {
             const { req, res } = ctrl
@@ -78,7 +80,7 @@ export class SSRComposeController {
             let value = coordinateInputs.get(prefix)
             if (!value) value = coordinateInputs.get("error")
             if (!value) return null
-            const _value = value.coordinate[sourcePath]
+            const _value = (value as SSRComposeStartCoordinateValue).coordinate[sourcePath]
             if (!_value) return null
             return value
           },
@@ -93,6 +95,7 @@ export class SSRComposeController {
       this.composeService.createSSRComposeContext = () => {
         const ssrComposeContext: AlbumSSRComposeContext = {
           sources: {},
+          projectInputs: null,
           dependenciesMap: dependenciesToMap(dependencies),
           viteComponentBuild: async ({ input, outDir }) => {
             const config = mergeConfig(userConfig.vite ?? {}, {
