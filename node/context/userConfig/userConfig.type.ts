@@ -1,14 +1,11 @@
 import { UserConfig } from "vite"
 import { LoggerParams } from "../../modules/logger/logger.type.js"
 import { AlbumUserPlugin } from "../../plugins/plugin.type.js"
-import { Env } from "../env/env.type.js"
+import { Env, EnvValue } from "../env/env.type.js"
 import { UserDevStartConfig } from "../start/start.type.js"
 
-export interface UserConfigEnv {
-  common?: (Record<string, string> | string)[]
-  production?: (Record<string, string> | string)[]
-  development?: (Record<string, string> | string)[]
-}
+export type UserConfigEnvValue = Partial<EnvValue>
+export type UserConfigEnv = UserConfigEnvValue | string
 
 export interface UserConfigAppRouter {
   basename?: string
@@ -37,7 +34,7 @@ export interface UserConfigServer {
 
 export interface AlbumUserConfig {
   env?: UserConfigEnv[]
-  app?: UserConfigApp[]
+  app?: UserConfigApp | UserConfigApp[]
   ssrCompose?: UserSSRCompose
   server?: UserConfigServer
   logger?: LoggerParams

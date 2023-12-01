@@ -1,4 +1,4 @@
-import { parser } from "@ungap/structured-clone/json"
+import { parse } from "@ungap/structured-clone/json"
 import { existsSync, statSync } from "fs"
 import { readFile, readdir } from "fs/promises"
 import { resolve } from "path"
@@ -39,7 +39,7 @@ export async function createSSRComposeConfig(root: string) {
 
     try {
       const depDirPath = resolve(root, name, ".ssr-compose-dependencies")
-      const composeManifest: SSRComposeDependencies = parser(await readFile(resolve(depDirPath, "manifest.json"), "utf-8"))
+      const composeManifest: SSRComposeDependencies = parse(await readFile(resolve(depDirPath, "manifest.json"), "utf-8"))
       composeManifest.forEach((value, id) => {
         if (dependenciesInputs.has(id)) return
         value.filepath = resolve(depDirPath, value.filename)

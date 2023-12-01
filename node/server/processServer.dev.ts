@@ -1,12 +1,12 @@
 import { INestApplication } from "@nestjs/common"
 import { LazyModuleLoader } from "@nestjs/core"
-import { applySSRComposeDevMiddleware } from "ssrCompose/dev/applySSRComposeMiddleware.dev.js"
 import { createServer } from "vite"
 import { AlbumDevContext } from "../context/context.type.js"
 import { resolveMiddlewareConfig } from "../middlewares/resolveMiddlewareConfig.js"
 import { AlbumContextService } from "../modules/context/album-context.service.js"
 import { SSRModule } from "../modules/ssr/ssr.module.js"
 import { callPluginWithCatch } from "../plugins/callPluginWithCatch.js"
+import { applySSRComposeDevMiddleware } from "../ssrCompose/dev/applySSRComposeMiddleware.dev.js"
 
 export async function processServer(serverApp: INestApplication, context: AlbumDevContext) {
   const { info, pluginConfig, logger } = context

@@ -22,16 +22,13 @@ export function mergeConfigRecursively(conf1: AlbumUserConfig, conf2: AlbumUserC
       continue
     }
 
-    if (key === "app") {
-    }
-
     if (key === "vite") {
-      merged[key] = viteMergeConfig(mValue, value)
+      merged.vite = viteMergeConfig(mValue, value)
       continue
     }
 
     if (key === "env") {
-      merged[key] = [...arraify(value), ...arraify(value)]
+      merged.env = [...arraify(value), ...arraify(value)]
       continue
     }
 
@@ -41,7 +38,7 @@ export function mergeConfigRecursively(conf1: AlbumUserConfig, conf2: AlbumUserC
     }
 
     if (isPlainObject(value)) {
-      merged[key] = mergeConfigRecursively(mValue[key], value[key])
+      merged[key] = mergeConfigRecursively(mValue, value)
       continue
     }
 

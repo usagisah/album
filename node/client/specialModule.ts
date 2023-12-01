@@ -1,8 +1,28 @@
 import { Dirent } from "fs"
 import { readdir } from "fs/promises"
 import { basename, parse as pathParse, resolve } from "path"
+import { AlbumDevContext } from "../context/context.type.js"
 import { ILogger } from "../modules/logger/logger.type.js"
 import { SpecialModule, SpecialModuleFile } from "./client.type.js"
+
+export async function buildSpecialModules(context: AlbumDevContext): Promise<SpecialModule[]> {
+  const { clientConfig, logger, info } = context
+  const { module } = clientConfig
+  if (!module) return []
+
+  const { moduleName, modulePath } = module
+  const { ssrCompose } = info
+  if (ssrCompose) {
+    const res = await resolveModules({ logger, modulePath, moduleName, parentModule: null })
+    return res ? [res] : []
+  }
+  return await walkModules({
+    logger,
+    modulePath,
+    moduleName,
+    parentModule: null
+  })
+}
 
 type ParseRouterParams = {
   modulePath: string
@@ -29,8 +49,8 @@ export async function resolveModules(params: ParseRouterParams) {
   const { moduleName, modulePath, parentModule, logger } = params
   const filename = basename(modulePath)
   if (!regLegalModuleName.test(filename)) {
-    logger.warn("约定式模块的文件夹名称，只支持以字母开头的，字符与数字混合的名称", "album")
-    return
+    // logger.warn("约定式模块的文件夹名称，只支持以字母开头的，字符与数字混合的名称", "album")
+    return false
   }
 
   const files: SpecialModuleFile[] = []
@@ -97,7 +117,10 @@ function buildRoute({ filename, files, parentModule }: BuildRouteParams) {
   let routePath = ""
   if (!parentModule && filename.toLocaleLowerCase() === "home") routePath = "/"
   else if (!parentModule && filename.toLocaleLowerCase() === "error") routePath = "/*"
-  else routePath = "/" + pageFile.filename.slice(0, -5)
+  else {
+    const index = pageFile.filename.lastIndexOf(".page")
+    routePath = "/" + pageFile.filename.slice(0, index)
+  }
 
   return { pageFile, routerFile, actionFile, routePath }
 }

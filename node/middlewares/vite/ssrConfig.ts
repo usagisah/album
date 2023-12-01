@@ -1,6 +1,7 @@
 import { InlineConfig, PluginOption } from "vite"
 import { AlbumDevContext } from "../../context/context.type.js"
 
+const configName = "album:ssr"
 export function createSSRCoreConfig(context: AlbumDevContext): [InlineConfig, PluginOption] {
   const { info, clientManager } = context
   const { outputs } = info
@@ -17,5 +18,5 @@ export function createSSRCoreConfig(context: AlbumDevContext): [InlineConfig, Pl
       }
     }
   }
-  return [config, { name: "" }]
+  return [config, { name: configName }]
 }

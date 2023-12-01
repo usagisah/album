@@ -11,12 +11,12 @@ export type ResolveFilePathParams = {
 }
 
 export async function resolveFilePath(params: ResolveFilePathParams): Promise<null | string> {
-  const { root = process.cwd(), name = "", prefixes = ["./", "src"], suffixes, exts = [".js", ".mjs"], realPath } = params
+  const { root = process.cwd(), name = "", prefixes = ["./", "src"], suffixes = [""], exts = [".js", ".mjs"], realPath } = params
   if (!name && (!suffixes || suffixes.length === 0)) return null
   for (const prefix of prefixes) {
     for (const ext of exts) {
-      for (const suffix of buildSuffixes(suffixes)) {
-        const filePath = resolve(root, prefix, name + suffix + ext)
+      for (const suffix of suffixes) {
+        const filePath = resolve(root, prefix, name + padSpot(suffix) + padSpot(ext))
         if (existsSync(filePath)) {
           if (realPath) return (await import("./resolveRealPath.js")).resolveRealPath(filePath)
           return filePath
@@ -36,11 +36,11 @@ export type ResolveDirPathParams = {
 }
 
 export async function resolveDirPath(params: ResolveDirPathParams) {
-  const { root = process.cwd(), name = "", prefixes = ["./", "src"], suffixes, realPath } = params ?? {}
+  const { root = process.cwd(), name = "", prefixes = ["./", "src"], suffixes = [""], realPath } = params ?? {}
   if (!name && (!suffixes || suffixes.length === 0)) return null
   for (const prefix of prefixes) {
-    for (const suffix of buildSuffixes(suffixes)) {
-      const dirPath = resolve(root, prefix, name + suffix)
+    for (const suffix of suffixes) {
+      const dirPath = resolve(root, prefix, name + padSpot(suffix))
       if (existsSync(dirPath)) {
         if (realPath) return (await import("./resolveRealPath.js")).resolveRealPath(dirPath)
         return dirPath
@@ -50,7 +50,7 @@ export async function resolveDirPath(params: ResolveDirPathParams) {
   return null
 }
 
-function buildSuffixes(suffix?: string[]) {
-  if (!suffix) return [""]
-  return [...suffix, ...suffix.map(v => (v.startsWith(".") ? suffix.slice(1) : `.${v}`))]
+function padSpot(v: string) {
+  if (v.length === 0) return ""
+  return v.startsWith(".") ? v : "." + v
 }

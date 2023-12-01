@@ -1,10 +1,10 @@
 import { INestApplication } from "@nestjs/common"
 import { LazyModuleLoader } from "@nestjs/core"
-import { applySSRComposeStartMiddleware } from "ssrCompose/start/applySSRComposeMiddleware.start.js"
 import { AlbumStartContext } from "../context/context.type.js"
 import { expressConfigs } from "../middlewares/express/expressConfigs.js"
 import { AlbumContextService } from "../modules/context/album-context.service.js"
 import { SSRModule } from "../modules/ssr/ssr.module.js"
+import { applySSRComposeStartMiddleware } from "../ssrCompose/start/applySSRComposeMiddleware.start.js"
 
 export async function processServer(serverApp: INestApplication, context: AlbumStartContext) {
   const { info, logger } = context

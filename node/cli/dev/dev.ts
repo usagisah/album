@@ -10,8 +10,8 @@ import { DevServerParams } from "../cli.type.js"
 export async function albumDevServer(params: DevServerParams) {
   let { appId = "default", args } = params
   let _logger: ILogger = console
+  const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "dev" })
   try {
-    const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "dev" })
     const { logger, info, pluginConfig, serverConfig } = context
     const { plugins, events } = pluginConfig
     const { mode, serverMode, ssr, ssrCompose } = info
@@ -27,7 +27,8 @@ export async function albumDevServer(params: DevServerParams) {
     await serverApp.listen(port)
     logger.log(`listen port: http://localhost:${port}`, "album")
   } catch (e: any) {
-    _logger.error(e, "album")
-    throw e
+    if (_logger !== console) _logger.error(e, "album")
+    else _logger.error(e)
+    process.exit(1)
   }
 }

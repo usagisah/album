@@ -168,22 +168,10 @@ export class DirStruct {
     if (this.#files.get(key)) return false
 
     const name = filePaths[0]
-    type === "file"
-      ? this.#files.set(
-          key,
-          await new FileStruct({
-            name,
-            path: resolve(this.path, name),
-            value
-          }).create()
-        )
-      : this.#files.set(
-          key,
-          await new DirStruct({
-            name,
-            path: resolve(this.path, name)
-          }).create()
-        )
+    let fileIns: FileStruct | DirStruct
+    if (type === "file") fileIns = await new FileStruct({ name, path: resolve(this.path, name), value }).create()
+    else fileIns = await new DirStruct({ name, path: resolve(this.path, name) }).create()
+    this.#files.set(key, fileIns)
 
     return true
   }

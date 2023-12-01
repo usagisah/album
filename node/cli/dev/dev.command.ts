@@ -9,8 +9,6 @@ export class DevCommand {
   }
 
   start() {
-    return albumDevServer(this.params).catch((e: any) => {
-      throw e
-    })
+    return albumDevServer(this.params)
   }
 }

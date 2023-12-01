@@ -93,8 +93,10 @@
     "@types/minimist": "^1.2.3",
     "@types/node": "^20.3.1",
     "@types/serve-static": "^1.15.3",
+    "colorette": "^2.0.20",
     "prettier": "^3.0.3",
     "prettier-plugin-organize-imports": "^3.2.3",
-    "prettier-plugin-packagejson": "^2.4.6"
+    "prettier-plugin-packagejson": "^2.4.6",
+    "pretty-format": "^29.7.0"
   }
 }

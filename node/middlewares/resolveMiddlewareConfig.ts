@@ -16,7 +16,18 @@ export async function resolveMiddlewareConfig(context: AlbumDevContext, forceCli
       events,
       info,
       midConfigs: expressConfigs(context),
-      viteConfigs: [viteCoreOptions(context, forceClient), viteOptimizeOptions(context, forceClient), { name: "userViteConfig", config: userConfig.vite ?? {} }]
+      viteConfigs: [
+        viteCoreOptions(context, forceClient),
+        viteOptimizeOptions(context, forceClient),
+        ...(userConfig.vite
+          ? [
+              {
+                name: "userViteConfig",
+                config: userConfig.vite
+              }
+            ]
+          : [])
+      ]
     },
     logger
   )

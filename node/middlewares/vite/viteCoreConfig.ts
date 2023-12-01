@@ -21,10 +21,10 @@ export function viteCoreOptions(context: AlbumDevContext, forceClient = false): 
   }
 
   let base = "/"
-  let defineBase = '""'
+  let basePath = '""'
   if (ssrCompose && serverMode === "build") {
     base = `/${appId}`
-    defineBase = `"/${appId}"`
+    basePath = `"/${appId}"`
   }
 
   const baseConfig: InlineConfig = {
@@ -39,8 +39,8 @@ export function viteCoreOptions(context: AlbumDevContext, forceClient = false): 
       }
     },
     define: {
-      __app_id__: appId,
-      __base_path__: ssrCompose && serverMode === "build" ? `"/${appId}"` : '""'
+      __app_id__: `"${appId}"`,
+      __app_id_path__: basePath
     },
     logLevel: serverMode === "build" ? "error" : "info",
     customLogger: serverMode === "build" ? undefined : proxyLogger(logger),
