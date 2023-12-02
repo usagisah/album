@@ -1,4 +1,5 @@
 import { NestFactory } from "@nestjs/core"
+import { blueBright } from "colorette"
 import { processClient } from "../../client/processClient.js"
 import { createAlbumDevContext } from "../../context/context.dev.js"
 import { AppModule } from "../../modules/app/app.module.js"
@@ -23,9 +24,8 @@ export async function albumDevServer(params: DevServerParams) {
     const serverApp = await NestFactory.create(AppModule, { logger, cors: true })
     await processServer(serverApp, context)
 
-    logger.log(`dev config: `, { appId, mode, serverMode, ssrCompose, ssr }, "album")
     await serverApp.listen(port)
-    logger.log(`listen port: http://localhost:${port}`, "album")
+    logger.log(`dev config: `, { appId, mode, serverMode, ssrCompose, ssr, listen: blueBright(`http://localhost:${port}`) }, "album")
   } catch (e: any) {
     if (_logger !== console) _logger.error(e, "album")
     else _logger.error(e)

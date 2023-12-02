@@ -30,16 +30,23 @@ export let useRouter = createEmptyHook<() => RouterLocation>("useRouter")
 export let useLoader = createEmptyHook<() => ["success", any] | ["loading", null] | ["fail", any]>("useLoader")
 
 export type SSRProps = {
-  req: Request
-  headers: Record<string, string>
   mode: string
   serverMode: string
-  logger: Record<string, (...message: string[]) => any>
+  ssr: boolean
+  ssrCompose: boolean
+  env: Record<string, string>
   inputs: Record<string, string>
-  outputs: Record<string, string>
-  meta: any
+  logger: Record<string, (...message: string[]) => any>
   query: Record<string, any>
-  params: Record<string, any>
+  params: Record<string, string>
+  req: Request
+  headers: Record<string, string>
+  albumOptions: {
+    pathname: string
+    prefix: string
+  }
+  serverRouteData: Record<string, any>
+  serverDynamicData: Record<string, any>
   [key: string]: any
 }
 

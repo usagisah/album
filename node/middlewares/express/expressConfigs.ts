@@ -11,7 +11,7 @@ export function expressConfigs(context: Context) {
 }
 
 const helmetConfig: AlbumServerExpressConfig = {
-  enable: true,
+  enable: false,
   name: "helmet",
   config: [
     {
@@ -45,12 +45,14 @@ const sirvConfig = function (root: string, dev: boolean, single: boolean): Album
 
 function devOptions(context: Context): AlbumServerExpressConfig[] {
   const { serverMode, ssr } = context.info
-  const root = serverMode === "start" ? (context as AlbumStartContext).info.inputs.ssrInput! : (context as AlbumDevContext).info.outputs.clientOutDir
-  return [helmetConfig, { ...compressionConfig, enable: true }, sirvConfig(root, true, !ssr)]
+  const isStart = serverMode === "start"
+  const root = isStart ? (context as AlbumStartContext).info.inputs.ssrInput! : (context as AlbumDevContext).info.outputs.clientOutDir
+  return [{ ...helmetConfig, enable: isStart }, { ...compressionConfig, enable: isStart }, sirvConfig(root, true, !ssr)]
 }
 
 function prodOptions(context: Context): AlbumServerExpressConfig[] {
   const { serverMode, ssr } = context.info
+  const isStart = serverMode === "start"
   const root = serverMode === "start" ? (context as AlbumStartContext).info.inputs.clientInput! : (context as AlbumDevContext).info.outputs.clientOutDir
-  return [helmetConfig, compressionConfig, sirvConfig(root, false, !ssr)]
+  return [{ ...helmetConfig, enable: isStart }, { ...compressionConfig, enable: isStart }, sirvConfig(root, false, !ssr)]
 }

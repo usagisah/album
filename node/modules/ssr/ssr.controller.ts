@@ -3,22 +3,15 @@ import { Request, Response } from "express"
 import { AlbumDevContext, AlbumStartContext } from "../../context/context.type.js"
 import { Fun } from "../../utils/types/types.js"
 import { AlbumContextService } from "../context/album-context.service.js"
-import { SSRComposeService } from "../ssr-compose/ssr-compose.service.js"
-import { SSRService } from "./ssr.service.js"
 import { AlbumSSRRenderOptions, CtrlOptions } from "./ssr.type.js"
 
 @Controller()
 export class SSRController {
   onSSRenderError?: Fun<[any]>
 
-  constructor(
-    private context: AlbumContextService,
-    private ssrService: SSRService,
-    private ssrComposeService: SSRComposeService
-  ) {
-    this.context.getContext().then((ctx: any) => {
-      ctx.info.serverMode === "start" ? this.initStartModule(ctx) : this.initDevModule(ctx)
-    })
+  constructor(private context: AlbumContextService) {
+    const ctx = this.context.getContext()
+    ctx.info.serverMode === "start" ? this.initStartModule(ctx as any) : this.initDevModule(ctx as any)
   }
 
   private async ssrRender(opts: CtrlOptions) {
@@ -40,9 +33,9 @@ export class SSRController {
     const { cwd, root } = inputs
     const { projectInputs } = ssrComposeConfig
 
-    let createOptions = this.ssrService.createSSRRenderOptions
-    if (!createOptions) {
-      createOptions = this.ssrService.createSSRRenderOptions = ({ req, res, headers }) => {
+    let createOptions = this.context.createSSRRenderOptions
+    if (!Reflect.has(createOptions, "overwrite")) {
+      createOptions = this.context.createSSRRenderOptions = ({ req, res, headers }) => {
         const userSSRRenderOptions: AlbumSSRRenderOptions = {
           ssrContext: {
             mode,
@@ -67,6 +60,7 @@ export class SSRController {
         }
         return userSSRRenderOptions
       }
+      Object.defineProperty(createOptions, "overwrite", { configurable: false, enumerable: false, get: () => true })
     }
 
     this.ssrRenderError = (e, res) => {
@@ -74,27 +68,27 @@ export class SSRController {
       logger.error(e, "album")
     }
 
-    if (!ssrCompose) {
-      this.ssrRender = async options => {
-        const userSSRRender = (await import(inputs.mainSSRInput!)).ssrRender
-        return userSSRRender(createOptions(options))
+    if (ssrCompose) {
+      const errorPage = projectInputs.get("error")
+      this.ssrRender = async (options: CtrlOptions) => {
+        const { req, res } = options
+        const { prefix } = req.albumOptions
+        const userSSRRenderOptions = createOptions(options)
+        const userComposeContext = this.context.createSSRComposeContext()
+        userSSRRenderOptions.ssrComposeContext = userComposeContext
+
+        if (!projectInputs.has(prefix)) {
+          if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender(userSSRRenderOptions)
+          return res.status(404).send()
+        }
+        return (await import(projectInputs.get(prefix)!.mainServerInput)).ssrRender(userSSRRenderOptions)
       }
       return
     }
 
-    const errorPage = projectInputs.get("error")
-    this.ssrRender = async (options: CtrlOptions) => {
-      const { req, res } = options
-      const { prefix } = req.albumOptions
-      const userSSRRenderOptions = createOptions(options)
-      const userComposeContext = this.ssrComposeService.createSSRComposeContext()
-      userSSRRenderOptions.ssrComposeContext = userComposeContext
-
-      if (!projectInputs.has(prefix)) {
-        if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender(userSSRRenderOptions)
-        return res.status(404).send()
-      }
-      return (await import(projectInputs.get(prefix)!.mainServerInput)).ssrRender(userSSRRenderOptions)
+    this.ssrRender = async options => {
+      const userSSRRender = (await import(inputs.mainSSRInput!)).ssrRender
+      return userSSRRender(createOptions(options))
     }
   }
 
@@ -104,44 +98,47 @@ export class SSRController {
     const { cwd, dumpInput } = inputs
     const { realSSRInput, realClientInput } = clientManager!
 
-    this.ssrRender = async options => {
-      const userSSRRender = (await viteDevServer!.ssrLoadModule(realSSRInput!)).ssrRender
+    let createOptions = this.context.createSSRRenderOptions
+    if (!Reflect.has(createOptions, "overwrite")) {
+      createOptions = this.context.createSSRRenderOptions = function ({ req, res, headers }) {
+        const userSSRRenderOptions: AlbumSSRRenderOptions = {
+          ssrContext: {
+            mode,
+            serverMode,
+            ssr,
+            ssrCompose,
+            env,
+            inputs: { cwd, root: dumpInput, clientEntryInput: realClientInput },
 
-      let createOptions = this.ssrService.createSSRRenderOptions
-      if (!createOptions) {
-        createOptions = this.ssrService.createSSRRenderOptions = ({ req, res, headers }) => {
-          const userSSRRenderOptions: AlbumSSRRenderOptions = {
-            ssrContext: {
-              mode,
-              serverMode,
-              ssr,
-              ssrCompose,
-              env,
-              inputs: { cwd, root: dumpInput, clientEntryInput: realClientInput },
+            req,
+            res,
+            headers,
+            albumOptions: req.albumOptions,
+            query: req.query,
+            params: {},
+            logger,
 
-              req,
-              res,
-              headers,
-              albumOptions: req.albumOptions,
-              query: req.query,
-              params: {},
-              logger,
-
-              serverDynamicData: {},
-              serverRouteData: {}
-            },
-            ssrComposeContext: null
-          }
-          return userSSRRenderOptions
+            serverDynamicData: {},
+            serverRouteData: {}
+          },
+          ssrComposeContext: null
         }
+        return userSSRRenderOptions
       }
-
-      return userSSRRender(createOptions(options))
+      Object.defineProperty(createOptions, "overwrite", { configurable: false, enumerable: false, get: () => true })
     }
+
     this.ssrRenderError = (e, res) => {
       res.status(500).send("服务器错误")
       viteDevServer!.ssrFixStacktrace(e as any)
       logger.error(e, "album")
+    }
+
+    this.ssrRender = async options => {
+      const userSSRRender = (await viteDevServer!.ssrLoadModule(realSSRInput!)).ssrRender
+      const userSSRRenderOptions = createOptions(options)
+      if (ssrCompose) userSSRRenderOptions.ssrComposeContext = this.context.createSSRComposeContext()
+      return userSSRRender(userSSRRenderOptions)
     }
   }
 }

@@ -84,6 +84,6 @@ export class Logger implements ILogger {
     const c = this.getColor(level)
     const t = day().format("YYYY-MM-DD HH:mm:ss")
     const m = messages.map(m => (typeof m === "string" ? m : prettyFormat(m))).join("")
-    return `${c("[" + level + "]")} ${red(t)} ${context ? c("{" + context + "}") : ""} -> ${c(m)}`
+    return `${c("[" + level + "]")} ${red(t)} ${context ? gray("[" + context + "]") : ""} -> ${c(m)}`
   }
 }

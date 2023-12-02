@@ -12,9 +12,8 @@ export async function processServer(serverApp: INestApplication, context: AlbumD
   const { info, pluginConfig, logger } = context
   const { ssr } = info
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
-
-  const contextService = serverApp.get(AlbumContextService)
-  contextService.setContext(context)
+  
+  serverApp.get(AlbumContextService).getContext = () => context
 
   const { plugins, events } = pluginConfig
   await callPluginWithCatch("server", plugins, { messages: new Map(), events, info, app: serverApp }, logger)

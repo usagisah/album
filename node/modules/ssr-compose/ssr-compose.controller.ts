@@ -7,17 +7,11 @@ import { UserConfig, mergeConfig, build as viteBuild } from "vite"
 import { SSRComposeStartCoordinateValue } from "../../ssrCompose/ssrCompose.type.js"
 import { isPlainObject } from "../../utils/check/simple.js"
 import { AlbumContextService } from "../context/album-context.service.js"
-import { SSRService } from "../ssr/ssr.service.js"
-import { SSRComposeService } from "./ssr-compose.service.js"
 import { AlbumSSRComposeContext, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
 
 @Controller()
 export class SSRComposeController {
-  constructor(
-    private context: AlbumContextService,
-    private ssrService: SSRService,
-    private composeService: SSRComposeService
-  ) {
+  constructor(private context: AlbumContextService) {
     this.initModule()
   }
 
@@ -26,13 +20,13 @@ export class SSRComposeController {
     if (!Object.hasOwn(headers, "album-remote-source")) return res.status(404).send()
     if (!params.props || !isPlainObject(params.props)) return res.status(404).send()
 
-    const albumContext = await this.context.getContext()
+    const albumContext = this.context.getContext()
     const { logger } = albumContext
     const { prefix, pathname } = req.albumOptions
     const sourcePath = prefix + pathname
 
     try {
-      const ssrComposeContext = this.composeService.createSSRComposeContext()
+      const ssrComposeContext = this.context.createSSRComposeContext()
       const result: SSRComposeRenderRemoteComponentReturn = await ssrComposeContext.renderRemoteComponent({ props: params, sourcePath }, { req, res, headers })
       return res.send({ code: 200, messages: "", result })
     } catch (error) {
@@ -42,8 +36,8 @@ export class SSRComposeController {
   }
 
   async initModule() {
-    const ctx = await this.context.getContext()
-    const ssrService = this.ssrService
+    const ctx = this.context.getContext()
+    const { createSSRRenderOptions } = this.context
 
     if (ctx.info.serverMode === "start") {
       const { ssrComposeConfig, logger } = ctx as AlbumStartContext
@@ -53,7 +47,7 @@ export class SSRComposeController {
         if (projectInputs.has("error")) return await import(projectInputs.get("error")!.mainServerInput)
         return () => ({})
       }
-      this.composeService.createSSRComposeContext = () => {
+      this.context.createSSRComposeContext = () => {
         const ssrComposeContext: AlbumSSRComposeContext = {
           sources: {},
           projectInputs,
@@ -68,7 +62,7 @@ export class SSRComposeController {
               return res.status(404).send()
             }
 
-            const { ssrContext } = ssrService.createSSRRenderOptions(ctrl)
+            const { ssrContext } = createSSRRenderOptions(ctrl)
             const renderOptions: SSRComposeRenderRemoteComponentOptions = {
               renderProps,
               ssrContext,
@@ -92,7 +86,8 @@ export class SSRComposeController {
       const { viteDevServer, clientConfig, userConfig, ssrComposeConfig, logger } = ctx as AlbumDevContext
       const { module } = clientConfig
       const { projectInputs, dependencies } = ssrComposeConfig!
-      this.composeService.createSSRComposeContext = () => {
+      const { createSSRRenderOptions } = this.context
+      this.context.createSSRComposeContext = () => {
         const ssrComposeContext: AlbumSSRComposeContext = {
           sources: {},
           projectInputs: null,
@@ -135,7 +130,7 @@ export class SSRComposeController {
               return res.status(404).send()
             }
 
-            const { ssrContext } = ssrService.createSSRRenderOptions(ctrl)
+            const { ssrContext } = createSSRRenderOptions(ctrl)
             const renderOptions: SSRComposeRenderRemoteComponentOptions = {
               renderProps,
               ssrContext,

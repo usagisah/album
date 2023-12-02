@@ -1,26 +1,19 @@
 import { Injectable } from "@nestjs/common"
 import { AlbumContext } from "../../context/context.type.js"
+import { AlbumSSRComposeContext } from "../ssr-compose/ssr-compose.type.js"
+import { AlbumSSRRenderOptions, CtrlOptions } from "../ssr/ssr.type.js"
 
 @Injectable()
 export class AlbumContextService {
-  private context: AlbumContext | null = null
-  private pending: any[] = []
-
-  async getContext() {
-    if (!this.context) {
-      return new Promise<AlbumContext>(r => {
-        this.pending.push(() => {
-          r(this.context!)
-        })
-      })
-    }
-
-    return this.context
+  getContext(): AlbumContext {
+    throw "未初始化的 album builtin getContext" 
   }
 
-  setContext(ctx: AlbumContext) {
-    this.context = ctx
-    this.pending.forEach(f => f())
-    this.pending = []
+  createSSRRenderOptions(opts: CtrlOptions): AlbumSSRRenderOptions {
+    throw "未初始化的 album builtin createSSRRenderOptions"
+  }
+
+  createSSRComposeContext(): AlbumSSRComposeContext {
+    throw "未初始化的 album builtin createSSRComposeContext"
   }
 }

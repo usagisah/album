@@ -3,7 +3,6 @@ import { AlbumContextService } from "./album-context.service.js"
 
 @Global()
 @Module({
-  imports: [],
   providers: [AlbumContextService],
   exports: [AlbumContextService]
 })
