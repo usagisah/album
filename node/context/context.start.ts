@@ -13,7 +13,7 @@ export async function createAlbumContext(): Promise<AlbumStartContext> {
   let logger: ILogger = console
   try {
     const cwd = process.cwd()
-    const cacheConfig = await loadConfig()
+    const cacheConfig = await loadConfig(cwd)
     logger = resolveLogger(cacheConfig.logger)
 
     const { root } = await checkStartConfig(cwd, cacheConfig.start)
@@ -23,7 +23,7 @@ export async function createAlbumContext(): Promise<AlbumStartContext> {
     if (cacheConfig.info.ssr && !cacheConfig.info.ssrCompose) {
       mainSSRInput = await resolveFilePath({
         root,
-        prefixes: ["server", "./", "ssr"],
+        prefixes: ["ssr", "./"],
         suffixes: ["main.ssr"]
       })
       if (!mainSSRInput) throw "找不到 ssr 的入口文件，请检查目录配置格式是否正确"
@@ -36,7 +36,7 @@ export async function createAlbumContext(): Promise<AlbumStartContext> {
     return {
       info: {
         serverMode: "start",
-        mode: "production",
+        mode: ((cacheConfig.info.env.NODE_ENV ?? process.env.NODE_ENV) as any) ?? "production",
         ssr: cacheConfig.info.ssr,
         ssrCompose: cacheConfig.info.ssrCompose,
         env: registryEnv(cacheConfig.info.env),

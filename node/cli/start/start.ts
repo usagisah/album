@@ -13,12 +13,10 @@ export async function albumStartServer() {
     const { port } = serverConfig
     _logger = logger
 
-    const serverApp = await NestFactory.create(AppModule, { logger, cors: true })
+    const serverApp = await NestFactory.create(AppModule, { logger })
     await processServer(serverApp, context)
-
-    logger.log(`start config: `, { mode, serverMode, ssrCompose, ssr }, "album")
     await serverApp.listen(port)
-    logger.log(`listen port: http://localhost:${port}`, "album")
+    logger.log(`start config: `, { mode, serverMode, ssrCompose, ssr, listen: `http://localhost:${port}` }, "album")
   } catch (e: any) {
     _logger.error(e, "album")
     throw e

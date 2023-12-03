@@ -20,11 +20,11 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
   try {
     const { appId, mode, serverMode, args } = params
     const inputs = buildDevInputs()
-    const userConfig = await loadConfig({ mode, args, inputs })
+    let userConfig = await loadConfig({ mode, args, inputs })
     logger = new Logger(isPlainObject(userConfig.logger) ? userConfig.logger : undefined)
 
     const pluginConfig: ContextPluginConfig = { events: new EventEmitter(), plugins: userConfig.plugins ?? [] }
-    await callPluginWithCatch(
+    const { config } = await callPluginWithCatch(
       "config",
       pluginConfig.plugins,
       {
@@ -41,6 +41,7 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
         }
       } as any
     )
+    if (isPlainObject(config)) userConfig = config
 
     const [{ appFileManager, dumpFileManager }, env, clientConfig, serverConfig] = await waitPromiseAll([
       createFileManager(inputs),

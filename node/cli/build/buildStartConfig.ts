@@ -8,6 +8,5 @@ export async function buildStartConfig(context: AlbumDevContext) {
   const userConfig = createCacheUserConfig(context)
   const config = { ...userConfig }
   const output = resolve(context.info.outputs.outDir!, "album.config.js")
-  const content = `export default ${stringify(config)}`
-  await writeFile(output, content, "utf-8")
+  await writeFile(output, stringify(config), "utf-8")
 }

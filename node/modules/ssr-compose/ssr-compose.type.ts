@@ -42,8 +42,8 @@ export type SSRComposeRenderRemoteComponentReturn = {
 }
 
 export type AlbumSSRComposeContext = {
-  dependenciesMap: Record<string, string>
-  projectInputs?: SSRComposeStartProjectsInput | null
+  dependenciesMap: Record<string, string> | null
+  projectInputs: SSRComposeStartProjectsInput | null
   sources: SSRComposeSources
   renderRemoteComponent: (renderProps: SSRComposeRenderProps, ctrl: CtrlOptions) => Promise<SSRComposeRenderRemoteComponentReturn>
   existsProject: (prefix: string, sourcePath: string) => SSRComposeCoordinateValue | null

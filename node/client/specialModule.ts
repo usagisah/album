@@ -44,7 +44,7 @@ export async function walkModules(params: ParseRouterParams) {
   return modules
 }
 
-const regLegalModuleName = /^[a-zA-Z][a-zA-Z0-9]*$/
+const regLegalModuleName = /^[a-zA-Z\$:][a-zA-Z0-9]*$/
 export async function resolveModules(params: ParseRouterParams) {
   const { moduleName, modulePath, parentModule, logger } = params
   const filename = basename(modulePath)

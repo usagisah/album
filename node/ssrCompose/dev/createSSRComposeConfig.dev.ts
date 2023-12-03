@@ -1,5 +1,5 @@
 import { readdir } from "fs/promises"
-import { resolve } from "path"
+import { dirname } from "path"
 import { ClientConfig, UserSSRCompose } from "../../context/context.type.js"
 import { SSRComposeDevConfig, SSRComposeDevProjectInputs } from "../ssrCompose.type.js"
 
@@ -13,10 +13,14 @@ export async function createSSRComposeConfig({ appId, ssrCompose, clientConfig }
   if (!ssrCompose) return null
 
   const { router, module } = clientConfig
-  if (appId !== "error" && router.basename.length !== 1) router.basename = "/" + appId + +router.basename
+  // if (appId !== "error") {
+  //   router.basename = "/" + appId + router.basename
+  //   if (router.basename.startsWith("//")) router.basename = router.basename.slice(1)
+  //   else if (router.basename.endsWith("/")) router.basename = router.basename.slice(0, -1)
+  // }
 
   const projectInputs: SSRComposeDevProjectInputs = new Map()
-  const root = resolve(module!.modulePath, "../")
+  const root = dirname(module!.modulePath)
   for (const fileInfo of await readdir(root, { withFileTypes: true })) {
     if (!fileInfo.isDirectory()) continue
     const { name } = fileInfo
@@ -24,7 +28,7 @@ export async function createSSRComposeConfig({ appId, ssrCompose, clientConfig }
   }
 
   const { dependencies } = ssrCompose
-  const _dependencies = dependencies ? [...new Set(dependencies).values()] : []
+  const _dependencies = dependencies ? [...new Set(dependencies)] : []
 
   return { projectInputs, dependencies: _dependencies }
 }

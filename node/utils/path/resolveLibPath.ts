@@ -9,7 +9,8 @@ const NODE_MODULES = "node_modules"
 export async function resolveLibPath(libPath: string) {
   let index = libPath.lastIndexOf(NODE_MODULES)
   if (index === -1) throw "resolveLibPath 的参数必须是一个指向 node_modules 内的依赖路径"
-  index = index + 1
+  index = index + NODE_MODULES.length
+
   const node_modules = libPath.slice(0, index)
   const ref_name = libPath.slice(index + 1)
   if (ref_name.length === 0) throw "包名不合法"
@@ -39,8 +40,7 @@ export async function resolveLibPath(libPath: string) {
     const res = exports(pkg, _subpath)
     if (res) subpath = res[0]
   } catch {}
-  if (!subpath) subpath = pkg.module
-  if (!subpath) subpath = pkg.main
+  if (!subpath) subpath = pkg.module ?? pkg.main
   if (subpath) {
     if (subpath.startsWith("/")) subpath = subpath.slice(1)
     return {

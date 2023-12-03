@@ -48,7 +48,7 @@ export class SSRController {
             req,
             res,
             headers,
-            albumOptions: req.albumOptions,
+            albumOptions: { ...req.albumOptions },
             query: req.query,
             params: {},
             logger,
@@ -69,7 +69,6 @@ export class SSRController {
     }
 
     if (ssrCompose) {
-      const errorPage = projectInputs.get("error")
       this.ssrRender = async (options: CtrlOptions) => {
         const { req, res } = options
         const { prefix } = req.albumOptions
@@ -77,10 +76,7 @@ export class SSRController {
         const userComposeContext = this.context.createSSRComposeContext()
         userSSRRenderOptions.ssrComposeContext = userComposeContext
 
-        if (!projectInputs.has(prefix)) {
-          if (errorPage) return (await import(errorPage.mainServerInput)).ssrRender(userSSRRenderOptions)
-          return res.status(404).send()
-        }
+        if (!projectInputs.has(prefix)) return res.status(404).send()
         return (await import(projectInputs.get(prefix)!.mainServerInput)).ssrRender(userSSRRenderOptions)
       }
       return
@@ -113,7 +109,7 @@ export class SSRController {
             req,
             res,
             headers,
-            albumOptions: req.albumOptions,
+            albumOptions: { ...req.albumOptions },
             query: req.query,
             params: {},
             logger,

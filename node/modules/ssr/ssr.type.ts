@@ -31,7 +31,9 @@ export type AlbumSSRContext = {
   headers: Record<string, string>
   albumOptions: {
     pathname: string
+    originalPathname: string
     prefix: string
+    url: string
   }
 
   // 由插件负责的数据

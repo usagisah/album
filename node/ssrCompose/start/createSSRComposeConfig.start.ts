@@ -27,7 +27,7 @@ export async function createSSRComposeConfig(root: string) {
     projectInputs.set(_name, { clientInput, ssrInput, mainServerInput })
 
     try {
-      const [clientManifestFile, ssrManifestFile, coordinateFile] = await Promise.all([readFile(resolve(root, name, "client/manifest.json"), "utf-8"), readFile(resolve(root, name, "server/ssr-manifest.json"), "utf-8"), readFile(resolve(root, name, "coordinate.json"), "utf-8")])
+      const [clientManifestFile, ssrManifestFile, coordinateFile] = await Promise.all([readFile(resolve(clientInput, "manifest.json"), "utf-8"), readFile(resolve(ssrInput, "ssr-manifest.json"), "utf-8"), readFile(resolve(root, name, "coordinate.json"), "utf-8")])
       coordinateInputs.set(_name, {
         manifest: JSON.parse(clientManifestFile),
         ssrManifest: JSON.parse(ssrManifestFile),

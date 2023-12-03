@@ -15,11 +15,11 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
 
   await app.get(LazyModuleLoader).load(() => SSRComposeModule)
 
-  const { dependenciesInputs, coordinateInputs, projectInputs } = ssrComposeConfig
+  const { dependenciesInputs, projectInputs } = ssrComposeConfig
   const sirvConfig = midConfigs.find(v => v.name === "sirv")!
-  sirvConfig.factory = function proxyServerStaticFactory(_, options: any) {
+  sirvConfig.factory = function proxyServerStaticFactory(_, sirvConfig: any) {
     projectInputs.forEach(value => {
-      value.assetsService = sirv(value.clientInput, sirvConfig.config[1])
+      value.assetsService = sirv(value.clientInput, sirvConfig)
     })
 
     return async function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -32,11 +32,12 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
         return
       }
 
-      const { pathname, prefix, url } = normalizeMidRequestOptions(reqPath, projectInputs)
+      const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectInputs)
+      const { prefix, url } = albumOptions
       const project = projectInputs.get(prefix)
       if (!project) return res.status(404).send("")
 
-      req.albumOptions = { pathname, prefix }
+      req.albumOptions = albumOptions
       req.url = url
       return project.assetsService(req, res, next)
     }

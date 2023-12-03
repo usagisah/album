@@ -16,7 +16,7 @@ export async function resolveFilePath(params: ResolveFilePathParams): Promise<nu
   for (const prefix of prefixes) {
     for (const ext of exts) {
       for (const suffix of suffixes) {
-        const filePath = resolve(root, prefix, name + padSpot(suffix) + padSpot(ext))
+        const filePath = resolve(root, prefix, name + (name ? padSpot(suffix) : suffix) + padSpot(ext))
         if (existsSync(filePath)) {
           if (realPath) return (await import("./resolveRealPath.js")).resolveRealPath(filePath)
           return filePath
@@ -40,7 +40,7 @@ export async function resolveDirPath(params: ResolveDirPathParams) {
   if (!name && (!suffixes || suffixes.length === 0)) return null
   for (const prefix of prefixes) {
     for (const suffix of suffixes) {
-      const dirPath = resolve(root, prefix, name + padSpot(suffix))
+      const dirPath = resolve(root, prefix, name + (name ? padSpot(suffix) : suffix))
       if (existsSync(dirPath)) {
         if (realPath) return (await import("./resolveRealPath.js")).resolveRealPath(dirPath)
         return dirPath

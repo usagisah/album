@@ -15,7 +15,7 @@ export async function applySSRComposeDevMiddleware(app: INestApplication<any>, c
   app.use(function (req: Request, res: Response, next: NextFunction) {
     const { pathname, prefix, url } = normalizeMidRequestOptions(req.originalUrl, projectInputs)
     req.albumOptions = { pathname, prefix }
-    if (!projectInputs.has(prefix)) return res.status(404).send("")
+    if (!projectInputs.has(prefix)) return res.status(404).send()
     req.url = url
     next()
   })

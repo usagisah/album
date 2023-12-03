@@ -18,7 +18,7 @@ export async function albumBuild(params: DevServerParams) {
   let { appId = "default", args } = params
   let _logger: ILogger = console
   try {
-    const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "dev" })
+    const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "build" })
     const { logger, info, pluginConfig, clientConfig } = context
     const { plugins, events } = pluginConfig
     const { mode, serverMode, ssr, ssrCompose, inputs, outputs } = info
@@ -76,26 +76,25 @@ async function buildClient(context: AlbumDevContext) {
 }
 
 async function buildSSR(context: AlbumDevContext) {
-  const { info, logger, userConfig } = context
+  const { info, logger, ssrComposeConfig } = context
   const { outputs } = info
   const { clientOutDir, ssrOutDir } = outputs
-  const { viteConfigs } = await resolveMiddlewareConfig(context, true)
+  const clientConfig = (await resolveMiddlewareConfig(context, true)).viteConfigs
+  const ssrConfig = (await resolveMiddlewareConfig(context)).viteConfigs
 
   await Promise.all([rm(clientOutDir, rmOptions), rm(ssrOutDir!, rmOptions)])
 
   let ssrComposeDependencies: SSRComposeDependencies | undefined
   logger.log("正在创建缓存配置，请耐心等待...", "album")
-  if (userConfig?.ssrCompose?.dependencies?.length) ssrComposeDependencies = await buildSSRComposeDependencies(context)
+  if (ssrComposeConfig && ssrComposeConfig.dependencies.length > 0) ssrComposeDependencies = await buildSSRComposeDependencies(context)
   await buildStartConfig(context)
   logger.log("创建完成", "album")
 
   logger.log("正在打包客户端，请耐心等待...", "album")
-  await viteBuild(ssrComposeDependencies ? withTransformCjsPlugin(viteConfigs, ssrComposeDependencies) : viteConfigs)
+  await viteBuild(ssrComposeDependencies ? withTransformCjsPlugin(clientConfig, ssrComposeDependencies) : clientConfig)
   logger.log("打包客户端(client)成功", "album")
 
   logger.log("正在打包服务端，请耐心等待...", "album")
-  await viteBuild(viteConfigs)
-  logger.log("打包服务端(ssr/server)成功", "album")
-
-  logger.log("正在生产生产配置文件，请耐心等待", "album")
+  await viteBuild(ssrConfig)
+  logger.log("打包服务端(ssr)成功", "album")
 }

@@ -1,6 +1,5 @@
 import { stringify } from "@ungap/structured-clone/json"
-import { readFileSync } from "fs"
-import { mkdir, rm, writeFile } from "fs/promises"
+import { mkdir, readFile, rm, writeFile } from "fs/promises"
 import { hasCJSSyntax } from "mlly"
 import { resolve } from "path"
 import { build as viteBuild } from "vite"
@@ -47,8 +46,8 @@ async function buildDependency(libPath: string, depOutDir: string, external: str
   return [
     refPath,
     {
-      filename,
-      cjs: hasCJSSyntax(readFileSync(refPath, "utf-8"))
+      filename: filename + ".js",
+      cjs: hasCJSSyntax(await readFile(refFullPath, "utf-8"))
     }
   ] as const
 }
