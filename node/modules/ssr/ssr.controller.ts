@@ -1,13 +1,13 @@
 import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
 import { AlbumDevContext, AlbumStartContext } from "../../context/context.type.js"
-import { Fun } from "../../utils/types/types.js"
+import { Func } from "../../utils/types/types.js"
 import { AlbumContextService } from "../context/album-context.service.js"
 import { AlbumSSRRenderOptions, CtrlOptions } from "./ssr.type.js"
 
 @Controller()
 export class SSRController {
-  onSSRenderError?: Fun<[any]>
+  onSSRenderError?: Func<[any]>
 
   constructor(private context: AlbumContextService) {
     const ctx = this.context.getContext()

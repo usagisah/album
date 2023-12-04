@@ -1,6 +1,7 @@
 export type ClientConfigModule = {
   moduleName: string
   modulePath: string
+  ignore: RegExp[]
 }
 
 export type ClientConfigRouter = {
@@ -10,6 +11,6 @@ export type ClientConfigRouter = {
 export type ClientConfig = {
   mainInput: string
   mainSSRInput: string | null
-  module: ClientConfigModule | null
+  module: ClientConfigModule
   router: ClientConfigRouter
 }

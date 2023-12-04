@@ -7,9 +7,10 @@ import { AlbumStartContext } from "../../context/context.type.js"
 import { AlbumServerExpressConfig } from "../../middlewares/middlewares.type.js"
 import { SSRComposeModule } from "../../modules/ssr-compose/ssr-compose.module.js"
 import { normalizeMidRequestOptions } from "../normalizeMidRequestOptions.js"
+import { createRewriter } from "../rewriteUrl.js"
 
 export async function applySSRComposeStartMiddleware(app: INestApplication, context: AlbumStartContext, midConfigs: AlbumServerExpressConfig[]) {
-  const { info, ssrComposeConfig } = context
+  const { info, ssrComposeConfig, serverConfig } = context
   const { ssrCompose } = info
   if (!ssrCompose) return
 
@@ -17,12 +18,14 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
 
   const { dependenciesInputs, projectInputs } = ssrComposeConfig
   const sirvConfig = midConfigs.find(v => v.name === "sirv")!
+  const rewrite = createRewriter(serverConfig.rewrite)
   sirvConfig.factory = function proxyServerStaticFactory(_, sirvConfig: any) {
     projectInputs.forEach(value => {
       value.assetsService = sirv(value.clientInput, sirvConfig)
     })
 
     return async function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
+      rewrite(req)
       const reqPath = req.path
       const dependencyInfo = dependenciesInputs.get(reqPath.slice(1))
       if (dependencyInfo) {

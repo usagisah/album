@@ -3,7 +3,7 @@ import { stat } from "fs/promises"
 import { format } from "pretty-format"
 import { ILogger } from "../../modules/logger/logger.type.js"
 import { callPluginWithCatch } from "../../plugins/callPluginWithCatch.js"
-import { isArray, isStringEmpty } from "../../utils/check/simple.js"
+import { isArray, isRegExp, isStringEmpty } from "../../utils/check/simple.js"
 import { ContextPluginConfig } from "../context.type.js"
 import { DevInputs } from "../inputs/inputs.type.js"
 import { UserConfigApp } from "../userConfig/userConfig.type.js"
@@ -63,11 +63,16 @@ export async function createClientConfig({ appId, inputs, pluginConfig, conf, ss
 
   const moduleConfig: ClientConfigModule = {
     moduleName: result.module!.name!,
-    modulePath: result.module!.path!
+    modulePath: result.module!.path!,
+    ignore: [/^(\.)|(_)|(common)/]
   }
   if (!moduleConfig.modulePath) throw `找不到${c.module?.path ? "指定的" : "默认的"} app.module.path 入口`
   if (!existsSync(moduleConfig.modulePath)) throw "找不到与module.path入口匹配的文件, " + commonError + moduleConfig.modulePath
   if (!(await stat(moduleConfig.modulePath)).isDirectory()) throw "app.module.path 指向的不是一个文件夹"
+  if (isArray(result.module!.ignore)) {
+    const ignores = result.module!.ignore.map(v => (isRegExp(v) ? v : new RegExp(`^${v}`)))
+    moduleConfig.ignore.push(...ignores)
+  }
 
   const clientConfig: ClientConfig = {
     mainInput,

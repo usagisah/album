@@ -1,2 +1,2 @@
-export type Fun<P extends any[] = any[], R = any> = (...params: P) => R
-export type Obj = Record<string, any>
+export type Func<P extends any[] = any[], R = any> = (...params: P) => R
+export type Obj<T = any> = Record<string | number | symbol, T>

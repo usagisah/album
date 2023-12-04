@@ -33,6 +33,8 @@ export async function createAlbumContext(): Promise<AlbumStartContext> {
       if (!existsSync(clientInput)) throw "找不到 client 的入口文件夹，请检查目录格式是否正确"
     }
 
+    const { port, rewrite } = cacheConfig.serverConfig
+
     return {
       info: {
         serverMode: "start",
@@ -44,7 +46,7 @@ export async function createAlbumContext(): Promise<AlbumStartContext> {
       },
       logger,
       userConfig: cacheConfig,
-      serverConfig: { port: cacheConfig.serverConfig.port },
+      serverConfig: { port, rewrite: rewrite.map(code => new Function("...args", `${code}\nreturn anonymous(...args)`) as any) },
       ssrComposeConfig: await createSSRComposeConfig(root)
     }
   } catch (e) {

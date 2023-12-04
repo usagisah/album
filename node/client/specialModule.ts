@@ -8,25 +8,18 @@ import { SpecialModule, SpecialModuleFile } from "./client.type.js"
 export async function buildSpecialModules(context: AlbumDevContext): Promise<SpecialModule[]> {
   const { clientConfig, logger, info } = context
   const { module } = clientConfig
-  if (!module) return []
-
-  const { moduleName, modulePath } = module
   const { ssrCompose } = info
   if (ssrCompose) {
-    const res = await resolveModules({ logger, modulePath, moduleName, parentModule: null })
+    const res = await resolveModules({ logger, parentModule: null, ...module })
     return res ? [res] : []
   }
-  return await walkModules({
-    logger,
-    modulePath,
-    moduleName,
-    parentModule: null
-  })
+  return await walkModules({ logger, parentModule: null, ...module })
 }
 
 type ParseRouterParams = {
   modulePath: string
   moduleName: string
+  ignore: RegExp[]
   parentModule: SpecialModule | null
   logger: ILogger
 }
@@ -44,14 +37,10 @@ export async function walkModules(params: ParseRouterParams) {
   return modules
 }
 
-const regLegalModuleName = /^[a-zA-Z\$:][a-zA-Z0-9]*$/
 export async function resolveModules(params: ParseRouterParams) {
-  const { moduleName, modulePath, parentModule, logger } = params
+  const { moduleName, modulePath, ignore, parentModule, logger } = params
   const filename = basename(modulePath)
-  if (!regLegalModuleName.test(filename)) {
-    // logger.warn("约定式模块的文件夹名称，只支持以字母开头的，字符与数字混合的名称", "album")
-    return false
-  }
+  if (ignore.some(r => r.test(filename))) return false
 
   const files: SpecialModuleFile[] = []
   const dirFiles = await readdir(modulePath, { encoding: "utf-8", withFileTypes: true })
@@ -96,6 +85,7 @@ export async function resolveModules(params: ParseRouterParams) {
     specialModule.children = await walkModules({
       moduleName,
       modulePath: resolve(modulePath, childModuleDir.name),
+      ignore,
       parentModule: specialModule,
       logger
     })

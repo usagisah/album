@@ -6,7 +6,7 @@ import { AlbumSSRRenderOptions, CtrlOptions } from "../ssr/ssr.type.js"
 @Injectable()
 export class AlbumContextService {
   getContext(): AlbumContext {
-    throw "未初始化的 album builtin getContext" 
+    throw "未初始化的 album builtin getContext"
   }
 
   createSSRRenderOptions(opts: CtrlOptions): AlbumSSRRenderOptions {

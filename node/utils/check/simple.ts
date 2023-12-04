@@ -1,4 +1,4 @@
-import { Fun } from "../types/types.js"
+import { Func } from "../types/types.js"
 
 const s = Object.prototype.toString
 
@@ -21,7 +21,7 @@ export function isBoolean(value: unknown): value is boolean {
 export function isArray<T extends any[] = any>(value: unknown): value is T[] {
   return Array.isArray(value)
 }
-export function isFunction<T extends Fun>(value: unknown): value is T {
+export function isFunction<T extends Func>(value: unknown): value is T {
   return typeof value === "function"
 }
 export function isSymbol(value: unknown): value is symbol {
@@ -49,7 +49,7 @@ export function isError(value: unknown): value is Error {
 }
 
 export function isStrictEmpty(value: unknown) {
-  return value === null || value === undefined || (isString(value) && value.trim() === "") || (isArray(value) && value.length === 0)
+  return value === null || value === undefined || (isString(value) && value.trim() === "") || (isArray(value) && value.length === 0) || value === false
 }
 
 export function isEmpty(value: unknown): value is null | undefined {

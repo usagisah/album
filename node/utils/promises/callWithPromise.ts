@@ -1,6 +1,6 @@
-import { Fun } from "../types/types.js"
+import { Func } from "../types/types.js"
 
-export function callWithPromise(fn: Fun, params: any[], self: any) {
+export function callWithPromise(fn: Func, params: any[], self: any) {
   return new Promise((resolve, reject) => {
     fn.apply(
       self,

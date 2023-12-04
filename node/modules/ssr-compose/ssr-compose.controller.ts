@@ -48,7 +48,7 @@ export class SSRComposeController {
         return () => ({})
       }
       const dependenciesMap = {}
-      dependenciesInputs.forEach((_, id) => dependenciesMap[id] = `/${id}`)
+      dependenciesInputs.forEach((_, id) => (dependenciesMap[id] = `/${id}`))
       this.context.createSSRComposeContext = () => {
         const ssrComposeContext: AlbumSSRComposeContext = {
           sources: {},

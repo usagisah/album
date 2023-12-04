@@ -12,7 +12,7 @@ export async function processServer(serverApp: INestApplication, context: AlbumD
   const { info, pluginConfig, logger } = context
   const { ssr } = info
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
-  
+
   serverApp.get(AlbumContextService).getContext = () => context
 
   const { plugins, events } = pluginConfig

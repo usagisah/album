@@ -1,7 +1,10 @@
+import { Request } from "express"
 import { UserConfig } from "vite"
 import { LoggerParams } from "../../modules/logger/logger.type.js"
 import { AlbumUserPlugin } from "../../plugins/plugin.type.js"
+import { Func } from "../../utils/types/types.js"
 import { Env, EnvValue } from "../env/env.type.js"
+import { ServerConfig } from "../server/serverConfig.type.js"
 import { UserDevStartConfig } from "../start/start.type.js"
 
 export type UserConfigEnvValue = Partial<EnvValue>
@@ -14,6 +17,7 @@ export interface UserConfigAppRouter {
 export interface UserConfigAppModule {
   path?: string
   name?: string
+  ignore?: (string | RegExp)[]
 }
 
 export interface UserConfigApp {
@@ -30,6 +34,7 @@ export interface UserSSRCompose {
 
 export interface UserConfigServer {
   port?: number
+  rewrite?: (Record<string, string> | Func<[string, Record<string, string>, Request]>)[]
 }
 
 export interface AlbumUserConfig {
@@ -58,6 +63,7 @@ export interface StartCacheUserConfig {
   }
   serverConfig: {
     port: number
+    rewrite: string[]
   }
   start: {
     root: string
