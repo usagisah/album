@@ -1,25 +1,35 @@
+import { cac } from "cac"
+import { readFileSync } from "fs"
+import { dirname, resolve } from "path"
+import { fileURLToPath } from "url"
 import { resolveNodeArgs } from "../utils/command/args.js"
-import { BuildCommand } from "./build/build.command.js"
-import { ServerMode } from "./cli.type.js"
-import { DevCommand } from "./dev/dev.command.js"
-import { StartCommand } from "./start/start.command.js"
+import { albumBuild } from "./build/albumBuild.js"
+import { albumDevServer } from "./dev/dev.js"
+import { albumStartServer } from "./start/start.js"
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const { version } = JSON.parse(readFileSync(resolve(__dirname, "../package.json"), "utf-8"))
 const args = resolveNodeArgs()
-const serverMode: ServerMode = args._[0] as any
-const appId = args._[1] ?? "default"
+const cli = cac("album")
+cli
+  .command("dev [id]", "启动开发服务器")
+  .example("album dev [config.app.id]")
+  .action(appId => albumDevServer({ appId: appId ?? "default", args }))
 
-switch (serverMode) {
-  case "start":
-    new StartCommand()
-    break
-  case "dev":
-    new DevCommand({ appId, args })
-    break
-  case "build":
-    new BuildCommand({ appId, args })
-    break
-  default: {
-    console.error(`启动参数(${serverMode})不合法`, "cli")
-    process.exit(1)
-  }
+cli
+  .command("build [id]", "打包应用")
+  .example("album build [config.app.id]")
+  .action(appId => albumBuild({ appId: appId ?? "default", args }))
+
+cli
+  .command("build start", "启动生产服务器")
+  .example("album start")
+  .action(() => albumStartServer())
+
+try {
+
+  cli.help().version(version).parse()
+} catch (e) {
+  console.error(`启动参数(${JSON.stringify(args)})不合法`, "cli")
+  process.exit(1)
 }
