@@ -21,7 +21,10 @@ export function tsconfigPath(config?: Config): Plugin {
 
         const resolvePath = (p: string) => resolve(process.cwd(), baseUrl, p)
         const alias = {}
-        for (const p in paths) alias[p.slice(0, -2)] = resolvePath(paths[p][0].slice(2, -2))
+        for (const p in paths) {
+          const value: string = paths[p][0].slice(0, -2)
+          alias[p.slice(0, -2)] = resolvePath(value.startsWith("/") ? value.slice(1) : value)
+        }
         return mergeConfig(config, { resolve: { alias } })
       } catch {}
     }

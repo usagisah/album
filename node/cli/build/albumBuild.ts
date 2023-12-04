@@ -1,5 +1,5 @@
 import { RmOptions } from "fs"
-import { rm } from "fs/promises"
+import { mkdir, rm } from "fs/promises"
 import { resolve } from "path"
 import { build as viteBuild } from "vite"
 import { processClient } from "../../client/processClient.js"
@@ -77,12 +77,16 @@ async function buildClient(context: AlbumDevContext) {
 
 async function buildSSR(context: AlbumDevContext) {
   const { info, logger, ssrComposeConfig } = context
-  const { outputs } = info
-  const { clientOutDir, ssrOutDir } = outputs
+  const { ssrCompose, outputs } = info
+  const { outBase, clientOutDir, ssrOutDir } = outputs
   const clientConfig = (await resolveMiddlewareConfig(context, true)).viteConfigs
   const ssrConfig = (await resolveMiddlewareConfig(context)).viteConfigs
 
-  await Promise.all([rm(clientOutDir, rmOptions), rm(ssrOutDir!, rmOptions)])
+  if (ssrCompose) await Promise.all([rm(clientOutDir, rmOptions), rm(ssrOutDir!, rmOptions)])
+  else {
+    await rm(outBase, rmOptions)
+    await mkdir(outBase, { recursive: true })
+  }
 
   let ssrComposeDependencies: SSRComposeDependencies | undefined
   logger.log("正在创建缓存配置，请耐心等待...", "album")

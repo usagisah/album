@@ -1,6 +1,6 @@
 import { existsSync } from "fs"
 import { mkdir, readFile, rm, writeFile } from "fs/promises"
-import { resolve } from "path"
+import { basename, resolve } from "path"
 import { isEmpty, isFunction, isString, isStringEmpty } from "../check/simple.js"
 import { Func } from "../types/types.js"
 
@@ -17,11 +17,10 @@ export class FileStruct {
   #name: string
   #path: string
 
-  constructor(params: { name: string; path: string }) {
-    const { name, path } = params
-    if (isStringEmpty(name)) throw "new FileStruct() 参数name必须是一个不为空的字符串"
+  constructor(params: { path: string }) {
+    const { path } = params
     if (isStringEmpty(path)) throw "new FileStruct() 参数path必须是一个不为空的字符串"
-    this.#name = name
+    this.#name = basename(path)
     this.#path = path
   }
 
@@ -41,9 +40,11 @@ export class FileStruct {
     return await readFile(this.#path, "utf-8").catch(() => "")
   }
 
-  async write(value: string): Promise<FileStruct>
-  async write(fn: Func<[string]>): Promise<FileStruct>
-  async write(param: any): Promise<any> {
+  async write(value: string, force?: boolean): Promise<FileStruct>
+  async write(fn: Func<[string]>, force?: boolean): Promise<FileStruct>
+  async write(param: any, force = true): Promise<any> {
+    if (existsSync(this.#path) && !force) return this
+
     let content = ""
     if (isString(param)) content = param
     else if (isFunction(param)) {
@@ -62,11 +63,10 @@ export class DirStruct {
   #path: string
   #files = new Map<string, FileStruct | DirStruct>()
 
-  constructor(params: { name: string; path: string }) {
-    const { name, path } = params
-    if (isStringEmpty(name)) throw "new FileStruct() 参数name必须是一个不为空的字符串"
+  constructor(params: { path: string }) {
+    const { path } = params
     if (isStringEmpty(path)) throw "new FileStruct() 参数path必须是一个不为空的字符串"
-    this.#name = name
+    this.#name = basename(path)
     this.#path = path
   }
 
@@ -83,12 +83,11 @@ export class DirStruct {
   }
 
   async write(force = false) {
-    let exist = existsSync(this.#path)
-    if (exist && force) {
-      await rm(this.#path, { recursive: true, force: true })
-      exist = false
+    if (existsSync(this.#path)) {
+      if (force) await rm(this.#path, { recursive: true, force: true })
+      else return this
     }
-    if (!exist) await mkdir(this.#path)
+    await mkdir(this.#path, { recursive: true })
     return this
   }
 
@@ -142,7 +141,8 @@ export class DirStruct {
     return false
   }
 
-  async add(type: FileType, filePaths: string | string[], value: string | Func<[string]> = ""): Promise<boolean> {
+  async add(options: { type: FileType; file: string | string[]; value?: string | Func<[string]>; force?: boolean }): Promise<boolean> {
+    let { type, file: filePaths, value = "", force } = options
     if (!["file", "dir"].includes(type)) return false
     if (isString(filePaths)) filePaths = filePaths.split("/").filter(v => v.length > 0)
     if (!Array.isArray(filePaths) || filePaths.length === 0) return false
@@ -151,13 +151,10 @@ export class DirStruct {
       const key = buildFileKey("dir", name)
       let file = this.#files.get(key)
       if (!file || file.type !== "dir") {
-        file = await new DirStruct({
-          name,
-          path: resolve(this.path, name)
-        }).write()
+        file = await new DirStruct({ path: resolve(this.path, name) }).write()
         this.#files.set(key, file)
       }
-      return file.add(type, filePaths.slice(1), value)
+      return file.add({ type, file: filePaths.slice(1), value, force })
     }
 
     const key = buildFileKey(type, filePaths[0])
@@ -165,8 +162,8 @@ export class DirStruct {
 
     const name = filePaths[0]
     let fileIns: FileStruct | DirStruct
-    if (type === "file") fileIns = await new FileStruct({ name, path: resolve(this.path, name) }).write(value as any)
-    else fileIns = await new DirStruct({ name, path: resolve(this.path, name) }).write()
+    if (type === "file") fileIns = await new FileStruct({ path: resolve(this.path, name) }).write(value as any, force)
+    else fileIns = await new DirStruct({ path: resolve(this.path, name) }).write(force)
     this.#files.set(key, fileIns)
 
     return true

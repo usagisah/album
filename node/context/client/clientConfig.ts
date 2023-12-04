@@ -19,7 +19,7 @@ type ClientConfigParams = {
 }
 
 export async function createClientConfig({ appId, inputs, pluginConfig, conf, ssrCompose, logger }: ClientConfigParams) {
-  const _conf = isArray(conf) ? conf : [conf ?? {}]
+  const _conf = isArray(conf) ? (conf.length > 0 ? conf : [{}]) : [conf ?? {}]
   const ids = new Set<any>([..._conf.map(v => v.id)])
   if (ids.size !== _conf.length) throw "config.app 每项必须携带唯一id，这将用于启动匹配"
 

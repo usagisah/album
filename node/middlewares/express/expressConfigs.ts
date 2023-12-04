@@ -38,7 +38,7 @@ const sirvConfig = function (root: string, dev: boolean, single: boolean): Album
   return {
     enable: true,
     name: "sirv",
-    config: [root, { dev, gzip: true, etag: false, dotfiles: false, brotli: false, single, extensions: ["html"], maxAge: 31536000, immutable: true, ignores: ["manifest.json"] } as SirvOptions],
+    config: [root, { dev, gzip: true, etag: false, dotfiles: false, brotli: false, single, extensions: ["html"], maxAge: 31536000, immutable: true } as SirvOptions],
     factory: async (...config: any[]) => sirv.apply(globalThis, config)
   }
 }

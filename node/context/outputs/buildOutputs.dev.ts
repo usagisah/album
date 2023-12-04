@@ -3,9 +3,9 @@ import { DevInputs } from "../inputs/inputs.type.js"
 import { DevOutputs } from "./outputs.type.js"
 
 export function buildOutputs(appId: string, ssr: boolean, inputs: DevInputs): DevOutputs {
-  const outputs: DevOutputs = { outDir: null, clientOutDir: "", ssrOutDir: null }
+  const outputs: DevOutputs = { outBase: "", outDir: null, clientOutDir: "", ssrOutDir: null }
   const { cwd } = inputs
-  const baseOutDir = resolve(cwd, "dist")
+  const baseOutDir = (outputs.outBase = resolve(cwd, "dist"))
   const targetDir = appId === "default" ? "" : appId
   if (ssr) {
     const outDir = (outputs.outDir = resolve(baseOutDir, targetDir))
