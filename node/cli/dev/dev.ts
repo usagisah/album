@@ -7,6 +7,7 @@ import { ILogger } from "../../modules/logger/logger.type.js"
 import { callPluginWithCatch } from "../../plugins/callPluginWithCatch.js"
 import { processServer } from "../../server/processServer.dev.js"
 import { DevServerParams } from "../cli.type.js"
+import { rsBuild } from "./rspack.build.js"
 
 export async function albumDevServer(params: DevServerParams) {
   let { appId = "default", args } = params
@@ -21,11 +22,26 @@ export async function albumDevServer(params: DevServerParams) {
 
     await callPluginWithCatch("context", plugins, { messages: new Map(), events, albumContext: context }, logger)
     await processClient(context)
-    const serverApp = await NestFactory.create(AppModule, { logger, cors: true })
-    await processServer(serverApp, context)
 
-    await serverApp.listen(port)
-    logger.log(`dev config: `, { appId, mode, serverMode, ssrCompose, ssr, listen: blueBright(`http://localhost:${port}`) }, "album")
+    const listenServer = async () => {
+      const serverApp = await NestFactory.create(AppModule, { logger, cors: true })
+      await processServer(serverApp, context)
+      await serverApp.listen(port)
+      return serverApp
+    }
+    const devLogger = () => logger.log(`dev config: `, { appId, mode, serverMode, ssrCompose, ssr, listen: blueBright(`http://localhost:${port}`) }, "album")
+
+    if (1) {
+      rsBuild({} as any, async (err, _, first) => {
+        if (err) return logger.error(err, "album"), null
+        const app = await listenServer()
+        if (first) devLogger()
+        return app
+      })
+    } else {
+      await listenServer()
+      devLogger()
+    }
   } catch (e: any) {
     if (_logger !== console) _logger.error(e, "album")
     else _logger.error(e)

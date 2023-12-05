@@ -1,8 +1,8 @@
 import { mergeConfig, splitVendorChunkPlugin, UserConfig } from "vite"
 import viteCompressionPlugin from "vite-plugin-compression"
 import { AlbumDevContext } from "../../context/context.type.js"
+import { tsconfigPath } from "../../plugins/vite/tsconfigPaths.js"
 import { AlbumServerViteConfig } from "../middlewares.type.js"
-import { tsconfigPath } from "./plugins/tsconfigPaths.js"
 
 const configName = "album:optimize"
 export function viteOptimizeOptions(context: AlbumDevContext, forceClient: boolean): AlbumServerViteConfig {
