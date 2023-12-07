@@ -1,9 +1,9 @@
 import { Request } from "express"
-import { ServerConfig } from "../context/context.type.js"
+import { ServerConfigRewrite } from "../context/context.type.js"
 import { isStringEmpty } from "../utils/check/simple.js"
 import { queryString } from "../utils/request/searchParams.js"
 
-export function createRewriter(rewriteRules: ServerConfig["rewrite"]) {
+export function createRewriter(rewriteRules: ServerConfigRewrite) {
   return function rewrite(req: Request) {
     if (rewriteRules.length === 0) return
 

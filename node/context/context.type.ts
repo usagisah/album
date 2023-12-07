@@ -12,7 +12,7 @@ import { ClientConfig } from "./client/clientConfig.type.js"
 import { Env } from "./env/env.type.js"
 import { DevInputs, StartInputs } from "./inputs/inputs.type.js"
 import { DevOutputs } from "./outputs/outputs.type.js"
-import { ServerConfig } from "./server/serverConfig.type.js"
+import { DevServerConfig, StartServerConfig } from "./server/serverConfig.type.js"
 import { AlbumUserConfig, StartCacheUserConfig } from "./userConfig/userConfig.type.js"
 
 export { FSWatcher } from "chokidar"
@@ -58,7 +58,7 @@ export type AlbumDevContext = {
 
   pluginConfig: ContextPluginConfig
   clientConfig: ClientConfig
-  serverConfig: ServerConfig
+  serverConfig: DevServerConfig
   ssrComposeConfig: SSRComposeDevConfig | null
   userConfig: AlbumUserConfig
 
@@ -79,7 +79,7 @@ export type AlbumStartContext = {
   info: AlbumStartStaticInfo
   logger: ILogger
 
-  serverConfig: ServerConfig
+  serverConfig: StartServerConfig
   ssrComposeConfig: SSRComposeStartConfig
   userConfig: StartCacheUserConfig
 }

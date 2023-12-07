@@ -15,7 +15,7 @@ export function tsconfigPath(config?: Config): Plugin {
       const tsconfigPath = resolve(cwd, "tsconfig.json")
       if (!existsSync(tsconfigPath)) return
 
-      const alias = resolveTsconfigPaths(tsconfigPath)
+      const alias = await resolveTsconfigPaths(tsconfigPath)
       return mergeConfig(config, { resolve: { alias } })
     }
   }

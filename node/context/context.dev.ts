@@ -54,7 +54,7 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
         conf: userConfig.app,
         ssrCompose: !!userConfig.ssrCompose
       }),
-      createServerConfig(userConfig.server)
+      createServerConfig(inputs, userConfig.server)
     ])
     const ssrComposeConfig = await createSSRComposeConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
     const ssr = !!clientConfig.mainSSRInput

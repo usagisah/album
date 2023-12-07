@@ -47,7 +47,9 @@ const ssrComposeValidator = object(
 const serverValidator = object(
   {
     port: number({ invalid_type_error: "config.server.port 必须是一个数字" }).optional(),
-    rewrite: array(union([function_(), record(string())]), { invalid_type_error: "config.server.rewrite 必须是一个(字符串|函数)数组" }).optional()
+    rewrite: array(union([function_(), record(string())]), { invalid_type_error: "config.server.rewrite 必须是一个(字符串|函数)数组" }).optional(),
+    appModule: string({ invalid_type_error: "config.server.appModule 必须是一个路径字符串" }).optional(),
+    tsconfig: union([string(), record(any())], { invalid_type_error: "config.server.tsconfig 必须是一个指向(tsconfig)的配置文件，或者是(tsconfig)配置对象" }).optional()
   },
   { invalid_type_error: "config.server 必须是一个对象" }
 ).optional()

@@ -1,7 +1,24 @@
 import { Request } from "express"
-import { Func } from "../../utils/types/types.js"
+import { Func, Obj } from "../../utils/types/types.js"
 
-export type ServerConfig = {
+export type ServerConfigRewrite = Func<[string, Record<string, string>, Request]>[]
+
+export type DevServerConfigAppModule = {
+  filename: string
+  input: string | null
+  output: string | null
+}
+
+export type DevServerConfigTsconfig = Obj | string | null
+
+export type DevServerConfig = {
   port: number
-  rewrite: Func<[string, Record<string, string>, Request]>[]
+  rewrite: ServerConfigRewrite
+  appModule: DevServerConfigAppModule
+  tsconfig: DevServerConfigTsconfig
+}
+
+export type StartServerConfig = {
+  port: number
+  rewrite: ServerConfigRewrite
 }

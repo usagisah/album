@@ -2,9 +2,8 @@ import { Request } from "express"
 import { UserConfig } from "vite"
 import { LoggerParams } from "../../modules/logger/logger.type.js"
 import { AlbumUserPlugin } from "../../plugins/plugin.type.js"
-import { Func } from "../../utils/types/types.js"
+import { Func, Obj } from "../../utils/types/types.js"
 import { Env, EnvValue } from "../env/env.type.js"
-import { ServerConfig } from "../server/serverConfig.type.js"
 import { UserDevStartConfig } from "../start/start.type.js"
 
 export type UserConfigEnvValue = Partial<EnvValue>
@@ -35,6 +34,8 @@ export interface UserSSRCompose {
 export interface UserConfigServer {
   port?: number
   rewrite?: (Record<string, string> | Func<[string, Record<string, string>, Request]>)[]
+  appModule?: string
+  tsconfig?: string | Obj
 }
 
 export interface AlbumUserConfig {
