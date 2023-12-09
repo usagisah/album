@@ -1,4 +1,5 @@
 import { LazyModuleLoader, NestFactory } from "@nestjs/core"
+import { resolve } from "path"
 import { createServer } from "vite"
 import { AlbumDevContext } from "../context/context.type.js"
 import { resolveMiddlewareConfig } from "../middlewares/resolveMiddlewareConfig.js"
@@ -14,9 +15,13 @@ export async function processServer(context: AlbumDevContext) {
   const { info, serverConfig, pluginConfig, logger } = context
   const { ssr, serverMode } = info
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
-  const { appModule } = serverConfig
 
-  const serverApp = await NestFactory.create(await loadRootModule(appModule), { logger, cors: serverMode !== "start" })
+  const m = serverConfig.appModule
+  const apiAppModuleInput = m.input ? resolve(m.output!, m.filename) : null
+  const serverApp = await NestFactory.create(await loadRootModule(apiAppModuleInput), {
+    logger,
+    cors: serverMode !== "start"
+  })
   const moduleLoader = serverApp.get(LazyModuleLoader)
   await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
 

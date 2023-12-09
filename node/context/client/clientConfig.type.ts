@@ -14,3 +14,9 @@ export type ClientConfig = {
   module: ClientConfigModule
   router: ClientConfigRouter
 }
+
+export type StartClientConfig = {
+  router: {
+    basename: string
+  }
+}

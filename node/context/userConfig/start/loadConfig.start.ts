@@ -4,12 +4,12 @@ import { isPlainObject } from "../../../utils/check/simple.js"
 import { resolveFilePath } from "../../../utils/path/resolvePath.js"
 import { StartCacheUserConfig } from "../userConfig.type.js"
 
-export async function loadConfig(cwd: string) {
+export async function loadConfig(root: string) {
   const configPath = await resolveFilePath({
-    root: cwd,
-    prefixes: ["./", "dist"],
+    root,
+    prefixes: [""],
     name: "album.config",
-    exts: ["js", ""]
+    exts: ["js"]
   })
   if (!configPath) throw "找不到生产配置文件"
 

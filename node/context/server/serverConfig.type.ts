@@ -9,7 +9,7 @@ export type DevServerConfigAppModule = {
   output: string | null
 }
 
-export type DevServerConfigTsconfig = Obj | string | null
+export type DevServerConfigTsconfig = Obj | null
 
 export type DevServerConfig = {
   port: number
@@ -21,4 +21,5 @@ export type DevServerConfig = {
 export type StartServerConfig = {
   port: number
   rewrite: ServerConfigRewrite
+  tsconfig: Obj | null
 }

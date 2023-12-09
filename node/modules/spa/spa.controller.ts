@@ -12,7 +12,7 @@ export class SpaController {
 
   @Get("*")
   async spa(@Req() req: Request, @Res() res: Response) {
-    console.log( "????" )
+    console.log("????")
     const { url, originalUrl } = req
     const { info, viteDevServer } = this.context.getContext() as AlbumDevContext
     const { inputs } = info

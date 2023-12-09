@@ -4,7 +4,6 @@ import { LoggerParams } from "../../modules/logger/logger.type.js"
 import { AlbumUserPlugin } from "../../plugins/plugin.type.js"
 import { Func, Obj } from "../../utils/types/types.js"
 import { Env, EnvValue } from "../env/env.type.js"
-import { UserDevStartConfig } from "../start/start.type.js"
 
 export type UserConfigEnvValue = Partial<EnvValue>
 export type UserConfigEnv = UserConfigEnvValue | string
@@ -46,7 +45,6 @@ export interface AlbumUserConfig {
   logger?: LoggerParams
   plugins?: AlbumUserPlugin[]
   vite?: UserConfig
-  start?: UserDevStartConfig
 }
 
 export interface CacheSSRCompose {
@@ -60,14 +58,17 @@ export interface StartCacheUserConfig {
     ssrCompose: boolean
   }
   clientConfig: {
-    router: string
+    router: {
+      basename: string
+    }
   }
   serverConfig: {
     port: number
     rewrite: string[]
-  }
-  start: {
-    root: string
+    appModule: {
+      input: string | null
+    }
+    tsconfig: Obj | null
   }
   logger?: LoggerParams
 }

@@ -1,4 +1,5 @@
 import { blueBright } from "colorette"
+import { rsBuild } from "../../builder/rspack/rspack.build.js"
 import { processClient } from "../../client/processClient.js"
 import { SYSTEM_RESTART } from "../../constants.js"
 import { createAlbumDevContext } from "../../context/context.dev.js"
@@ -6,7 +7,6 @@ import { ILogger } from "../../modules/logger/logger.type.js"
 import { callPluginWithCatch } from "../../plugins/callPluginWithCatch.js"
 import { processServer } from "../../server/processServer.dev.js"
 import { DevServerParams } from "../cli.type.js"
-import { rsBuild } from "./rspack.build.js"
 
 export async function albumDevServer(params: DevServerParams) {
   let { appId = "default", args } = params

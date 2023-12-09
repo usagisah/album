@@ -6,3 +6,7 @@ export type DevServerParams = {
   appId: string
   args: NodeArgs
 }
+
+export type StartServerParams = {
+  args: NodeArgs
+}

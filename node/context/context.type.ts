@@ -8,7 +8,7 @@ import { AlbumUserPlugin } from "../plugins/plugin.type.js"
 import { SSRComposeDevConfig, SSRComposeStartConfig } from "../ssrCompose/ssrCompose.type.js"
 import { NodeArgs } from "../utils/command/args.js"
 import { DirStruct } from "../utils/fs/fileManager.js"
-import { ClientConfig } from "./client/clientConfig.type.js"
+import { ClientConfig, StartClientConfig } from "./client/clientConfig.type.js"
 import { Env } from "./env/env.type.js"
 import { DevInputs, StartInputs } from "./inputs/inputs.type.js"
 import { DevOutputs } from "./outputs/outputs.type.js"
@@ -79,6 +79,7 @@ export type AlbumStartContext = {
   info: AlbumStartStaticInfo
   logger: ILogger
 
+  clientConfig: StartClientConfig
   serverConfig: StartServerConfig
   ssrComposeConfig: SSRComposeStartConfig
   userConfig: StartCacheUserConfig

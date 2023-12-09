@@ -65,13 +65,6 @@ const loggerValidator = object(
   { invalid_type_error: "config.logger 必须是一个对象" }
 ).optional()
 
-const startValidator = object(
-  {
-    root: string({ invalid_type_error: "config.start.root 必须是一个字符串" }).optional()
-  },
-  { invalid_type_error: "config.start 必须是一个对象" }
-).optional()
-
 export function checkUserConfig(userConfig: any) {
   const res = object({
     env: envValidator,
@@ -85,8 +78,7 @@ export function checkUserConfig(userConfig: any) {
       }).or(record(function_())),
       { invalid_type_error: "config.plugins[] 每项必须是组件对象" }
     ).optional(),
-    vite: record(any(), { invalid_type_error: "config.vite 必须是一个 vite 配置对象" }).optional(),
-    start: startValidator
+    vite: record(any(), { invalid_type_error: "config.vite 必须是一个 vite 配置对象" }).optional()
   }).safeParse(userConfig)
   if (!res.success) throw res.error.errors.map(e => ({ config: e.path.join("."), message: e.message }))
 }

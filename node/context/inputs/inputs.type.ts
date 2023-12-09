@@ -11,4 +11,5 @@ export type StartInputs = {
   clientInput: string | null
   ssrInput: string | null
   mainSSRInput: string | null
+  apiAppInput: string | null
 }

@@ -1,5 +1,6 @@
 import { resolve } from "path"
-import { isArray, isFunction, isNumber } from "../../utils/check/simple.js"
+import { isArray, isFunction, isNumber, isPlainObject, isString } from "../../utils/check/simple.js"
+import { readJson } from "../../utils/fs/readJson.js"
 import { resolveFilePath } from "../../utils/path/resolvePath.js"
 import { Obj } from "../../utils/types/types.js"
 import { DevInputs } from "../inputs/inputs.type.js"
@@ -34,16 +35,17 @@ export async function createServerConfig(input: DevInputs, conf?: UserConfigServ
     })
   }
 
-  let _tsconfig: Obj | string | null = null
+  let _tsconfig: Obj | null = null
   if (_appModule) {
-    if (tsconfig) _tsconfig = tsconfig
-    else {
-      _tsconfig = await resolveFilePath({
+    if (isPlainObject(tsconfig)) _tsconfig = tsconfig
+    if (isString(tsconfig)) {
+      const configPath = await resolveFilePath({
         root: cwd,
         prefixes: ["./", "server"],
         name: "tsconfig.server",
         exts: ["json"]
       })
+      if (configPath) _tsconfig = await readJson(configPath)
     }
   }
 

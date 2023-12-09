@@ -5,7 +5,7 @@ export async function readJson(path: string) {
   try {
     const res = await readFile(path, "utf-8")
     return JSON.parse(res) as Obj
-  } catch(e) {
+  } catch (e) {
     return null
   }
 }

@@ -46,9 +46,9 @@ cli
   .action(appId => albumBuild({ appId: appId ?? "default", args }))
 
 cli
-  .command("build start", "启动生产服务器")
+  .command("build start [root]", "启动生产服务器")
   .example("album start")
-  .action(() => albumStartServer())
+  .action(() => albumStartServer({ args }))
 
 try {
   cli.help().version(version).parse()
