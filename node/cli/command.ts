@@ -1,10 +1,12 @@
 import { cac } from "cac"
+import { ExecaChildProcess, execa } from "execa"
 import { readFileSync } from "fs"
 import { dirname, resolve } from "path"
+import { Writable } from "stream"
 import { fileURLToPath } from "url"
+import { SYSTEM_RESTART } from "../constants.js"
 import { resolveNodeArgs } from "../utils/command/args.js"
 import { albumBuild } from "./build/albumBuild.js"
-import { albumDevServer } from "./dev/dev.js"
 import { albumStartServer } from "./start/start.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -14,7 +16,29 @@ const cli = cac("album")
 cli
   .command("dev [id]", "启动开发服务器")
   .example("album dev [config.app.id]")
-  .action(appId => albumDevServer({ appId: appId ?? "default", args }))
+  .action(async appId => {
+    let cProcess: ExecaChildProcess | null = null
+    const restart = () => {
+      if (cProcess) {
+        cProcess.kill()
+        cProcess = null
+      }
+      cProcess = execa("node", [resolve(__dirname, "./dev/dev.placeholder.js"), "--color", JSON.stringify({ appId: appId ?? "default", args })], {
+        cwd: process.cwd(),
+        stderr: process.stderr
+      })
+      cProcess.stdout!.pipe(
+        new Writable({
+          write(c, _, cb) {
+            if (c.toString().includes(SYSTEM_RESTART)) restart()
+            else process.stdout.write(c)
+            cb()
+          }
+        })
+      )
+    }
+    restart()
+  })
 
 cli
   .command("build [id]", "打包应用")
@@ -27,7 +51,6 @@ cli
   .action(() => albumStartServer())
 
 try {
-
   cli.help().version(version).parse()
 } catch (e) {
   console.error(`启动参数(${JSON.stringify(args)})不合法`, "cli")

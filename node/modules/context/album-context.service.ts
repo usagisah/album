@@ -17,3 +17,8 @@ export class AlbumContextService {
     throw "未初始化的 album builtin createSSRComposeContext"
   }
 }
+
+export function createAlbumServer(ctx: AlbumContext) {
+  AlbumContextService.prototype.getContext = () => ctx
+  return AlbumContextService
+}

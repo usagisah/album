@@ -1,9 +1,16 @@
-import { Global, Module } from "@nestjs/common"
-import { AlbumLoggerService } from "./logger.service.js"
+import { DynamicModule, Module } from "@nestjs/common"
+import { createAlbumLoggerService } from "./logger.service.js"
+import { ILogger } from "./logger.type.js"
 
-@Global()
-@Module({
-  providers: [AlbumLoggerService],
-  exports: [AlbumLoggerService]
-})
-export class LoggerModule {}
+@Module({})
+export class LoggerModule {
+  static forRoot(logger: ILogger): DynamicModule {
+    const loggerService = createAlbumLoggerService(logger)
+    return {
+      global: true,
+      module: LoggerModule,
+      providers: [loggerService],
+      exports: [loggerService]
+    }
+  }
+}

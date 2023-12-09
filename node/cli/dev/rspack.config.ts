@@ -2,7 +2,7 @@ import { RspackOptions, rspack } from "@rspack/core"
 import { DevServerConfigTsconfig } from "../../context/context.type.js"
 import { resolveTsconfigPaths } from "../../utils/path/resolveTsconfigPaths.js"
 
-export type RsConfig = {
+export type RsBuildConfig = {
   filename: string
   env: Record<string, string>
   input: string
@@ -11,7 +11,7 @@ export type RsConfig = {
   cwd: string
 }
 
-export async function createRsConfig(config: RsConfig): Promise<RspackOptions> {
+export async function createRsConfig(config: RsBuildConfig): Promise<RspackOptions> {
   const { filename, env, input, output, tsconfig, cwd } = config
   const isProd = env.mode === "production"
   const mode = isProd ? "production" : "development"

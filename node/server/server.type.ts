@@ -1,3 +1,1 @@
-export type AlbumAppModuleOptions = {
-  imports: any[]
-}
+export type AlbumAppModuleOptions = {}

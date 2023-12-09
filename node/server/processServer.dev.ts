@@ -1,8 +1,10 @@
-import { LazyModuleLoader, ModuleRef, NestFactory } from "@nestjs/core"
+import { LazyModuleLoader, NestFactory } from "@nestjs/core"
 import { createServer } from "vite"
 import { AlbumDevContext } from "../context/context.type.js"
 import { resolveMiddlewareConfig } from "../middlewares/resolveMiddlewareConfig.js"
-import { AlbumContextService } from "../modules/context/album-context.service.js"
+import { AlbumContextModule } from "../modules/context/album-context.module.js"
+import { LoggerModule } from "../modules/logger/logger.module.js"
+import { SpaModule } from "../modules/spa/spa.module.js"
 import { SSRModule } from "../modules/ssr/ssr.module.js"
 import { callPluginWithCatch } from "../plugins/callPluginWithCatch.js"
 import { applySSRComposeDevMiddleware } from "../ssrCompose/dev/applySSRComposeMiddleware.dev.js"
@@ -13,9 +15,10 @@ export async function processServer(context: AlbumDevContext) {
   const { ssr, serverMode } = info
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
   const { appModule } = serverConfig
-  const serverApp = await NestFactory.create(await loadRootModule(appModule), { logger, cors: serverMode !== "start" })
 
-  serverApp.get(AlbumContextService).getContext = () => context
+  const serverApp = await NestFactory.create(await loadRootModule(appModule), { logger, cors: serverMode !== "start" })
+  const moduleLoader = serverApp.get(LazyModuleLoader)
+  await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
 
   const { plugins, events } = pluginConfig
   await callPluginWithCatch("server", plugins, { messages: new Map(), events, info, app: serverApp }, logger)
@@ -29,9 +32,11 @@ export async function processServer(context: AlbumDevContext) {
     }
   }
 
-  serverApp.use((context.viteDevServer = await createServer(viteConfigs)).middlewares)
+  const viteDevServer = await createServer(viteConfigs)
+  serverApp.use((context.viteDevServer = viteDevServer).middlewares)
   await applySSRComposeDevMiddleware(serverApp, context)
 
-  if (ssr) await serverApp.get(LazyModuleLoader).load(() => SSRModule)
-  return serverApp
+  if (ssr) await moduleLoader.load(() => SSRModule)
+  else await moduleLoader.load(() => SpaModule)
+  return { serverApp, viteDevServer }
 }

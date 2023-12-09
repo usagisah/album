@@ -11,7 +11,7 @@ export function createSPACoreConfig(context: AlbumDevContext): [InlineConfig, Pl
   const { cwd } = inputs
   const { clientOutDir } = outputs
   const config: InlineConfig = {
-    appType: ssr ? "custom" : "spa",
+    appType: "custom",
     build: {
       manifest: ssr,
       outDir: clientOutDir,

@@ -4,30 +4,40 @@ import { ILogger } from "./logger.type.js"
 
 @Injectable()
 export class AlbumLoggerService implements ILogger {
-  constructor() {
-    if (!Logger.logger) {
-      throw new Error("请不要在初始化 album server 前尝试创建 AlbumLoggerService")
-    }
-  }
   log(message: any, ...optionalParams: any[]) {
-    Logger.logger.log(message, ...optionalParams)
+    this.getLogger().log(message, ...optionalParams)
   }
+
   error(message: any, ...optionalParams: any[]) {
-    Logger.logger.error(message, ...optionalParams)
+    this.getLogger().error(message, ...optionalParams)
   }
+
   warn(message: any, ...optionalParams: any[]) {
-    Logger.logger.warn(message, ...optionalParams)
+    this.getLogger().warn(message, ...optionalParams)
   }
+
   debug?(message: any, ...optionalParams: any[]) {
-    Logger.logger.debug(message, ...optionalParams)
+    this.getLogger().debug!(message, ...optionalParams)
   }
+
   verbose(message: any, ...optionalParams: any[]) {
-    Logger.logger.verbose(message, ...optionalParams)
+    this.getLogger().verbose!(message, ...optionalParams)
   }
+
   fatal(message: any, ...optionalParams: any[]) {
     throw new Error("Method not implemented.")
   }
+
   setLogLevels(levels: LogLevel[]) {
     throw new Error("Method not implemented.")
   }
+
+  getLogger(): ILogger {
+    throw "(AlbumLoggerService) 未初始化的 album builtin getLogger"
+  }
+}
+
+export function createAlbumLoggerService(logger: ILogger) {
+  AlbumLoggerService.prototype.getLogger = () => logger
+  return AlbumLoggerService
 }

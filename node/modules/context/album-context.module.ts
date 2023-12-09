@@ -1,9 +1,16 @@
-import { Global, Module } from "@nestjs/common"
-import { AlbumContextService } from "./album-context.service.js"
+import { DynamicModule, Module } from "@nestjs/common"
+import { AlbumContext } from "../../context/context.type.js"
+import { createAlbumServer } from "./album-context.service.js"
 
-@Global()
-@Module({
-  providers: [AlbumContextService],
-  exports: [AlbumContextService]
-})
-export class AlbumContextModule {}
+@Module({})
+export class AlbumContextModule {
+  static forRoot(ctx: AlbumContext): DynamicModule {
+    const ctxService = createAlbumServer(ctx)
+    return {
+      global: true,
+      module: AlbumContextModule,
+      providers: [ctxService],
+      exports: [ctxService]
+    }
+  }
+}
