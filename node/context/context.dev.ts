@@ -18,9 +18,9 @@ import { createWatcher } from "./watcher/watcher.js"
 export async function createAlbumDevContext(params: CreateContextParams): Promise<AlbumDevContext> {
   let logger: ILogger = console
   try {
-    const { appId, mode, serverMode, args } = params
+    const { appId, serverMode, args } = params
     const inputs = buildDevInputs()
-    let userConfig = await loadConfig({ mode, args, inputs })
+    let userConfig = await loadConfig({ args, inputs, serverMode })
     logger = new Logger(isPlainObject(userConfig.logger) ? userConfig.logger : undefined)
 
     const pluginConfig: ContextPluginConfig = { events: new EventEmitter(), plugins: userConfig.plugins ?? [] }
@@ -30,7 +30,6 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
       {
         events: pluginConfig.events,
         messages: new Map(),
-        mode,
         serverMode,
         config: userConfig
       },
@@ -59,7 +58,7 @@ export async function createAlbumDevContext(params: CreateContextParams): Promis
     const ssrComposeConfig = await createSSRComposeConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
     const ssr = !!clientConfig.mainSSRInput
     return {
-      info: { appId, mode, serverMode, ssr, ssrCompose: !!ssrComposeConfig, inputs, outputs: buildOutputs(appId, ssr, inputs, serverConfig), env },
+      info: { appId, serverMode, ssr, ssrCompose: !!ssrComposeConfig, inputs, outputs: buildOutputs(appId, ssr, inputs, serverConfig), env },
       logger,
       watcher: createWatcher(inputs, clientConfig),
 

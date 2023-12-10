@@ -6,10 +6,9 @@ import { AlbumServerViteConfig } from "../middlewares.type.js"
 
 const configName = "album:optimize"
 export function viteOptimizeOptions(context: AlbumDevContext, forceClient: boolean): AlbumServerViteConfig {
-  const { mode } = context.info
   return {
     name: configName,
-    config: mergeConfig(commonConfig(context), mode === "production" ? prodConfig(context, forceClient) : devConfig())
+    config: mergeConfig(commonConfig(context), context.info.env.mode === "production" ? prodConfig(context, forceClient) : devConfig())
   }
 }
 
@@ -19,6 +18,12 @@ function commonConfig(context: AlbumDevContext): UserConfig {
     plugins: [splitVendorChunkPlugin(), tsconfigPath({ cwd })],
     build: { reportCompressedSize: false }
   }
+}
+
+export const defaultCompressionConfig: any = {
+  deleteOriginFile: false,
+  threshold: 10240,
+  verbose: false
 }
 
 function devConfig(): UserConfig {
@@ -44,14 +49,9 @@ function prodConfig(context: AlbumDevContext, forceClient: boolean): UserConfig 
       cssMinify: "lightningcss"
     }
   }
-
   if (!ssr || forceClient) {
     config.plugins!.push(
-      (viteCompressionPlugin as any)({
-        deleteOriginFile: false,
-        threshold: 10240,
-        verbose: false
-      })
+      (viteCompressionPlugin as any)(defaultCompressionConfig)
     )
   }
   return config

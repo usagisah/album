@@ -3,11 +3,11 @@ import { resolve } from "path"
 import { Plugin, mergeConfig } from "vite"
 import { resolveTsconfigPaths } from "../../utils/path/resolveTsconfigPaths.js"
 
-type Config = {
+type TsconfigPathConfig = {
   cwd?: string
 }
 
-export function tsconfigPath(config?: Config): Plugin {
+export function tsconfigPath(config?: TsconfigPathConfig): Plugin {
   const { cwd = process.cwd() } = config ?? {}
   return {
     name: "album:tsconfigPath",

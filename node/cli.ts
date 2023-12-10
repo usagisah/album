@@ -11,3 +11,6 @@ import { AlbumUserConfig } from "./context/userConfig/userConfig.type.js"
 export function defineConfig(config: AlbumUserConfig) {
   return config
 }
+
+export * from "./plugins/album/pluginAlbumExpress.js"
+export * from "./plugins/album/pluginAlbumVite.js"

@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { ServerMode } from "../../cli/cli.type.js"
-import { ClientConfigSSRRender, Env, Mode } from "../../context/context.type.js"
+import { ClientConfigSSRRender, Env } from "../../context/context.type.js"
 import { ILogger } from "../logger/logger.type.js"
 import { AlbumSSRComposeContext } from "../ssr-compose/ssr-compose.type.js"
 
@@ -15,7 +15,6 @@ export type AlbumSSRInputs = {
 
 export type AlbumSSRContext = {
   // 上下文静态信息
-  mode: Mode
   serverMode: ServerMode
   ssr: boolean
   ssrCompose: boolean

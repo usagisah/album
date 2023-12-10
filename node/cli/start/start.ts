@@ -8,13 +8,13 @@ export async function albumStartServer(params: StartServerParams) {
   try {
     const context = await createAlbumContext(params)
     const { logger, info, serverConfig } = context
-    const { mode, serverMode, ssr, ssrCompose } = info
+    const { serverMode, ssr, ssrCompose } = info
     const { port } = serverConfig
     _logger = logger
 
     const serverApp = await processServer(context)
     await serverApp.listen(port)
-    logger.log(`start config: `, { mode, serverMode, ssrCompose, ssr, listen: `http://localhost:${port}` }, "album")
+    logger.log(`start config: `, { serverMode, ssrCompose, ssr, listen: `http://localhost:${port}` }, "album")
   } catch (e: any) {
     _logger.error(e, "album")
     throw e

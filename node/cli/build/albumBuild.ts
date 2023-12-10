@@ -20,10 +20,10 @@ export async function albumBuild(params: DevServerParams) {
   let { appId = "default", args } = params
   let _logger: ILogger = console
   try {
-    const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "build" })
+    const context = await createAlbumDevContext({ appId, args, serverMode: "build" })
     const { logger, info, pluginConfig, clientConfig } = context
     const { plugins, events } = pluginConfig
-    const { mode, serverMode, ssr, ssrCompose, inputs, outputs } = info
+    const { env, serverMode, ssr, ssrCompose, inputs, outputs } = info
     const { cwd } = inputs
     const { clientOutDir, ssrOutDir } = outputs
     _logger = logger
@@ -35,7 +35,7 @@ export async function albumBuild(params: DevServerParams) {
       "build config: ",
       {
         appId,
-        mode,
+        mode: env.mode,
         serverMode,
         ssrCompose,
         client: {

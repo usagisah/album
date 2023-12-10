@@ -2,7 +2,7 @@ import { INestApplication } from "@nestjs/common"
 import EventEmitter from "events"
 import { ServerMode } from "../cli/cli.type.js"
 import { SpecialModule } from "../client/client.type.js"
-import { AlbumDevContext, AlbumDevStaticInfo, ClientConfig, Mode, UserConfigAppModule, UserConfigAppRouter } from "../context/context.type.js"
+import { AlbumDevContext, AlbumDevStaticInfo, ClientConfig, UserConfigAppModule, UserConfigAppRouter } from "../context/context.type.js"
 import { DevInputs } from "../context/inputs/inputs.type.js"
 import { AlbumUserConfig, UserConfigApp } from "../context/userConfig/userConfig.type.js"
 import { AlbumServerExpressConfig, AlbumServerViteConfig } from "../middlewares/middlewares.type.js"
@@ -15,7 +15,6 @@ export type PluginGlobalOptions = {
 
 // 修改引用配置文件
 export type PluginConfigParams = {
-  mode: Mode
   serverMode: ServerMode
   config: AlbumUserConfig
 } & PluginGlobalOptions

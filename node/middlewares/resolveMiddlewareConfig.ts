@@ -31,5 +31,6 @@ export async function resolveMiddlewareConfig(context: AlbumDevContext, forceCli
     },
     logger
   )
+  debugger
   return { midConfigs, viteConfigs: mergeMultipleViteConfig(viteConfigs) }
 }

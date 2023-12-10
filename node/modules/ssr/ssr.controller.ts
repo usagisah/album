@@ -30,7 +30,7 @@ export class SSRController {
   async initStartModule(ctx: AlbumStartContext) {
     const { info, logger, clientConfig, ssrComposeConfig } = ctx
     const { ssrRender } = clientConfig
-    const { mode, serverMode, ssr, ssrCompose, inputs, env } = info
+    const { serverMode, ssr, ssrCompose, inputs, env } = info
     const { cwd, root } = inputs
     const { projectInputs } = ssrComposeConfig
 
@@ -39,7 +39,6 @@ export class SSRController {
       createOptions = this.context.createSSRRenderOptions = ({ req, res, headers }) => {
         const userSSRRenderOptions: AlbumSSRRenderOptions = {
           ssrContext: {
-            mode,
             serverMode,
             ssr,
             ssrCompose,
@@ -93,7 +92,7 @@ export class SSRController {
   async initDevModule(ctx: AlbumDevContext) {
     const { info, clientConfig, clientManager, viteDevServer, logger } = ctx
     const { ssrRender } = clientConfig
-    const { mode, serverMode, ssr, ssrCompose, env, inputs } = info
+    const { serverMode, ssr, ssrCompose, env, inputs } = info
     const { cwd, dumpInput } = inputs
     const { realSSRInput, realClientInput } = clientManager!
 
@@ -102,7 +101,6 @@ export class SSRController {
       createOptions = this.context.createSSRRenderOptions = function ({ req, res, headers }) {
         const userSSRRenderOptions: AlbumSSRRenderOptions = {
           ssrContext: {
-            mode,
             serverMode,
             ssr,
             ssrCompose,

@@ -7,7 +7,7 @@ import { AlbumServerExpressConfig } from "../middlewares.type.js"
 type Context = AlbumDevContext | AlbumStartContext
 
 export function expressConfigs(context: Context) {
-  return context.info.mode === "production" ? prodOptions(context) : devOptions(context)
+  return context.info.env.mode === "production" ? prodOptions(context) : devOptions(context)
 }
 
 const helmetConfig: AlbumServerExpressConfig = {

@@ -11,18 +11,18 @@ import { DevServerParams } from "../cli.type.js"
 export async function albumDevServer(params: DevServerParams) {
   let { appId = "default", args } = params
   let _logger: ILogger = console
-  const context = await createAlbumDevContext({ appId, args, mode: "development", serverMode: "dev" })
+  const context = await createAlbumDevContext({ appId, args, serverMode: "dev" })
   try {
     const { logger, info, pluginConfig, serverConfig } = context
     const { plugins, events } = pluginConfig
-    const { mode, env, serverMode, inputs, ssr, ssrCompose } = info
+    const { env, serverMode, inputs, ssr, ssrCompose } = info
     const { port, appModule, tsconfig } = serverConfig
     _logger = logger
 
     await callPluginWithCatch("context", plugins, { messages: new Map(), events, albumContext: context }, logger)
     await processClient(context)
 
-    const devLogger = () => logger.log(`dev config: `, { appId, mode, serverMode, ssrCompose, ssr, listen: blueBright(`http://localhost:${port}`) }, "album")
+    const devLogger = () => logger.log(`dev config: `, { appId, mode: env.mode, serverMode, ssrCompose, ssr, listen: blueBright(`http://localhost:${port}`) }, "album")
     const listenServer = async () => {
       try {
         const res = await processServer(context)

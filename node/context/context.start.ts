@@ -45,7 +45,6 @@ export async function createAlbumContext({ args }: StartServerParams): Promise<A
     return {
       info: {
         serverMode: "start",
-        mode: ((cacheConfig.info.env.NODE_ENV ?? process.env.NODE_ENV) as any) ?? "production",
         ssr: cacheConfig.info.ssr,
         ssrCompose: cacheConfig.info.ssrCompose,
         env: registryEnv(cacheConfig.info.env),

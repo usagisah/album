@@ -25,12 +25,9 @@ export * from "./userConfig/userConfig.type.js"
 
 export type CreateContextParams = {
   appId: string
-  mode: Mode
   serverMode: ServerMode
   args: NodeArgs
 }
-
-export type Mode = "development" | "production"
 
 export type ContextPluginConfig = {
   events: EventEmitter
@@ -40,7 +37,6 @@ export type ContextPluginConfig = {
 export type AlbumDevStaticInfo = {
   serverMode: ServerMode
   appId: string
-  mode: Mode
   ssr: boolean
   ssrCompose: boolean
   inputs: DevInputs
@@ -68,7 +64,6 @@ export type AlbumDevContext = {
 
 export type AlbumStartStaticInfo = {
   serverMode: "start"
-  mode: Mode
   ssr: boolean
   ssrCompose: boolean
   inputs: StartInputs
