@@ -1,7 +1,7 @@
 export type DevOutputs = {
   outBase: string
-  outDir: string | null
+  outDir: string
   clientOutDir: string
   ssrOutDir: string | null
-  apiOutDir: string
+  apiOutDir: string | null
 }

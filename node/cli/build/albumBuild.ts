@@ -83,8 +83,11 @@ async function buildCache(context: AlbumDevContext) {
     serverConfig: { port, rewrite: rewrite.map(v => v.toString()), appModule: { input: `${outputs.apiOutDir}${sep}${appModule.filename}` } },
     logger: userConfig.logger
   }
-  const output = resolve(context.info.outputs.outBase, "album.config.js")
-  await writeFile(output, stringify(config), "utf-8")
+  const filename = "album.config.js"
+  const output = resolve(outputs.outBase, filename)
+  const content = stringify(config)
+  await writeFile(output, content, "utf-8")
+  if (outputs.outBase !== outputs.outDir) await writeFile(resolve(outputs.outDir, filename), content, "utf-8")
 
   logger.log("创建完成", "album")
   return ssrComposeDependencies
@@ -139,7 +142,7 @@ async function buildApi(context: AlbumDevContext) {
       env,
       filename,
       input,
-      output: outputs.apiOutDir,
+      output: outputs.apiOutDir!,
       tsconfig,
       cwd: inputs.cwd
     })

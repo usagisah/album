@@ -15,7 +15,7 @@ export async function buildSSRComposeDependencies(context: AlbumDevContext): Pro
   const { inputs, outputs } = context.info
   const { cwd } = inputs
   const { outDir } = outputs
-  const depOutDir = resolve(outDir!, ".ssr-compose-dependencies")
+  const depOutDir = resolve(outDir, ".ssr-compose-dependencies")
 
   await rm(depOutDir, { force: true, recursive: true })
   await mkdir(depOutDir, { recursive: true })
