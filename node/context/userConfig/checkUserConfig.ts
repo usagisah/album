@@ -1,4 +1,4 @@
-import { any, array, boolean, function as function_, number, object, record, string, union } from "zod"
+import { any, array, boolean, function as function_, literal, number, object, record, string, union } from "zod"
 import { isRegExp } from "../../utils/check/simple.js"
 
 const regexp = (message = "不是一个正则表达式") => {
@@ -21,6 +21,12 @@ const appValidator = object({
   id: string({ invalid_type_error: "config.app.id 必须是一个字符串" }).optional(),
   main: string({ invalid_type_error: "config.app.main 必须是一个字符串" }).optional(),
   mainSSR: string({ invalid_type_error: "config.app.mainSSR 必须是一个字符串" }).optional(),
+  ssrRender: object(
+    {
+      sendMode: union([literal("pipe"), literal("string")], { invalid_type_error: "config.app.ssrRender.sendMode 必须是(pipe|string)其中一个" }).optional()
+    },
+    { invalid_type_error: "config.app.ssrRender 必须是一个对象" }
+  ).optional(),
   module: object(
     {
       path: string({ invalid_type_error: "config.app.module.path 必须是一个字符串" }).optional(),

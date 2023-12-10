@@ -4,7 +4,6 @@ import { StartServerParams } from "../cli/cli.type.js"
 import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
 import { createSSRComposeConfig } from "../ssrCompose/start/createSSRComposeConfig.start.js"
-import { isPlainObject } from "../utils/check/simple.js"
 import { resolveFilePath } from "../utils/path/resolvePath.js"
 import { AlbumStartContext } from "./context.type.js"
 import { registryEnv } from "./env/start/env.start.js"
@@ -14,7 +13,7 @@ export async function createAlbumContext({ args }: StartServerParams): Promise<A
   let logger: ILogger = console
   try {
     const cwd = process.cwd()
-    let root = args._[0] ?? cwd
+    let root = args._[1] ?? cwd
     if (root) {
       root = resolve(cwd, root)
       if (!existsSync(root) && !statSync(root).isDirectory()) throw `指定的启动根目录路径不存在(${root})`
@@ -39,10 +38,9 @@ export async function createAlbumContext({ args }: StartServerParams): Promise<A
       if (!existsSync(clientInput)) throw "找不到 client 的入口文件夹，请检查目录格式是否正确"
     }
 
-    const { port, rewrite, appModule, tsconfig } = cacheConfig.serverConfig
+    const { port, rewrite, appModule } = cacheConfig.serverConfig
     const apiAppInput = appModule.input
     if (apiAppInput && (!existsSync(apiAppInput) || !statSync(apiAppInput).isFile())) throw "指定的 apiAppModule 必须是一个指向文件的路径"
-    if (tsconfig && !isPlainObject(tsconfig)) throw "非法格式的 api.tsconfig 格式"
 
     return {
       info: {
@@ -58,7 +56,6 @@ export async function createAlbumContext({ args }: StartServerParams): Promise<A
       clientConfig: cacheConfig.clientConfig,
       serverConfig: {
         port,
-        tsconfig,
         rewrite: rewrite.map(code => new Function("...args", `${code}\nreturn anonymous(...args)`) as any)
       },
       ssrComposeConfig: await createSSRComposeConfig(root)

@@ -13,8 +13,8 @@ export type RsBuildConfig = {
 
 export async function createRsConfig(config: RsBuildConfig): Promise<RspackOptions> {
   const { filename, env, input, output, tsconfig, cwd } = config
-  const isProd = env.mode === "production"
-  const mode = isProd ? "production" : "development"
+  const mode: any = env.mode
+  const isProd = mode === "production"
   const alias = await resolveTsconfigPaths(tsconfig, cwd)
   return {
     cache: true,

@@ -16,10 +16,7 @@ export function buildOutputs(appId: string, ssr: boolean, inputs: DevInputs, ser
   const baseOutDir = (outputs.outBase = resolve(cwd, "dist"))
   const targetDir = resolve(baseOutDir, appId === "default" ? "" : appId)
 
-  if (serverConfig.appModule.input) {
-    const { filename } = serverConfig.appModule
-    outputs.apiOutDir = resolve(targetDir, "api", filename)
-  }
+  if (serverConfig.appModule.input) outputs.apiOutDir = resolve(targetDir, "api")
 
   if (ssr) {
     const outDir = (outputs.outDir = targetDir)

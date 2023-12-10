@@ -7,7 +7,7 @@ import { isArray, isRegExp, isStringEmpty } from "../../utils/check/simple.js"
 import { ContextPluginConfig } from "../context.type.js"
 import { DevInputs } from "../inputs/inputs.type.js"
 import { UserConfigApp } from "../userConfig/userConfig.type.js"
-import { ClientConfig, ClientConfigModule, ClientConfigRouter } from "./clientConfig.type.js"
+import { ClientConfig, ClientConfigModule, ClientConfigRouter, ClientConfigSSRRender } from "./clientConfig.type.js"
 
 type ClientConfigParams = {
   appId: string
@@ -74,9 +74,11 @@ export async function createClientConfig({ appId, inputs, pluginConfig, conf, ss
     moduleConfig.ignore.push(...ignores)
   }
 
+  const ssrRender: ClientConfigSSRRender = { sendMode: c.ssrRender?.sendMode ?? "pipe" }
   const clientConfig: ClientConfig = {
     mainInput,
     mainSSRInput,
+    ssrRender,
     router: routerConfig,
     module: moduleConfig
   }

@@ -3,6 +3,7 @@ import { UserConfig } from "vite"
 import { LoggerParams } from "../../modules/logger/logger.type.js"
 import { AlbumUserPlugin } from "../../plugins/plugin.type.js"
 import { Func, Obj } from "../../utils/types/types.js"
+import { ClientConfigSSRRender } from "../client/clientConfig.type.js"
 import { Env, EnvValue } from "../env/env.type.js"
 
 export type UserConfigEnvValue = Partial<EnvValue>
@@ -18,10 +19,15 @@ export interface UserConfigAppModule {
   ignore?: (string | RegExp)[]
 }
 
+export interface UserConfigAppSSRRender {
+  sendMode?: ClientConfigSSRRender["sendMode"]
+}
+
 export interface UserConfigApp {
   id?: string
   main?: string
   mainSSR?: string
+  ssrRender?: UserConfigAppSSRRender
   module?: UserConfigAppModule
   router?: UserConfigAppRouter
 }
@@ -58,9 +64,7 @@ export interface StartCacheUserConfig {
     ssrCompose: boolean
   }
   clientConfig: {
-    router: {
-      basename: string
-    }
+    ssrRender: ClientConfigSSRRender
   }
   serverConfig: {
     port: number
@@ -68,7 +72,6 @@ export interface StartCacheUserConfig {
     appModule: {
       input: string | null
     }
-    tsconfig: Obj | null
   }
   logger?: LoggerParams
 }

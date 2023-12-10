@@ -25,5 +25,6 @@ export async function registryEnv(serverMode: ServerMode, inputs: DevInputs, env
 
   const record: Env = { ...envValue.common, ...(serverMode === "build" ? envValue.production : envValue.development) }
   Object.assign(process.env, record)
+  if (!record.mode) record.mode = serverMode === "build" ? "production" : "development"
   return record
 }

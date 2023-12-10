@@ -1,38 +1,6 @@
 import { parse, traverse } from "@babel/core"
 import MS from "magic-string"
-import { InlineConfig, UserConfig, mergeConfig } from "vite"
-import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
-import { makeLegalIdentifier } from "../../utils/modules/makeLegalIdentifier.js"
-
-const applyFilesReg = /\.(js|ts|jsx|tsx)$/
-export function withTransformCjsPlugin(config: UserConfig, ssrComposeDependencies: SSRComposeDependencies) {
-  const external: string[] = []
-  const cjsExternal: string[] = []
-  ssrComposeDependencies.forEach((value, id) => {
-    external.push(id)
-    if (value.cjs) cjsExternal.push(id)
-  })
-  const cjsConfig: InlineConfig = {
-    build: {
-      rollupOptions: {
-        external
-      }
-    },
-    plugins:
-      cjsExternal.length > 0
-        ? [
-            {
-              name: "album:ssr-compose-cjs",
-              enforce: "post",
-              transform(code, id) {
-                if (applyFilesReg.test(id)) return transformSSRComposeImporters(code, cjsExternal)
-              }
-            }
-          ]
-        : undefined
-  }
-  return mergeConfig(config, cjsConfig)
-}
+import { makeLegalIdentifier } from "../makeLegalIdentifier.js"
 
 function createMakeLegalName() {
   const counter = { true: 0, false: 0 }
@@ -42,7 +10,7 @@ function createMakeLegalName() {
   }
 }
 
-function transformSSRComposeImporters(code: string, cjsModules: string[]) {
+export function cjsImporterToEsm(code: string, cjsModules: string[]) {
   const str = new MS(code)
   const makeLegalName = createMakeLegalName()
   traverse(parse(code, { plugins: ["@babel/plugin-syntax-jsx", ["@babel/plugin-syntax-typescript", { isTSX: true }]] })!, {

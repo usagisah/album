@@ -1,18 +1,21 @@
-import { INestApplication } from "@nestjs/common"
-import { LazyModuleLoader } from "@nestjs/core"
+import { LazyModuleLoader, NestFactory } from "@nestjs/core"
+import { loadRsModule } from "../builder/rspack/rsModule.js"
 import { AlbumStartContext } from "../context/context.type.js"
 import { expressConfigs } from "../middlewares/express/expressConfigs.js"
-import { AlbumContextService } from "../modules/context/album-context.service.js"
+import { AlbumContextModule } from "../modules/context/album-context.module.js"
+import { LoggerModule } from "../modules/logger/logger.module.js"
 import { SSRModule } from "../modules/ssr/ssr.module.js"
 import { applySSRComposeStartMiddleware } from "../ssrCompose/start/applySSRComposeMiddleware.start.js"
 
-export async function processServer(serverApp: INestApplication, context: AlbumStartContext) {
+export async function processServer(context: AlbumStartContext) {
   const { info, logger } = context
-  const { ssr } = info
+  const { ssr, inputs } = info
+  const { apiAppInput } = inputs
   const midConfigs = expressConfigs(context)
 
-  const contextService = serverApp.get(AlbumContextService)
-  contextService.getContext = () => context
+  const serverApp = await NestFactory.create(await loadRsModule(apiAppInput, false), { logger })
+  const moduleLoader = serverApp.get(LazyModuleLoader)
+  await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
   await applySSRComposeStartMiddleware(serverApp, context, midConfigs)
   for (const { enable, name, config, factory } of midConfigs) {
     if (!enable) continue
@@ -22,5 +25,6 @@ export async function processServer(serverApp: INestApplication, context: AlbumS
       logger.error(`注册服务器中间件发现错误 --${name}\nerror:`, e, "album")
     }
   }
-  if (ssr) await serverApp.get(LazyModuleLoader).load(() => SSRModule)
+  if (ssr) await moduleLoader.load(() => SSRModule)
+  return serverApp
 }

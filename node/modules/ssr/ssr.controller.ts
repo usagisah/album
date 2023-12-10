@@ -28,7 +28,8 @@ export class SSRController {
   }
 
   async initStartModule(ctx: AlbumStartContext) {
-    const { info, logger, ssrComposeConfig } = ctx
+    const { info, logger, clientConfig, ssrComposeConfig } = ctx
+    const { ssrRender } = clientConfig
     const { mode, serverMode, ssr, ssrCompose, inputs, env } = info
     const { cwd, root } = inputs
     const { projectInputs } = ssrComposeConfig
@@ -44,6 +45,7 @@ export class SSRController {
             ssrCompose,
             env,
             inputs: { cwd, root: root!, clientEntryInput: "" },
+            ssrRender,
 
             req,
             res,
@@ -89,7 +91,8 @@ export class SSRController {
   }
 
   async initDevModule(ctx: AlbumDevContext) {
-    const { info, clientManager, viteDevServer, logger } = ctx
+    const { info, clientConfig, clientManager, viteDevServer, logger } = ctx
+    const { ssrRender } = clientConfig
     const { mode, serverMode, ssr, ssrCompose, env, inputs } = info
     const { cwd, dumpInput } = inputs
     const { realSSRInput, realClientInput } = clientManager!
@@ -105,6 +108,7 @@ export class SSRController {
             ssrCompose,
             env,
             inputs: { cwd, root: dumpInput, clientEntryInput: realClientInput },
+            ssrRender,
 
             req,
             res,
