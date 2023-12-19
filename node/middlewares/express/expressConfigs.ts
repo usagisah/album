@@ -1,13 +1,14 @@
 import compression from "compression"
 import helmet from "helmet"
 import sirv, { Options as SirvOptions } from "sirv"
-import { AlbumDevContext, AlbumStartContext } from "../../context/context.type.js"
+import { AlbumContext as DevContext } from "../../context/context.dev.type.js"
+import { AlbumContext as StartContext } from "../../context/context.start.type.js"
 import { AlbumServerExpressConfig } from "../middlewares.type.js"
 
-type Context = AlbumDevContext | AlbumStartContext
+type Context = DevContext | StartContext
 
 export function expressConfigs(context: Context) {
-  return context.info.env.mode === "production" ? prodOptions(context) : devOptions(context)
+  return context.env.mode === "production" ? prodOptions(context) : devOptions(context)
 }
 
 const helmetConfig: AlbumServerExpressConfig = {
@@ -44,9 +45,9 @@ const sirvConfig = function (root: string, dev: boolean, single: boolean): Album
 }
 
 function devOptions(context: Context): AlbumServerExpressConfig[] {
-  const { serverMode, ssr } = context.info
+  const { serverMode, ssr } = context
   const isStart = serverMode === "start"
-  const root = isStart ? (context as AlbumStartContext).info.inputs.ssrInput! : (context as AlbumDevContext).info.outputs.clientOutDir
+  const root = isStart ? (context as StartContext).info.inputs.ssrInput! : (context as DevContext).outputs.clientOutDir
   return [
     { ...helmetConfig, enable: isStart },
     { ...compressionConfig, enable: isStart },
@@ -55,9 +56,9 @@ function devOptions(context: Context): AlbumServerExpressConfig[] {
 }
 
 function prodOptions(context: Context): AlbumServerExpressConfig[] {
-  const { serverMode, ssr } = context.info
+  const { serverMode, ssr } = context
   const isStart = serverMode === "start"
-  const root = serverMode === "start" ? (context as AlbumStartContext).info.inputs.clientInput! : (context as AlbumDevContext).info.outputs.clientOutDir
+  const root = serverMode === "start" ? (context as StartContext).info.inputs.clientInput! : (context as DevContext).outputs.clientOutDir
   return [
     { ...helmetConfig, enable: isStart },
     { ...compressionConfig, enable: isStart },

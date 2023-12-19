@@ -3,7 +3,7 @@ import { HelmetOptions } from "helmet"
 import { Options as SirvOptions } from "sirv"
 import { isPlainObject } from "../../utils/check/simple.js"
 import { Func } from "../../utils/types/types.js"
-import { AlbumUserPlugin } from "../plugin.type.js"
+import { AlbumUserPlugin } from "../plugin.dev.type.js"
 
 export type PluginAlbumExpressConfig = {
   helmet?: { enable?: boolean } & HelmetOptions

@@ -1,5 +1,5 @@
 import { RspackOptions, rspack } from "@rspack/core"
-import { DevServerConfigTsconfig } from "../../context/context.type.js"
+import { ServerManagerTsconfig } from "../../server/server.dev.type.js"
 import { resolveTsconfigPaths } from "../../utils/path/resolveTsconfigPaths.js"
 
 export type RsBuildConfig = {
@@ -7,7 +7,7 @@ export type RsBuildConfig = {
   env: Record<string, string>
   input: string
   output: string
-  tsconfig: DevServerConfigTsconfig
+  tsconfig: ServerManagerTsconfig
   cwd: string
 }
 

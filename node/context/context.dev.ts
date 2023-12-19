@@ -1,81 +1,102 @@
-import EventEmitter from "events"
-import { Logger } from "../modules/logger/logger.js"
+import { watch } from "chokidar"
+import { resolve } from "path"
+import { createAppManager } from "../app/appManager.dev.js"
+import { ServerMode } from "../cli/cli.type.js"
+import { registryEnv } from "../env/env.dev.js"
 import { ILogger } from "../modules/logger/logger.type.js"
-import { callPluginWithCatch } from "../plugins/callPluginWithCatch.js"
-import { createSSRComposeConfig } from "../ssrCompose/dev/createSSRComposeConfig.dev.js"
-import { isPlainObject } from "../utils/check/simple.js"
+import { createServerManager } from "../server/serverManager.dev.js"
+import { createSSRComposeManager } from "../ssrCompose/ssrComposeManager.dev.js"
+import { loadConfig } from "../user/loadConfig.dev.js"
+import { NodeArgs } from "../utils/command/args.js"
 import { waitPromiseAll } from "../utils/promises/waitPromiseAll.js"
-import { createClientConfig } from "./client/clientConfig.js"
-import { AlbumDevContext, ContextPluginConfig, CreateContextParams } from "./context.type.js"
-import { registryEnv } from "./env/dev/env.dev.js"
-import { createFileManager } from "./fileManager/fileManager.js"
-import { buildDevInputs } from "./inputs/buildInputs.dev.js"
-import { buildOutputs } from "./outputs/buildOutputs.dev.js"
-import { createServerConfig } from "./server/serverConfig.js"
-import { loadConfig } from "./userConfig/dev/loadConfig.dev.js"
-import { createWatcher } from "./watcher/watcher.js"
+import { AlbumContext, Inputs, Outputs } from "./context.dev.type.js"
+import { createFileManager } from "./fileManager.dev.js"
 
-export async function createAlbumDevContext(params: CreateContextParams): Promise<AlbumDevContext> {
-  let logger: ILogger = console
+export type ContextParams = {
+  appId: string
+  serverMode: ServerMode
+  args: NodeArgs
+}
+
+export async function createContext(params: ContextParams): Promise<AlbumContext> {
+  let _logger: ILogger = console
   try {
     const { appId, serverMode, args } = params
-    const inputs = buildDevInputs()
-    let userConfig = await loadConfig({ args, inputs, serverMode })
-    logger = new Logger(isPlainObject(userConfig.logger) ? userConfig.logger : undefined)
 
-    const pluginConfig: ContextPluginConfig = { events: new EventEmitter(), plugins: userConfig.plugins ?? [] }
-    const { config } = await callPluginWithCatch(
-      "config",
-      pluginConfig.plugins,
-      {
-        events: pluginConfig.events,
-        messages: new Map(),
-        serverMode,
-        config: userConfig
-      },
-      {
-        error: (...params: string[]) => {
-          ;(logger as any).error(...params)
-          process.exit(1)
-        }
-      } as any
-    )
-    if (isPlainObject(config)) userConfig = config
+    const cwd = process.cwd()
+    const dumpInput = resolve(cwd, ".album")
+    const albumConfigInput = resolve(cwd, "album.config.ts")
+    const inputs: Inputs = { cwd, root: cwd, dumpInput, albumConfigInput }
 
-    const [{ appFileManager, dumpFileManager }, env, clientConfig, serverConfig] = await waitPromiseAll([
+    const { userConfig, pluginManager, logger } = await loadConfig({ args, inputs, serverMode })
+    _logger = logger
+
+    const watcher = watch([albumConfigInput], {
+      persistent: true,
+      ignorePermissionErrors: true,
+      useFsEvents: true,
+      ignoreInitial: true,
+      usePolling: false,
+      interval: 100,
+      awaitWriteFinish: true,
+      binaryInterval: 300
+    })
+
+    const ssrCompose = !!userConfig.ssrCompose
+    const [{ appFileManager, dumpFileManager }, env, appManager, serverManager] = await waitPromiseAll([
       createFileManager(inputs),
       registryEnv(serverMode, inputs, userConfig.env),
-      createClientConfig({
+      createAppManager({
         appId,
         inputs,
-        logger,
-        pluginConfig,
-        conf: userConfig.app,
-        ssrCompose: !!userConfig.ssrCompose
+        pluginManager,
+        ssrCompose,
+        userConfigApp: userConfig.app
       }),
-      createServerConfig(inputs, userConfig.server)
+      createServerManager(inputs, userConfig.server)
     ])
-    const ssrComposeConfig = await createSSRComposeConfig({ appId, clientConfig, ssrCompose: userConfig.ssrCompose })
-    const ssr = !!clientConfig.mainSSRInput
+    const ssr = !!appManager.mainSSRInput
+    const ssrComposeManager = await createSSRComposeManager({ logger, appManager, userConfigSSRCompose: userConfig.ssrCompose })
+
+    // outputs
+    const baseOutDir = resolve(cwd, "dist")
+    const outDir = resolve(baseOutDir, appId === "default" ? "" : appId)
+    const apiOutDir = serverManager.appModule.input ? resolve(outDir, "api") : ""
+    let clientOutDir = ""
+    let ssrOutDir = ""
+    if (ssr) {
+      clientOutDir = resolve(outDir, "client")
+      ssrOutDir = resolve(outDir, "ssr")
+    } else {
+      clientOutDir = outDir
+    }
+    const outputs: Outputs = { baseOutDir, outDir, clientOutDir, ssrOutDir, apiOutDir }
+
     return {
-      info: { appId, serverMode, ssr, ssrCompose: !!ssrComposeConfig, inputs, outputs: buildOutputs(appId, ssr, inputs, serverConfig), env },
-      logger,
-      watcher: createWatcher(inputs, clientConfig),
+      appId,
+      serverMode,
+      ssr,
+      ssrCompose,
+      inputs,
+      outputs,
+      env,
 
       appFileManager,
       dumpFileManager,
-
-      pluginConfig,
-      clientConfig,
-      serverConfig,
-      ssrComposeConfig,
+      appManager,
+      serverManager,
+      ssrComposeManager,
+      pluginManager,
       userConfig,
 
-      clientManager: null,
-      viteDevServer: null
+      logger,
+      watcher,
+      viteDevServer: null as any,
+
+      getStaticInfo: () => ({ appId, serverMode, ssr, ssrCompose, inputs, outputs, env })
     }
   } catch (e) {
-    logger.error(e, "album")
+    _logger.error(e, "album")
     process.exit(1)
   }
 }

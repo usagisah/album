@@ -1,4 +1,4 @@
-import { SSRComposeCoordinateValue, SSRComposeStartProjectsInput } from "../../ssrCompose/ssrCompose.type.js"
+import { SSRComposeCoordinateValue, SSRComposeStartProjectsInput } from "../../ssrCompose/ssrCompose.start.type.js"
 import { AlbumSSRRenderOptions, AlbumSSRServerDynamicData, CtrlOptions } from "../ssr/ssr.type.js"
 
 export type SSRComposeSourceAssets = {

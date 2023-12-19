@@ -3,16 +3,16 @@ import { mkdir, readFile, rm, writeFile } from "fs/promises"
 import { hasCJSSyntax } from "mlly"
 import { resolve } from "path"
 import { build as viteBuild } from "vite"
-import { AlbumDevContext } from "../../context/context.type.js"
-import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
+import { AlbumContext } from "../../context/context.dev.type.js"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.start.type.js"
 import { makeLegalIdentifier } from "../../utils/modules/makeLegalIdentifier.js"
 import { resolveLibPath } from "../../utils/path/resolveLibPath.js"
 
-export async function buildSSRComposeDependencies(context: AlbumDevContext): Promise<SSRComposeDependencies> {
-  const dependencies = context.ssrComposeConfig!.dependencies
+export async function buildSSRComposeDependencies(context: AlbumContext): Promise<SSRComposeDependencies> {
+  const dependencies = context.ssrComposeManager!.dependencies
   if (dependencies.length === 0) return new Map()
 
-  const { inputs, outputs } = context.info
+  const { inputs, outputs } = context
   const { cwd } = inputs
   const { outDir } = outputs
   const depOutDir = resolve(outDir, ".ssr-compose-dependencies")

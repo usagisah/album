@@ -1,6 +1,6 @@
 import compression from "vite-plugin-compression"
 import { isPlainObject } from "../../utils/check/simple.js"
-import { AlbumUserPlugin } from "../plugin.type.js"
+import { AlbumUserPlugin } from "../plugin.dev.type.js"
 
 type VitePluginCompression = Parameters<typeof compression.default>
 

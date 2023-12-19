@@ -5,7 +5,7 @@ import { expressConfigs } from "../middlewares/express/expressConfigs.js"
 import { AlbumContextModule } from "../modules/context/album-context.module.js"
 import { LoggerModule } from "../modules/logger/logger.module.js"
 import { SSRModule } from "../modules/ssr/ssr.module.js"
-import { applySSRComposeStartMiddleware } from "../ssrCompose/start/applySSRComposeMiddleware.start.js"
+import { applySSRComposeStartMiddleware } from "../ssrCompose/applySSRComposeMiddleware.start.js"
 
 export async function processServer(context: AlbumStartContext) {
   const { info, logger } = context

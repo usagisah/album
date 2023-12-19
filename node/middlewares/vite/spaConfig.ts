@@ -1,13 +1,12 @@
 import { readFile, writeFile } from "fs/promises"
 import { relative, resolve } from "path"
 import { InlineConfig, PluginOption } from "vite"
-import { AlbumDevContext } from "../../context/context.type.js"
+import { AlbumContext } from "../../context/context.dev.type.js"
 
 const configName = "album:spa"
-export function createSPACoreConfig(context: AlbumDevContext): [InlineConfig, PluginOption] {
-  const { info, clientManager } = context
-  const { serverMode, ssr, inputs, outputs } = info
-  const { realClientInput } = clientManager!
+export function createSPACoreConfig(context: AlbumContext): [InlineConfig, PluginOption] {
+  const { serverMode, ssr, inputs, outputs, appManager } = context
+  const { realClientInput } = appManager
   const { cwd } = inputs
   const { clientOutDir } = outputs
   const config: InlineConfig = {

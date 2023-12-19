@@ -1,25 +1,22 @@
 import { blueBright } from "colorette"
+import { processClient } from "../../app/processClient.js"
 import { rsBuild } from "../../builder/rspack/rspack.build.js"
-import { processClient } from "../../client/processClient.js"
 import { SYSTEM_RESTART } from "../../constants.js"
-import { createAlbumDevContext } from "../../context/context.dev.js"
+import { createContext } from "../../context/context.dev.js"
 import { ILogger } from "../../modules/logger/logger.type.js"
-import { callPluginWithCatch } from "../../plugins/callPluginWithCatch.js"
 import { processServer } from "../../server/processServer.dev.js"
 import { DevServerParams } from "../cli.type.js"
 
 export async function albumDevServer(params: DevServerParams) {
   let { appId = "default", args } = params
   let _logger: ILogger = console
-  const context = await createAlbumDevContext({ appId, args, serverMode: "dev" })
+  const context = await createContext({ appId, args, serverMode: "dev" })
   try {
-    const { logger, info, pluginConfig, serverConfig } = context
-    const { plugins, events } = pluginConfig
-    const { env, serverMode, inputs, ssr, ssrCompose } = info
-    const { port, appModule, tsconfig } = serverConfig
+    const { serverMode, ssrCompose, ssr, inputs, env, appManager, serverManager, pluginManager, logger } = context
+    const { port, appModule, tsconfig } = serverManager
     _logger = logger
 
-    await callPluginWithCatch("context", plugins, { messages: new Map(), events, albumContext: context }, logger)
+    await pluginManager.execute("context", { albumContext: context })
     await processClient(context)
 
     const devLogger = () => logger.log(`dev config: `, { appId, mode: env.mode, serverMode, ssrCompose, ssr, listen: blueBright(`http://localhost:${port}`) }, "album")

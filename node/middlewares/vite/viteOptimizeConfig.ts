@@ -1,19 +1,19 @@
 import { mergeConfig, splitVendorChunkPlugin, UserConfig } from "vite"
 import viteCompressionPlugin from "vite-plugin-compression"
-import { AlbumDevContext } from "../../context/context.type.js"
+import { AlbumContext } from "../../context/context.dev.type.js"
 import { tsconfigPath } from "../../plugins/vite/tsconfigPaths.js"
 import { AlbumServerViteConfig } from "../middlewares.type.js"
 
 const configName = "album:optimize"
-export function viteOptimizeOptions(context: AlbumDevContext, forceClient: boolean): AlbumServerViteConfig {
+export function viteOptimizeOptions(context: AlbumContext, forceClient: boolean): AlbumServerViteConfig {
   return {
     name: configName,
-    config: mergeConfig(commonConfig(context), context.info.env.mode === "production" ? prodConfig(context, forceClient) : devConfig())
+    config: mergeConfig(commonConfig(context), context.env.mode === "production" ? prodConfig(context, forceClient) : devConfig())
   }
 }
 
-function commonConfig(context: AlbumDevContext): UserConfig {
-  const { cwd } = context.info.inputs
+function commonConfig(context: AlbumContext): UserConfig {
+  const { cwd } = context.inputs
   return {
     plugins: [splitVendorChunkPlugin(), tsconfigPath({ cwd })],
     build: { reportCompressedSize: false }
@@ -30,8 +30,8 @@ function devConfig(): UserConfig {
   return {}
 }
 
-function prodConfig(context: AlbumDevContext, forceClient: boolean): UserConfig {
-  const { ssr } = context.info
+function prodConfig(context: AlbumContext, forceClient: boolean): UserConfig {
+  const { ssr } = context
   const config: UserConfig = {
     plugins: [],
     build: {
@@ -50,9 +50,7 @@ function prodConfig(context: AlbumDevContext, forceClient: boolean): UserConfig 
     }
   }
   if (!ssr || forceClient) {
-    config.plugins!.push(
-      (viteCompressionPlugin as any)(defaultCompressionConfig)
-    )
+    config.plugins!.push((viteCompressionPlugin as any)(defaultCompressionConfig))
   }
   return config
 }

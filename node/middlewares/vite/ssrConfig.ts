@@ -1,11 +1,10 @@
 import { InlineConfig, PluginOption } from "vite"
-import { AlbumDevContext } from "../../context/context.type.js"
+import { AlbumContext } from "../../context/context.dev.type.js"
 
 const configName = "album:ssr"
-export function createSSRCoreConfig(context: AlbumDevContext): [InlineConfig, PluginOption] {
-  const { info, clientManager } = context
-  const { outputs } = info
-  const { realSSRInput } = clientManager!
+export function createSSRCoreConfig(context: AlbumContext): [InlineConfig, PluginOption] {
+  const { outputs, appManager } = context
+  const { realSSRInput } = appManager
   const { ssrOutDir } = outputs
   const config: InlineConfig = {
     appType: "custom",

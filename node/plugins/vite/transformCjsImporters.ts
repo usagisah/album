@@ -1,5 +1,5 @@
 import { InlineConfig, UserConfig, mergeConfig } from "vite"
-import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.type.js"
+import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.start.type.js"
 import { cjsImporterToEsm } from "../../utils/modules/cjs/transformImporters.js"
 
 const applyFilesReg = /\.(js|ts|jsx|tsx)$/

@@ -1,14 +1,13 @@
 import { InlineConfig, PluginOption, mergeConfig } from "vite"
-import { AlbumDevContext } from "../../context/context.type.js"
+import { AlbumContext } from "../../context/context.dev.type.js"
 import { AlbumServerViteConfig } from "../middlewares.type.js"
 import { proxyLogger } from "./proxyLogger.js"
 import { createSPACoreConfig } from "./spaConfig.js"
 import { createSSRCoreConfig } from "./ssrConfig.js"
 
 const configName = "album:core"
-export function viteCoreOptions(context: AlbumDevContext, forceClient = false): AlbumServerViteConfig {
-  const { info, logger } = context
-  const { appId, serverMode, inputs, env, ssr, ssrCompose } = info
+export function viteCoreOptions(context: AlbumContext, forceClient = false): AlbumServerViteConfig {
+  const { appId, serverMode, ssr, ssrCompose, inputs, env, logger } = context
   const { cwd } = inputs
   const [_config, pluginOptions] = !forceClient && ssr ? createSSRCoreConfig(context) : createSPACoreConfig(context)
   const basePlugins: PluginOption = {

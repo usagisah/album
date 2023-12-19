@@ -1,4 +1,4 @@
-import { SSRComposeDevProjectInputs, SSRComposeStartProjectsInput } from "./ssrCompose.type.js"
+import { SSRComposeDevProjectInputs, SSRComposeStartProjectsInput } from "./ssrCompose.start.type.js"
 
 type ProjectInputs = SSRComposeDevProjectInputs | SSRComposeStartProjectsInput
 const placeholderHost = "a://a"
