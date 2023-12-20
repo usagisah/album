@@ -46,7 +46,8 @@ const appValidator = object({
 const ssrComposeValidator = object(
   {
     dependencies: array(string(), { invalid_type_error: "config.ssrCompose.dependencies 必须是一个字符串数组" }).optional(),
-    refPaths: array(string(), { invalid_type_error: "config.ssrCompose.refPaths 必须是一个指向具体路径的字符串数组" })
+    castExtensions: array(string(), { invalid_type_error: "config.ssrCompose.castExtensions 必须是一个字符串数组" }).optional(),
+    refPaths: array(string(), { invalid_type_error: "config.ssrCompose.refPaths 必须是一个指向具体路径的字符串数组" }).optional()
   },
   { invalid_type_error: "config.ssrCompose 必须是一个对象" }
 ).optional()

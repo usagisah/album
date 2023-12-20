@@ -1,6 +1,7 @@
-import { SSRComposeDevProjectInputs, SSRComposeStartProjectsInput } from "./ssrCompose.start.type.js"
+import { SSRComposeProjectInputs as DevProjectInputs } from "./ssrCompose.dev.type.js"
+import { SSRComposeProjectsInput as StartProjectInputs } from "./ssrCompose.start.type.js"
 
-type ProjectInputs = SSRComposeDevProjectInputs | SSRComposeStartProjectsInput
+type ProjectInputs = DevProjectInputs | StartProjectInputs
 const placeholderHost = "a://a"
 export function normalizeMidRequestOptions(path: string, projectInputs: ProjectInputs) {
   const url = new URL(placeholderHost + path)

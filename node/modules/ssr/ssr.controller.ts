@@ -1,6 +1,6 @@
 import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
-import { AlbumDevContext, AlbumStartContext } from "../../context/context.type.js"
+import { AlbumContext } from "../../context/context.start.type.js"
 import { Func } from "../../utils/types/types.js"
 import { AlbumContextService } from "../context/album-context.service.js"
 import { AlbumSSRRenderOptions, CtrlOptions } from "./ssr.type.js"
@@ -27,7 +27,7 @@ export class SSRController {
     await this.ssrRender({ req, res, headers }).catch(e => this.ssrRenderError(e, res))
   }
 
-  async initStartModule(ctx: AlbumStartContext) {
+  async initStartModule(ctx: AlbumContext) {
     const { info, logger, clientConfig, ssrComposeConfig } = ctx
     const { ssrRender } = clientConfig
     const { serverMode, ssr, ssrCompose, inputs, env } = info
@@ -78,7 +78,7 @@ export class SSRController {
         userSSRRenderOptions.ssrComposeContext = userComposeContext
 
         if (!projectInputs.has(prefix)) return res.status(404).send()
-        return (await import(projectInputs.get(prefix)!.mainServerInput)).ssrRender(userSSRRenderOptions)
+        return (await import(projectInputs.get(prefix).mainServerInput)).ssrRender(userSSRRenderOptions)
       }
       return
     }

@@ -1,5 +1,7 @@
-import { AppConfigSSRRender } from "./app.dev.type.js"
+export type AppManagerSSRRender = {
+  sendMode: "pipe" | "string"
+}
 
-export type AppConfig = {
-  ssrRender: AppConfigSSRRender
+export type AppManager = {
+  ssrRender: AppManagerSSRRender
 }

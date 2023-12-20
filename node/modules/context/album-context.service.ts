@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
-import { AlbumContext } from "../../context/context.type.js"
 import { AlbumSSRComposeContext } from "../ssr-compose/ssr-compose.type.js"
 import { AlbumSSRRenderOptions, CtrlOptions } from "../ssr/ssr.type.js"
+import { AlbumContext } from "./album-context.type.js"
 
 @Injectable()
 export class AlbumContextService {
@@ -9,7 +9,7 @@ export class AlbumContextService {
     throw "未初始化的 album builtin getContext"
   }
 
-  createSSRRenderOptions(opts: CtrlOptions): AlbumSSRRenderOptions {
+  createSSRRenderOptions(_: CtrlOptions): AlbumSSRRenderOptions {
     throw "未初始化的 album builtin createSSRRenderOptions"
   }
 

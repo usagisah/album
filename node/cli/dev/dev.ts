@@ -57,8 +57,7 @@ export async function albumDevServer(params: DevServerParams) {
       await listenServer().then(devLogger)
     }
   } catch (e: any) {
-    if (_logger !== console) _logger.error(e, "album")
-    else _logger.error(e)
+    _logger! ? _logger.error(e, "album") : console.error(e)
     process.exit(1)
   }
 }

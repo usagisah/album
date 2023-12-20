@@ -1,15 +1,16 @@
+import { parse } from "@ungap/structured-clone/json"
 import { existsSync, statSync } from "fs"
+import { readFile } from "fs/promises"
 import { dirname, resolve } from "path"
 import { StartServerParams } from "../cli/cli.type.js"
 import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
-import { createSSRComposeConfig } from "../ssrCompose/ssrComposeManager.start.js"
+import { createSSRComposeManager } from "../ssrCompose/ssrComposeManager.start.js"
+import { isPlainObject } from "../utils/check/simple.js"
 import { resolveFilePath } from "../utils/path/resolvePath.js"
-import { AlbumStartContext } from "./context.type.js"
-import { registryEnv } from "./env/start/env.start.js"
-import { loadConfig } from "./userConfig/start/loadConfig.start.js"
+import { AlbumContext, CacheConfig } from "./context.start.type.js"
 
-export async function createAlbumContext({ args }: StartServerParams): Promise<AlbumStartContext> {
+export async function createContext({ args }: StartServerParams): Promise<AlbumContext> {
   let logger: ILogger = console
   try {
     const cwd = process.cwd()
@@ -19,18 +20,28 @@ export async function createAlbumContext({ args }: StartServerParams): Promise<A
       if (!existsSync(root) && !statSync(root).isDirectory()) throw `指定的启动根目录路径不存在(${root})`
     }
 
-    const cacheConfig = await loadConfig(root)
-    logger = resolveLogger(cacheConfig.logger)
+    const configPath = await resolveFilePath({
+      root,
+      prefixes: [""],
+      name: "album.config",
+      exts: ["js"]
+    })
+    if (!configPath) throw "找不到生产配置文件"
+    const cacheConfig: CacheConfig = parse(await readFile(configPath, "utf-8"))
+    if (!isPlainObject(cacheConfig)) throw "似乎找到了个非法的配置文件"
 
-    let clientInput: string | null = null
-    let ssrInput: string | null = null
-    let mainSSRInput: string | null = null
-    if (cacheConfig.info.ssr && !cacheConfig.info.ssrCompose) {
-      mainSSRInput = await resolveFilePath({
-        root,
-        prefixes: ["ssr", "./"],
-        suffixes: ["main.ssr"]
-      })
+    const { logger: loggerConfig, ssr, ssrCompose, env, appConfig, serverConfig } = cacheConfig
+    logger = resolveLogger(loggerConfig)
+
+    for (const k of Object.getOwnPropertyNames(env)) {
+      process.env[k] = env[k]
+    }
+
+    let clientInput = ""
+    let ssrInput = ""
+    let mainSSRInput = ""
+    if (ssr && !ssrCompose) {
+      mainSSRInput = (await resolveFilePath({ root, prefixes: ["ssr", "./"], suffixes: ["main.ssr"] })) as any
       if (!mainSSRInput) throw "找不到 ssr 的入口文件，请检查目录配置格式是否正确"
 
       ssrInput = dirname(mainSSRInput)
@@ -38,26 +49,21 @@ export async function createAlbumContext({ args }: StartServerParams): Promise<A
       if (!existsSync(clientInput)) throw "找不到 client 的入口文件夹，请检查目录格式是否正确"
     }
 
-    const { port, rewrite, appModule } = cacheConfig.serverConfig
+    const { port, appModule } = serverConfig
     const apiAppInput = appModule.input
     if (apiAppInput && (!existsSync(apiAppInput) || !statSync(apiAppInput).isFile())) throw "指定的 apiAppModule 必须是一个指向文件的路径"
 
     return {
-      info: {
-        serverMode: "start",
-        ssr: cacheConfig.info.ssr,
-        ssrCompose: cacheConfig.info.ssrCompose,
-        env: registryEnv(cacheConfig.info.env),
-        inputs: { cwd, root, clientInput, ssrInput, mainSSRInput, apiAppInput }
-      },
+      serverMode: "start",
+      ssr,
+      ssrCompose,
+      inputs: { cwd, root, clientInput, ssrInput, mainSSRInput, apiAppInput },
+      env,
       logger,
-      userConfig: cacheConfig,
-      clientConfig: cacheConfig.clientConfig,
-      serverConfig: {
-        port,
-        rewrite: rewrite.map(code => new Function("...args", `${code}\nreturn anonymous(...args)`) as any)
-      },
-      ssrComposeConfig: await createSSRComposeConfig(root)
+      cacheConfig,
+      appManager: appConfig,
+      serverManager: { port },
+      ssrComposeManager: await createSSRComposeManager(root, cacheConfig.ssrComposeConfig)
     }
   } catch (e) {
     logger.error(e, "album")

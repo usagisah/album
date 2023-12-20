@@ -47,7 +47,7 @@ const sirvConfig = function (root: string, dev: boolean, single: boolean): Album
 function devOptions(context: Context): AlbumServerExpressConfig[] {
   const { serverMode, ssr } = context
   const isStart = serverMode === "start"
-  const root = isStart ? (context as StartContext).info.inputs.ssrInput! : (context as DevContext).outputs.clientOutDir
+  const root = isStart ? (context as StartContext).inputs.ssrInput : (context as DevContext).outputs.clientOutDir
   return [
     { ...helmetConfig, enable: isStart },
     { ...compressionConfig, enable: isStart },
@@ -58,7 +58,7 @@ function devOptions(context: Context): AlbumServerExpressConfig[] {
 function prodOptions(context: Context): AlbumServerExpressConfig[] {
   const { serverMode, ssr } = context
   const isStart = serverMode === "start"
-  const root = serverMode === "start" ? (context as StartContext).info.inputs.clientInput! : (context as DevContext).outputs.clientOutDir
+  const root = serverMode === "start" ? (context as StartContext).inputs.clientInput : (context as DevContext).outputs.clientOutDir
   return [
     { ...helmetConfig, enable: isStart },
     { ...compressionConfig, enable: isStart },

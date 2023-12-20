@@ -3,29 +3,29 @@ import { LazyModuleLoader } from "@nestjs/core"
 import { NextFunction, Request, Response } from "express"
 import { readFile } from "fs/promises"
 import sirv from "sirv"
-import { AlbumStartContext } from "../../context/context.type.js"
+import { AlbumContext } from "../context/context.start.type.js"
 import { AlbumServerExpressConfig } from "../middlewares/middlewares.type.js"
 import { SSRComposeModule } from "../modules/ssr-compose/ssr-compose.module.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
-import { createRewriter } from "./rewriteUrl.js"
+import { createPathRewriter } from "./rewriteUrl.js"
 
-export async function applySSRComposeStartMiddleware(app: INestApplication, context: AlbumStartContext, midConfigs: AlbumServerExpressConfig[]) {
-  const { info, ssrComposeConfig, serverConfig } = context
-  const { ssrCompose } = info
+export async function applySSRComposeStartMiddleware(app: INestApplication, context: AlbumContext, midConfigs: AlbumServerExpressConfig[]) {
+  const { ssrCompose } = context
   if (!ssrCompose) return
 
   await app.get(LazyModuleLoader).load(() => SSRComposeModule)
 
-  const { dependenciesInputs, projectInputs } = ssrComposeConfig
+  const { ssrComposeManager } = context
+  const { rewrites } = ssrComposeManager!
   const sirvConfig = midConfigs.find(v => v.name === "sirv")!
-  const rewrite = createRewriter(serverConfig.rewrite)
+  const rewriter = createPathRewriter(rewrites)
   sirvConfig.factory = function proxyServerStaticFactory(_, sirvConfig: any) {
     projectInputs.forEach(value => {
       value.assetsService = sirv(value.clientInput, sirvConfig)
     })
 
     return async function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
-      rewrite(req)
+      rewriter(req)
       const reqPath = req.path
       const dependencyInfo = dependenciesInputs.get(reqPath.slice(1))
       if (dependencyInfo) {

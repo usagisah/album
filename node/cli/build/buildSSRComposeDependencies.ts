@@ -8,6 +8,7 @@ import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.start.type.j
 import { makeLegalIdentifier } from "../../utils/modules/makeLegalIdentifier.js"
 import { resolveLibPath } from "../../utils/path/resolveLibPath.js"
 
+export const SCDName = ".ssr-compose-dependencies"
 export async function buildSSRComposeDependencies(context: AlbumContext): Promise<SSRComposeDependencies> {
   const dependencies = context.ssrComposeManager!.dependencies
   if (dependencies.length === 0) return new Map()
@@ -15,7 +16,7 @@ export async function buildSSRComposeDependencies(context: AlbumContext): Promis
   const { inputs, outputs } = context
   const { cwd } = inputs
   const { outDir } = outputs
-  const depOutDir = resolve(outDir, ".ssr-compose-dependencies")
+  const depOutDir = resolve(outDir, SCDName)
 
   await rm(depOutDir, { force: true, recursive: true })
   await mkdir(depOutDir, { recursive: true })

@@ -1,7 +1,7 @@
 import { mergeConfig as viteMergeConfig } from "vite"
-import { isArray, isPlainObject, isUndefined } from "../../utils/check/simple.js"
+import { isArray, isPlainObject, isUndefined } from "../utils/check/simple.js"
 import { checkUserConfig } from "./checkUserConfig.js"
-import { AlbumUserConfig } from "./userConfig.type.js"
+import { AlbumUserConfig } from "./user.dev.type.js"
 
 export function mergeConfig(conf1: AlbumUserConfig, conf2: AlbumUserConfig, check = true) {
   if (check) {

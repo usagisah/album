@@ -1,26 +1,17 @@
 import { build as esbuild } from "esbuild"
 import { rm } from "fs/promises"
-import { isFunction, isPlainObject, isString } from "../../../utils/check/simple.js"
-import { resolveFilePath } from "../../../utils/path/resolvePath.js"
-import { createEmptyEnvValue } from "../createEmptyEnvValue.js"
-import { EnvValue } from "../env.type.js"
+import { isFunction, isPlainObject, isString } from "../utils/check/simple.js"
+import { resolveFilePath } from "../utils/path/resolvePath.js"
+import { createEmptyEnvValue } from "./createEmptyEnvValue.js"
+import { EnvValue } from "./env.type.js"
 
 export async function transformEnvValue(cwd: string, env: unknown): Promise<EnvValue> {
   if (isString(env)) {
-    const path = await resolveFilePath({
-      root: cwd,
-      name: env,
-      exts: ["ts", "tsx"]
-    })
+    const path = await resolveFilePath({ root: cwd, name: env, exts: ["ts", "tsx"] })
     const output = path + ".mjs"
     try {
       if (!path) throw ""
-      await esbuild({
-        entryPoints: [path],
-        format: "esm",
-        platform: "node",
-        outfile: output
-      })
+      await esbuild({ entryPoints: [path], format: "esm", platform: "node", outfile: output })
       const exports = (await import(output)).default
       env = isFunction(exports) ? await exports() : exports
     } catch {

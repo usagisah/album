@@ -34,11 +34,11 @@ export interface UserSSRCompose {
   dependencies?: string[]
   castExtensions?: string[]
   refPaths?: string[]
+  rewrites?: (Record<string, string> | Func<[string, Record<string, string>], string>)[]
 }
 
 export interface UserConfigServer {
   port?: number
-  rewrite?: (Record<string, string> | Func<[string, Record<string, string>, Request]>)[]
   appModule?: string
   tsconfig?: string | Obj
 }

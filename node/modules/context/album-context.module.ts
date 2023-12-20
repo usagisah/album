@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from "@nestjs/common"
-import { AlbumContext } from "../../context/context.type.js"
 import { createAlbumServer } from "./album-context.service.js"
+import { AlbumContext } from "./album-context.type.js"
 
 @Module({})
 export class AlbumContextModule {

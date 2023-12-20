@@ -4,18 +4,18 @@ import { NextFunction, Request, Response } from "express"
 import { AlbumContext } from "../context/context.dev.type.js"
 import { SSRComposeModule } from "../modules/ssr-compose/ssr-compose.module.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
-import { createRewriter } from "./rewriteUrl.js"
+import { createPathRewriter } from "./rewriteUrl.js"
 
 export async function applySSRComposeDevMiddleware(app: INestApplication<any>, context: AlbumContext) {
-  const { info, ssrComposeConfig, serverConfig } = context
-  const { ssrCompose } = info
+  const { ssrCompose } = context
   if (!ssrCompose) return
   await app.get(LazyModuleLoader).load(() => SSRComposeModule)
 
-  const { projectInputs } = ssrComposeConfig!
-  const rewrite = createRewriter(serverConfig.rewrite)
+  const { ssrComposeManager } = context
+  const { rewrites } = ssrComposeManager!
+  const rewriter = createPathRewriter(rewrites)
   app.use(function (req: Request, res: Response, next: NextFunction) {
-    rewrite(req)
+    rewriter(req)
     const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectInputs)
     const { prefix, url } = albumOptions
     req.albumOptions = albumOptions
