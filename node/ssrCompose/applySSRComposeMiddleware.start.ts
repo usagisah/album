@@ -6,8 +6,8 @@ import sirv from "sirv"
 import { AlbumContext } from "../context/context.start.type.js"
 import { AlbumServerExpressConfig } from "../middlewares/middlewares.type.js"
 import { SSRComposeModule } from "../modules/ssr-compose/ssr-compose.module.js"
+import { isStrictEmpty } from "../utils/check/simple.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
-import { createPathRewriter } from "./rewriteUrl.js"
 
 export async function applySSRComposeStartMiddleware(app: INestApplication, context: AlbumContext, midConfigs: AlbumServerExpressConfig[]) {
   const { ssrCompose } = context
@@ -16,18 +16,19 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
   await app.get(LazyModuleLoader).load(() => SSRComposeModule)
 
   const { ssrComposeManager } = context
-  const { rewrites } = ssrComposeManager!
+  const { rewriter, projectMap } = ssrComposeManager!
   const sirvConfig = midConfigs.find(v => v.name === "sirv")!
-  const rewriter = createPathRewriter(rewrites)
   sirvConfig.factory = function proxyServerStaticFactory(_, sirvConfig: any) {
-    projectInputs.forEach(value => {
+    projectMap.forEach(value => {
       value.assetsService = sirv(value.clientInput, sirvConfig)
     })
 
     return async function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
-      rewriter(req)
+      const _url = rewriter(req.url)
+      if (!isStrictEmpty(_url)) req.url = _url
+
       const reqPath = req.path
-      const dependencyInfo = dependenciesInputs.get(reqPath.slice(1))
+      const dependencyInfo = projectMap.get(reqPath.slice(1))
       if (dependencyInfo) {
         const file = await readFile(dependencyInfo.filepath!, "utf-8")
         res.header("Content-Type", "application/javascript")
@@ -35,9 +36,9 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
         return
       }
 
-      const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectInputs)
+      const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectMap)
       const { prefix, url } = albumOptions
-      const project = projectInputs.get(prefix)
+      const project = projectMap.get(prefix)
       if (!project) return res.status(404).send("")
 
       req.albumOptions = albumOptions

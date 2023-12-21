@@ -83,7 +83,7 @@ export class Logger implements ILogger {
   formatConsoleMessage(level: string, context: string | null, messages: string[]) {
     const c = this.getColor(level)
     const t = day().format("YYYY-MM-DD HH:mm:ss")
-    const m = messages.map(m => (typeof m === "string" ? m : prettyFormat(m))).join("")
+    const m = messages.map(m => (typeof m === "string" ? m : prettyFormat(m, { highlight: true }))).join("")
     return `${c("[" + level + "]")} ${red(t)} ${context ? gray("[" + context + "]") : ""} -> ${c(m)}`
   }
 }

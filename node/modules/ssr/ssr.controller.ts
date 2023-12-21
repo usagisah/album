@@ -1,6 +1,7 @@
 import { Controller, Get, Headers, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
-import { AlbumContext } from "../../context/context.start.type.js"
+import { AlbumContext as DevContext } from "../../context/context.dev.type.js"
+import { AlbumContext as StartContext } from "../../context/context.start.type.js"
 import { Func } from "../../utils/types/types.js"
 import { AlbumContextService } from "../context/album-context.service.js"
 import { AlbumSSRRenderOptions, CtrlOptions } from "./ssr.type.js"
@@ -11,7 +12,7 @@ export class SSRController {
 
   constructor(private context: AlbumContextService) {
     const ctx = this.context.getContext()
-    ctx.info.serverMode === "start" ? this.initStartModule(ctx as any) : this.initDevModule(ctx as any)
+    ctx.serverMode === "start" ? this.initStartModule(ctx as any) : this.initDevModule(ctx as any)
   }
 
   private async ssrRender(opts: CtrlOptions) {
@@ -27,12 +28,10 @@ export class SSRController {
     await this.ssrRender({ req, res, headers }).catch(e => this.ssrRenderError(e, res))
   }
 
-  async initStartModule(ctx: AlbumContext) {
-    const { info, logger, clientConfig, ssrComposeConfig } = ctx
-    const { ssrRender } = clientConfig
-    const { serverMode, ssr, ssrCompose, inputs, env } = info
+  async initStartModule(ctx: StartContext) {
+    const { serverMode, ssr, ssrCompose, inputs, env, appManager, ssrComposeManager, logger } = ctx
+    const { ssrRender } = appManager
     const { cwd, root } = inputs
-    const { projectInputs } = ssrComposeConfig
 
     let createOptions = this.context.createSSRRenderOptions
     if (!Reflect.has(createOptions, "overwrite")) {
@@ -70,6 +69,7 @@ export class SSRController {
     }
 
     if (ssrCompose) {
+      const { projectMap } = ssrComposeManager
       this.ssrRender = async (options: CtrlOptions) => {
         const { req, res } = options
         const { prefix } = req.albumOptions
@@ -77,8 +77,8 @@ export class SSRController {
         const userComposeContext = this.context.createSSRComposeContext()
         userSSRRenderOptions.ssrComposeContext = userComposeContext
 
-        if (!projectInputs.has(prefix)) return res.status(404).send()
-        return (await import(projectInputs.get(prefix).mainServerInput)).ssrRender(userSSRRenderOptions)
+        if (!projectMap.has(prefix)) return res.status(404).send()
+        return (await import(projectMap.get(prefix)!.mainServerInput)).ssrRender(userSSRRenderOptions)
       }
       return
     }
@@ -89,12 +89,10 @@ export class SSRController {
     }
   }
 
-  async initDevModule(ctx: AlbumDevContext) {
-    const { info, clientConfig, clientManager, viteDevServer, logger } = ctx
-    const { ssrRender } = clientConfig
-    const { serverMode, ssr, ssrCompose, env, inputs } = info
+  async initDevModule(ctx: DevContext) {
+    const { serverMode, ssr, ssrCompose, inputs, env, appManager, viteDevServer, logger } = ctx
+    const { ssrRender, realClientInput, realSSRInput } = appManager
     const { cwd, dumpInput } = inputs
-    const { realSSRInput, realClientInput } = clientManager!
 
     let createOptions = this.context.createSSRRenderOptions
     if (!Reflect.has(createOptions, "overwrite")) {

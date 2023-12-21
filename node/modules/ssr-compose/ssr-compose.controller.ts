@@ -1,9 +1,7 @@
 import { Body, Controller, Headers, Post, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
-import { existsSync } from "fs"
-import { parse, resolve } from "path"
-import { UserConfig, mergeConfig, build as viteBuild } from "vite"
-import { SSRComposeStartCoordinateValue } from "../../ssrCompose/ssrCompose.start.type.js"
+import { AlbumContext as DevContext } from "../../context/context.dev.type.js"
+import { AlbumContext as StartContext } from "../../context/context.start.type.js"
 import { isPlainObject } from "../../utils/check/simple.js"
 import { AlbumContextService } from "../context/album-context.service.js"
 import { AlbumSSRComposeContext, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "./ssr-compose.type.js"
@@ -12,7 +10,7 @@ import { AlbumSSRComposeContext, SSRComposeRenderRemoteComponentOptions, SSRComp
 export class SSRComposeController {
   constructor(private context: AlbumContextService) {
     const ctx = this.context.getContext()
-    ctx.info.serverMode === "start" ? this.initStartModule(ctx as any) : this.initDevModule(ctx as any)
+    ctx.serverMode === "start" ? this.initStartModule(ctx as any) : this.initDevModule(ctx as any)
   }
 
   @Post("*")
@@ -35,22 +33,22 @@ export class SSRComposeController {
     }
   }
 
-  async initStartModule(ctx: AlbumStartContext) {
+  async initStartModule(ctx: StartContext) {
     const moduleContext = this.context
-    const { ssrComposeConfig, logger } = ctx
-    const { projectInputs, coordinateInputs, dependenciesInputs } = ssrComposeConfig
+    const { ssrComposeManager, logger } = ctx
+    const { projectMap, dependenciesMap } = ssrComposeManager
     const loader = async (prefix: string) => {
-      if (projectInputs.has(prefix)) return await import(projectInputs.get(prefix)!.mainServerInput)
-      if (projectInputs.has("error")) return await import(projectInputs.get("error")!.mainServerInput)
+      if (projectMap.has(prefix)) return await import(projectMap.get(prefix)!.mainServerInput)
+      if (projectMap.has("error")) return await import(projectMap.get("error")!.mainServerInput)
       return () => ({})
     }
-    const dependenciesMap = {}
-    dependenciesInputs.forEach((_, id) => (dependenciesMap[id] = `/${id}`))
+    const importerMap = {}
+    dependenciesMap.forEach((_, id) => (importerMap[id] = `/${id}`))
     this.context.createSSRComposeContext = () => {
       const ssrComposeContext: AlbumSSRComposeContext = {
         sources: {},
-        projectInputs,
-        dependenciesMap,
+        projectMap,
+        dependenciesMap: importerMap,
         async renderRemoteComponent(renderProps, ctrl) {
           const { req, res } = ctrl
           const { prefix } = req.albumOptions
@@ -69,88 +67,34 @@ export class SSRComposeController {
           }
           return userComposeRender(renderOptions)
         },
-        existsProject(prefix, sourcePath) {
-          let value = coordinateInputs.get(prefix)
-          if (!value) value = coordinateInputs.get("error")
-          if (!value) return null
-          const _value = (value as SSRComposeStartCoordinateValue).coordinate[sourcePath]
-          if (!_value) return null
-          return value
-        },
-        viteComponentBuild: null
+        // existsProject(prefix, sourcePath) {
+        //   let value = coordinateInputs.get(prefix)
+        //   if (!value) value = coordinateInputs.get("error")
+        //   if (!value) return null
+        //   const _value = (value as SSRComposeStartCoordinateValue).coordinate[sourcePath]
+        //   if (!_value) return null
+        //   return value
+        // },
+        ssrComposeBuild: null as any
       }
       return ssrComposeContext
     }
   }
 
-  async initDevModule(ctx: AlbumDevContext) {
+  async initDevModule(ctx: DevContext) {
     const moduleContext = this.context
-    const { viteDevServer, clientConfig, clientManager, userConfig, ssrComposeConfig, logger } = ctx
-    const { module } = clientConfig
-    const { projectInputs, dependencies } = ssrComposeConfig!
+    const { viteDevServer, appManager, ssrComposeManager, logger } = ctx
+    const { projectMap, build } = ssrComposeManager!
     this.context.createSSRComposeContext = () => {
       const ssrComposeContext: AlbumSSRComposeContext = {
         sources: {},
-        projectInputs: null,
-        dependenciesMap: null,
-        viteComponentBuild: async ({ input, outDir }) => {
-          const ids: string[] = []
-          const config = mergeConfig(userConfig.vite ?? {}, {
-            mode: "development",
-            logLevel: "error",
-            plugins: [
-              {
-                name: "album:ssr-compose-collect",
-                buildEnd(error) {
-                  if (error) return
-                  for (const id of Array.from(this.getModuleIds())) {
-                    if (!id.startsWith("/")) continue
-                    if (id.includes("node_modules")) continue
-                    ids.push(id)
-                  }
-                }
-              }
-            ],
-            build: {
-              manifest: true,
-              minify: false,
-              cssMinify: false,
-              rollupOptions: {
-                input,
-                external: [/node_modules/, ...dependencies]
-              },
-              lib: {
-                entry: input,
-                formats: ["es"],
-                fileName: parse(input).name
-              },
-              outDir,
-              cssCodeSplit: false
-            }
-          } as UserConfig)
-          /* 
-
-          composeInfo {
-            deps: Map[depInput, {
-              filepath: string
-              dirty: boolean
-              manifest: {},
-              sourceId: string[]
-            }],
-            sourceIds: Map[string, { deps: Set[] }]
-          }
-          */
-          await viteBuild(config)
-        },
-        existsProject: (prefix, sourcePath) => {
-          if (!projectInputs.has(prefix)) return null
-          const devFilepath = resolve(module!.modulePath, "../", sourcePath)
-          return existsSync(resolve(devFilepath)) ? { devFilepath } : null
-        },
+        projectMap: projectMap as any,
+        dependenciesMap: null as any,
+        ssrComposeBuild: build,
         async renderRemoteComponent(renderProps, ctrl) {
           const { req, res } = ctrl
           const { prefix } = req.albumOptions
-          const userComposeRender = (await viteDevServer!.ssrLoadModule(clientManager!.realSSRInput!)).renderRemoteComponent
+          const userComposeRender = (await viteDevServer!.ssrLoadModule(appManager.realSSRInput)).renderRemoteComponent
 
           if (!userComposeRender) {
             logger.error(`找不到(${prefix})匹配的渲染组件`, "album")

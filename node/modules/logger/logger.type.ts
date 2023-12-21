@@ -12,4 +12,4 @@ export type LoggerParams = {
   fileOptions?: DailyRotateFileTransportOptions | ((options: DailyRotateFileTransportOptions) => DailyRotateFileTransportOptions)
 }
 
-export { format, transport, transports } from "winston"
+export { format, transports } from "winston"

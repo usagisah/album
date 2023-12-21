@@ -20,7 +20,9 @@ export type AlbumSSRContext = {
   ssrCompose: boolean
   env: Env
   inputs: AlbumSSRInputs
-  ssrRender: "pipe" | "string"
+  ssrRender: {
+    sendMode: "pipe" | "string"
+  }
   logger: ILogger
 
   // 请求相关数据

@@ -3,8 +3,8 @@ import { LazyModuleLoader } from "@nestjs/core"
 import { NextFunction, Request, Response } from "express"
 import { AlbumContext } from "../context/context.dev.type.js"
 import { SSRComposeModule } from "../modules/ssr-compose/ssr-compose.module.js"
+import { isStringEmpty } from "../utils/check/simple.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
-import { createPathRewriter } from "./rewriteUrl.js"
 
 export async function applySSRComposeDevMiddleware(app: INestApplication<any>, context: AlbumContext) {
   const { ssrCompose } = context
@@ -12,14 +12,15 @@ export async function applySSRComposeDevMiddleware(app: INestApplication<any>, c
   await app.get(LazyModuleLoader).load(() => SSRComposeModule)
 
   const { ssrComposeManager } = context
-  const { rewrites } = ssrComposeManager!
-  const rewriter = createPathRewriter(rewrites)
+  const { rewriter, projectMap } = ssrComposeManager!
   app.use(function (req: Request, res: Response, next: NextFunction) {
-    rewriter(req)
-    const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectInputs)
+    const _url = rewriter(req.url)
+    if (!isStringEmpty(_url)) req.url = _url
+
+    const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectMap)
     const { prefix, url } = albumOptions
     req.albumOptions = albumOptions
-    if (!projectInputs.has(prefix)) return res.status(404).send()
+    if (!projectMap.has(prefix)) return res.status(404).send()
     req.url = url
     next()
   })

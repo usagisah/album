@@ -2,10 +2,10 @@ import { build as esbuild } from "esbuild"
 import { existsSync } from "fs"
 import { rm } from "fs/promises"
 import { resolve } from "path"
-import { createPluginManager } from "plugins/pluginManager.dev.js"
 import { ServerMode } from "../cli/cli.type.js"
 import { Inputs } from "../context/context.dev.type.js"
 import { Logger } from "../modules/logger/logger.js"
+import { createPluginManager } from "../plugins/pluginManager.dev.js"
 import { isFunction, isPlainObject } from "../utils/check/simple.js"
 import { NodeArgs } from "../utils/command/args.js"
 import { checkUserConfig } from "./checkUserConfig.js"
@@ -34,7 +34,6 @@ export async function loadConfig({ serverMode, inputs, args }: LoadConfigParams)
     let exports = (await import(output)).default
     if (isFunction(exports)) exports = exports(serverMode, args)
     if (isPlainObject(exports)) config = exports as any
-  } catch {
   } finally {
     await rm(output, { force: true, recursive: true })
   }

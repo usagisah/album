@@ -47,7 +47,8 @@ const ssrComposeValidator = object(
   {
     dependencies: array(string(), { invalid_type_error: "config.ssrCompose.dependencies 必须是一个字符串数组" }).optional(),
     castExtensions: array(string(), { invalid_type_error: "config.ssrCompose.castExtensions 必须是一个字符串数组" }).optional(),
-    refPaths: array(string(), { invalid_type_error: "config.ssrCompose.refPaths 必须是一个指向具体路径的字符串数组" }).optional()
+    startRoot: string({ invalid_type_error: "config.ssrCompose.startRoot 必须是一个指向具体路径的字符串" }).optional(),
+    rewrites: array(union([function_(), record(string())]), { invalid_type_error: "config.ssrCompose.rewrites 必须是一个(字符串|函数)数组" }).optional()
   },
   { invalid_type_error: "config.ssrCompose 必须是一个对象" }
 ).optional()
@@ -55,7 +56,6 @@ const ssrComposeValidator = object(
 const serverValidator = object(
   {
     port: number({ invalid_type_error: "config.server.port 必须是一个数字" }).optional(),
-    rewrite: array(union([function_(), record(string())]), { invalid_type_error: "config.server.rewrite 必须是一个(字符串|函数)数组" }).optional(),
     appModule: string({ invalid_type_error: "config.server.appModule 必须是一个路径字符串" }).optional(),
     tsconfig: union([string(), record(any())], { invalid_type_error: "config.server.tsconfig 必须是一个指向(tsconfig)的配置文件，或者是(tsconfig)配置对象" }).optional()
   },

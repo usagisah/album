@@ -12,7 +12,7 @@ export async function albumDevServer(params: DevServerParams) {
   let _logger: ILogger = console
   const context = await createContext({ appId, args, serverMode: "dev" })
   try {
-    const { serverMode, ssrCompose, ssr, inputs, env, appManager, serverManager, pluginManager, logger } = context
+    const { serverMode, ssrCompose, ssr, inputs, env, serverManager, pluginManager, logger } = context
     const { port, appModule, tsconfig } = serverManager
     _logger = logger
 

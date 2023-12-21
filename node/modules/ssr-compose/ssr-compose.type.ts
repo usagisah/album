@@ -1,4 +1,5 @@
-import { SSRComposeCoordinateValue, SSRComposeProjectsInput } from "../../ssrCompose/ssrCompose.start.type.js"
+import { SSRComposeBuild } from "../../ssrCompose/ssrCompose.dev.type.js"
+import { SSRComposeProject as DevProject, SSRComposeProject as StartProject } from "../../ssrCompose/ssrCompose.start.type.js"
 import { AlbumSSRRenderOptions, AlbumSSRServerDynamicData, CtrlOptions } from "../ssr/ssr.type.js"
 
 export type SSRComposeSourceAssets = {
@@ -42,10 +43,9 @@ export type SSRComposeRenderRemoteComponentReturn = {
 }
 
 export type AlbumSSRComposeContext = {
-  dependenciesMap: Record<string, string> | null
-  projectInputs: SSRComposeProjectsInput | null
+  dependenciesMap: Record<string, string>
+  projectMap: Map<string, DevProject | StartProject>
   sources: SSRComposeSources
   renderRemoteComponent: (renderProps: SSRComposeRenderProps, ctrl: CtrlOptions) => Promise<SSRComposeRenderRemoteComponentReturn>
-  existsProject: (prefix: string, sourcePath: string) => SSRComposeCoordinateValue | null
-  viteComponentBuild: ((props: { input: string; outDir: string }) => Promise<void>) | null
+  ssrComposeBuild: SSRComposeBuild
 }

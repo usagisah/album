@@ -33,7 +33,7 @@ export interface UserConfigApp {
 export interface UserSSRCompose {
   dependencies?: string[]
   castExtensions?: string[]
-  refPaths?: string[]
+  startRoot?: string
   rewrites?: (Record<string, string> | Func<[string, Record<string, string>], string>)[]
 }
 

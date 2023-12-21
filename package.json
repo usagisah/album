@@ -21,17 +21,17 @@
       "types": "./index.d.ts",
       "import": "./index.js"
     },
-    "./cli": {
-      "types": "./cli.d.ts",
-      "default": "./cli.js"
-    },
-    "./ssr": {
-      "types": "./ssr.d.ts",
-      "default": "./ssr.js"
-    },
     "./server": {
       "types": "./server.d.ts",
       "default": "./server.js"
+    },
+    "./start": {
+      "types": "./start.d.ts",
+      "default": "./start.js"
+    },
+    "./config": {
+      "types": "./config.d.ts",
+      "default": "./config.js"
     },
     "./utils/*": {
       "types": "./utils/*.d.ts",

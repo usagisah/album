@@ -1,9 +1,5 @@
-import { SSRComposeProjectInputs as DevProjectInputs } from "./ssrCompose.dev.type.js"
-import { SSRComposeProjectsInput as StartProjectInputs } from "./ssrCompose.start.type.js"
-
-type ProjectInputs = DevProjectInputs | StartProjectInputs
 const placeholderHost = "a://a"
-export function normalizeMidRequestOptions(path: string, projectInputs: ProjectInputs) {
+export function normalizeMidRequestOptions(path: string, projectMap: Map<any, any>) {
   const url = new URL(placeholderHost + path)
   let pathnames = url.pathname.split("/")
 
@@ -13,7 +9,7 @@ export function normalizeMidRequestOptions(path: string, projectInputs: ProjectI
     prefix = "home"
     pathnames = ["/", "home", ...pathnames.slice(2)]
   }
-  if (projectInputs.has(prefix)) {
+  if (projectMap.has(prefix)) {
     pathname = "/" + pathnames.slice(2).join("/")
   } else {
     prefix = "error"

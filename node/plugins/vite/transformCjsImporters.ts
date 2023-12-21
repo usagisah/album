@@ -1,9 +1,9 @@
 import { InlineConfig, UserConfig, mergeConfig } from "vite"
-import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.start.type.js"
+import { SSRComposeDependency } from "../../ssrCompose/ssrCompose.start.type.js"
 import { cjsImporterToEsm } from "../../utils/modules/cjs/transformImporters.js"
 
 const applyFilesReg = /\.(js|ts|jsx|tsx)$/
-export function withTransformCjsImporters(config: UserConfig, ssrComposeDependencies: SSRComposeDependencies) {
+export function withTransformCjsImporters(config: UserConfig, ssrComposeDependencies: Map<string, SSRComposeDependency>) {
   const external: string[] = []
   const cjsExternal: string[] = []
   ssrComposeDependencies.forEach((value, id) => {

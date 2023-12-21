@@ -3,7 +3,6 @@ import { writeFile } from "fs/promises"
 import { sep } from "path"
 import { AlbumContext } from "../../context/context.dev.type.js"
 import { CacheConfig } from "../../context/context.start.type.js"
-import { SSRComposeDependencies } from "../../ssrCompose/ssrCompose.start.type.js"
 import { buildSSRComposeDependencies } from "./buildSSRComposeDependencies.js"
 
 export async function buildCache(context: AlbumContext) {
@@ -12,9 +11,7 @@ export async function buildCache(context: AlbumContext) {
   const { appModule, port } = serverManager
 
   logger.log("正在创建缓存文件，请耐心等待...", "album")
-  let ssrComposeDependencies: SSRComposeDependencies | undefined
-  if (ssrComposeManager && ssrComposeManager.dependencies.length > 0) ssrComposeDependencies = await buildSSRComposeDependencies(context)
-
+  const ssrComposeDependencies = ssrComposeManager && ssrComposeManager.dependencies.length > 0 ? await buildSSRComposeDependencies(context) : null
   const config: CacheConfig = {
     ssr,
     ssrCompose,

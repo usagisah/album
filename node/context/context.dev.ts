@@ -1,5 +1,5 @@
 import { watch } from "chokidar"
-import { resolve } from "path"
+import { resolve, sep } from "path"
 import { createAppManager } from "../app/appManager.dev.js"
 import { ServerMode } from "../cli/cli.type.js"
 import { registryEnv } from "../env/env.dev.js"
@@ -24,8 +24,8 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
     const { appId, serverMode, args } = params
 
     const cwd = process.cwd()
-    const dumpInput = resolve(cwd, ".album")
-    const albumConfigInput = resolve(cwd, "album.config.ts")
+    const dumpInput = `${cwd}${sep}.album`
+    const albumConfigInput = `${cwd}${sep}album.config.ts`
     const inputs: Inputs = { cwd, root: cwd, dumpInput, albumConfigInput }
 
     const { userConfig, pluginManager, logger } = await loadConfig({ args, inputs, serverMode })
@@ -56,17 +56,22 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       createServerManager(inputs, userConfig.server)
     ])
     const ssr = !!appManager.mainSSRInput
-    const ssrComposeManager = await createSSRComposeManager({ logger, appManager, userConfigSSRCompose: userConfig.ssrCompose })
+    const ssrComposeManager = await createSSRComposeManager({
+      watcher,
+      appManager,
+      userConfigSSRCompose: userConfig.ssrCompose,
+      userConfig
+    })
 
     // outputs
-    const baseOutDir = resolve(cwd, "dist")
+    const baseOutDir = `${cwd}${sep}dist`
     const outDir = resolve(baseOutDir, appId === "default" ? "" : appId)
-    const apiOutDir = serverManager.appModule.input ? resolve(outDir, "api") : ""
+    const apiOutDir = serverManager.appModule.input ? `${outDir}${sep}api` : ""
     let clientOutDir = ""
     let ssrOutDir = ""
     if (ssr) {
-      clientOutDir = resolve(outDir, "client")
-      ssrOutDir = resolve(outDir, "ssr")
+      clientOutDir = `${outDir}${sep}client`
+      ssrOutDir = `${outDir}${sep}ssr`
     } else {
       clientOutDir = outDir
     }
