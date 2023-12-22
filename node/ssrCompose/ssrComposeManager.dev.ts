@@ -5,9 +5,8 @@ import { dirname, parse, sep } from "path"
 import { UserConfig, mergeConfig, build as viteBuild } from "vite"
 import { AppManager } from "../app/app.dev.type.js"
 import { AlbumUserConfig, UserSSRCompose } from "../user/user.dev.type.js"
-import { isArray, isFunction } from "../utils/check/simple.js"
+import { isStringEmpty } from "../utils/check/simple.js"
 import { Func } from "../utils/types/types.js"
-import { createPathRewriter } from "./pathRewriter.js"
 import { SSRComposeBuild, SSRComposeCoordinate, SSRComposeManager, SSRComposeProject, SSRComposeRewrite } from "./ssrCompose.dev.type.js"
 import { SSRComposeProject as StartProject } from "./ssrCompose.start.type.js"
 import { createModuleInfo } from "./ssrComposeManager.start.js"
@@ -28,21 +27,15 @@ export async function createSSRComposeManager({ userConfigSSRCompose, appManager
     _castExtensions.push(item.startsWith(".") ? item : `.${item}`)
   }
 
-  const _rewrites: SSRComposeRewrite[] = []
-  if (rewrites && !isArray(rewrites)) _rewrites.push(rewrites)
-  for (const rule of rewrites ?? []) {
-    if (isFunction(rule)) _rewrites.push(rule)
-    else {
-      for (const key in rule) {
-        _rewrites.push(new Function("req", `const {path}=req;if(path===${key})return ${rule[key]}`) as any)
-      }
-    }
-  }
-  const rewriter = createPathRewriter(_rewrites)
-
   const _dependencies = dependencies ? [...new Set(dependencies)] : []
 
-  const projectMap: Map<string, SSRComposeProject | StartProject> = (await createModuleInfo(rewriter, startRoot)).projectMap
+  const _rewrites: SSRComposeRewrite = { encode: [], decode: [] }
+  for (const { encode, decode } of rewrites ?? []) {
+    _rewrites.encode.push(encode)
+    _rewrites.decode.push(decode)
+  }
+
+  const projectMap: Map<string, SSRComposeProject | StartProject> = (await createModuleInfo(_rewrites.encode, startRoot)).projectMap
   const { modulePath, ignore } = appManager.module
   const localModuleRoot = dirname(modulePath)
   for (const fileInfo of await readdir(localModuleRoot, { withFileTypes: true })) {
@@ -55,8 +48,13 @@ export async function createSSRComposeManager({ userConfigSSRCompose, appManager
     projectMap.set(name.toLowerCase(), {
       local: true,
       coordinate: new Proxy(coordinate, {
-        get(target, p: string, receiver) {
-          if (Reflect.has(target, p)) return Reflect.get(target, p, receiver)
+        get(_, p: string) {
+          _rewrites.decode.forEach(transform => {
+            try {
+              const s = transform(p)
+              if (!isStringEmpty(s)) p = s
+            } catch {}
+          })
           const filepath = `${localModuleRoot}${sep}${p}`
           if (!existsSync(filepath)) return null
           return (coordinate[p] = { filepath, changed: false })
@@ -113,7 +111,6 @@ export async function createSSRComposeManager({ userConfigSSRCompose, appManager
     dependencies: _dependencies,
     castExtensions: _castExtensions,
     rewrites: _rewrites,
-    rewriter,
     projectMap,
     build
   }

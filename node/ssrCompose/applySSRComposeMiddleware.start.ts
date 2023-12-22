@@ -6,7 +6,6 @@ import sirv from "sirv"
 import { AlbumContext } from "../context/context.start.type.js"
 import { AlbumServerExpressConfig } from "../middlewares/middlewares.type.js"
 import { SSRComposeModule } from "../modules/ssr-compose/ssr-compose.module.js"
-import { isStrictEmpty } from "../utils/check/simple.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
 
 export async function applySSRComposeStartMiddleware(app: INestApplication, context: AlbumContext, midConfigs: AlbumServerExpressConfig[]) {
@@ -16,7 +15,7 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
   await app.get(LazyModuleLoader).load(() => SSRComposeModule)
 
   const { ssrComposeManager } = context
-  const { rewriter, projectMap } = ssrComposeManager!
+  const { projectMap, dependenciesMap } = ssrComposeManager!
   const sirvConfig = midConfigs.find(v => v.name === "sirv")!
   sirvConfig.factory = function proxyServerStaticFactory(_, sirvConfig: any) {
     projectMap.forEach(value => {
@@ -24,13 +23,10 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
     })
 
     return async function proxyServerStaticMiddleware(req: Request, res: Response, next: NextFunction) {
-      const _url = rewriter(req.url)
-      if (!isStrictEmpty(_url)) req.url = _url
-
       const reqPath = req.path
-      const dependencyInfo = projectMap.get(reqPath.slice(1))
+      const dependencyInfo = dependenciesMap.get(reqPath.slice(1))
       if (dependencyInfo) {
-        const file = await readFile(dependencyInfo.filepath!, "utf-8")
+        const file = await readFile(dependencyInfo.filepath, "utf-8")
         res.header("Content-Type", "application/javascript")
         res.send(file)
         return

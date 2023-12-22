@@ -22,7 +22,7 @@ export async function buildCache(context: AlbumContext) {
       appModule: { input: `${outputs.apiOutDir}${sep}${appModule.filename}` }
     },
     ssrComposeConfig: {
-      rewrites: ssrComposeManager ? ssrComposeManager.rewrites.map(v => v.toString()) : []
+      rewrites: ssrComposeManager ? ssrComposeManager.rewrites.encode.map(f => f.toString()) : []
     },
     logger: userConfig.logger ?? null
   }

@@ -3,12 +3,12 @@ import { existsSync, statSync } from "fs"
 import { readFile, readdir } from "fs/promises"
 import { resolve } from "path"
 import { CacheConfig } from "../context/context.start.type.js"
-import { resolveFilePath } from "../utils/path/resolvePath.js"
+import { isStringEmpty } from "../utils/check/simple.js"
 import { Func } from "../utils/types/types.js"
-import { createPathRewriter } from "./pathRewriter.js"
 import { SSRComposeDependency, SSRComposeManager, SSRComposeProject } from "./ssrCompose.start.type.js"
+import { DEP_OUT_NAME } from "../ssrCompose/constants.js"
 
-export async function createModuleInfo(rewriter: Func, root?: string) {
+export async function createModuleInfo(encodes: Func[], root?: string) {
   const projectMap = new Map<string, SSRComposeProject>()
   const dependenciesMap = new Map<string, SSRComposeDependency>()
   const res = { projectMap, dependenciesMap }
@@ -24,54 +24,79 @@ export async function createModuleInfo(rewriter: Func, root?: string) {
     const ssrInput = resolve(root, name, "ssr")
     if (!existsSync(clientInput) || !statSync(clientInput).isDirectory() || !existsSync(ssrInput) || !statSync(ssrInput).isDirectory()) continue
 
-    const mainServerInput = await resolveFilePath({ root: ssrInput, prefixes: ["./"], suffixes: ["main.ssr"] })
-    if (!mainServerInput) continue
-
     const _name = name.toLowerCase()
     const _projectInfo = {
       clientInput,
       clientManifest: {},
+      mainClientInput: "",
       ssrInput,
       ssrManifest: {},
+      ssrSSRManifest: {},
+      mainServerInput: "",
 
-      mainServerInput,
       coordinate: {}
     }
-    projectMap.set(_name, _projectInfo)
 
     try {
-      const depPath = resolve(root, name, ".ssr-compose-dependencies")
       const _clientManifestFile = readFile(resolve(clientInput, ".vite/manifest.json"), "utf-8")
-      const _ssrManifestFile = readFile(resolve(ssrInput, ".vite/ssr-manifest.json"), "utf-8")
+      const _ssrManifestFile = readFile(resolve(ssrInput, ".vite/manifest.json"), "utf-8")
+      const _ssrSSRManifestFile = readFile(resolve(ssrInput, ".vite/ssr-manifest.json"), "utf-8")
       const _coordinateFile = readFile(resolve(clientInput, ".vite/coordinate.json"), "utf-8")
-      const _composeManifest = readFile(resolve(depPath, "manifest.json"), "utf-8")
+      const _composeManifest = readFile(resolve(root, name, ".ssr-compose-dependencies", "manifest.json"), "utf-8")
+      const [clientManifestFile, ssrManifestFile, ssrSSRManifestFile, coordinateFile, depManifestFile] = await Promise.all([_clientManifestFile, _ssrManifestFile, _ssrSSRManifestFile, _coordinateFile, _composeManifest])
+      _projectInfo.ssrSSRManifest = JSON.parse(ssrSSRManifestFile)
 
-      const [clientManifestFile, ssrManifestFile, coordinateFile, depManifestFile] = await Promise.all([_clientManifestFile, _ssrManifestFile, _coordinateFile, _composeManifest])
-      _projectInfo.clientManifest = JSON.parse(clientManifestFile)
-      _projectInfo.ssrManifest = JSON.parse(ssrManifestFile)
-      _projectInfo.coordinate = JSON.parse(coordinateFile)
+      const clientManifestJson = (_projectInfo.clientManifest = JSON.parse(clientManifestFile))
+      for (const key in clientManifestJson) {
+        const v = clientManifestJson[key]
+        if (v.isEntry) {
+          _projectInfo.mainClientInput = resolve(clientInput, v.file)
+          break
+        }
+      }
+
+      const ssrManifestJson = (_projectInfo.ssrManifest = JSON.parse(ssrManifestFile))
+      for (const key in ssrManifestJson) {
+        const v = ssrManifestJson[key]
+        if (v.isEntry) {
+          _projectInfo.mainServerInput = resolve(ssrInput, v.file)
+          break
+        }
+      }
+
+      const coordinate = {}
+      const coordinateJson = JSON.parse(coordinateFile)
+      for (const key in coordinateJson) {
+        encodes.forEach(transform => {
+          try {
+            const s = transform(key)
+            if (!isStringEmpty(s)) coordinate[s] = coordinateJson[key]
+            else coordinate[key] = coordinateJson[key]
+          } catch {}
+        })
+      }
+      _projectInfo.coordinate = coordinate
 
       const depManifest: Map<string, SSRComposeDependency> = parse(depManifestFile)
       depManifest.forEach((value, id) => {
         if (dependenciesMap.has(id)) return
-        value.filepath = resolve(clientInput, value.filename)
+        value.filepath = resolve(root, name, DEP_OUT_NAME, value.filename)
         dependenciesMap.set(id, value)
       })
     } catch {
       continue
     }
+
+    projectMap.set(_name, _projectInfo)
   }
   return res
 }
 
 export async function createSSRComposeManager(root: string, ssrComposeConfig: CacheConfig["ssrComposeConfig"]) {
   const { rewrites } = ssrComposeConfig
-  const _rewrites = rewrites.map(sFn => new Function("req", `return (${sFn})(req)`))
-
-  const rewriter = createPathRewriter(_rewrites as any)
-  const { projectMap, dependenciesMap } = await createModuleInfo(rewriter, root)
+  const _rewrites: any = rewrites.map(str => new Function("p", `return (${str})(p)`))
+  const { projectMap, dependenciesMap } = await createModuleInfo(_rewrites, root)
   const manager: SSRComposeManager = {
-    rewriter,
     projectMap,
     dependenciesMap
   }

@@ -9,6 +9,7 @@ export function createSSRCoreConfig(context: AlbumContext): [InlineConfig, Plugi
   const config: InlineConfig = {
     appType: "custom",
     build: {
+      manifest: true,
       ssrManifest: true,
       ssr: true,
       outDir: ssrOutDir!,

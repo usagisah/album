@@ -1,7 +1,7 @@
 import { parse } from "@ungap/structured-clone/json"
 import { existsSync, statSync } from "fs"
 import { readFile } from "fs/promises"
-import { dirname, resolve } from "path"
+import { dirname, resolve, sep } from "path"
 import { StartServerParams } from "../cli/cli.type.js"
 import { Logger } from "../modules/logger/logger.js"
 import { ILogger } from "../modules/logger/logger.type.js"
@@ -11,31 +11,25 @@ import { resolveFilePath } from "../utils/path/resolvePath.js"
 import { AlbumContext, CacheConfig } from "./context.start.type.js"
 
 export async function createContext({ args }: StartServerParams): Promise<AlbumContext> {
-  let logger: ILogger = console
+  let logger: ILogger
   try {
     const cwd = process.cwd()
-    let root = args._[1] ?? cwd
+    let root = args._[1]
     if (root) {
-      root = resolve(cwd, root)
+      root = `${cwd}${sep}${root}`
       if (!existsSync(root) && !statSync(root).isDirectory()) throw `指定的启动根目录路径不存在(${root})`
+    } else {
+      root = cwd
     }
 
-    const configPath = await resolveFilePath({
-      root,
-      prefixes: [""],
-      name: "album.config",
-      exts: ["js"]
-    })
+    const configPath = await resolveFilePath({ root, prefixes: [""], name: "album.config", exts: ["js"] })
     if (!configPath) throw "找不到生产配置文件"
     const cacheConfig: CacheConfig = parse(await readFile(configPath, "utf-8"))
     if (!isPlainObject(cacheConfig)) throw "似乎找到了个非法的配置文件"
 
     const { logger: loggerConfig, ssr, ssrCompose, env, appConfig, serverConfig } = cacheConfig
     logger = resolveLogger(loggerConfig)
-
-    for (const k of Object.getOwnPropertyNames(env)) {
-      process.env[k] = env[k]
-    }
+    for (const k of Object.getOwnPropertyNames(env)) process.env[k] = env[k]
 
     let clientInput = ""
     let ssrInput = ""
@@ -66,8 +60,8 @@ export async function createContext({ args }: StartServerParams): Promise<AlbumC
       ssrComposeManager: await createSSRComposeManager(root, cacheConfig.ssrComposeConfig)
     }
   } catch (e) {
-    logger.error(e, "album")
-    throw e
+    logger! ? logger.error(e, "album") : console.error(e)
+    process.exit(1)
   }
 }
 

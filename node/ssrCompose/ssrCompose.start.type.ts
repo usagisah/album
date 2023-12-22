@@ -5,10 +5,12 @@ export type SSRComposeCoordinate = Obj
 export type SSRComposeProject = {
   clientInput: string
   clientManifest: Obj
+  mainClientInput: string
   ssrInput: string
   ssrManifest: Obj
-
+  ssrSSRManifest: Obj
   mainServerInput: string
+
   coordinate: SSRComposeCoordinate
   [x: string]: any
 }
@@ -19,11 +21,9 @@ export type SSRComposeDependency = {
   cjs: boolean
 }
 
-export type SSRComposeRewrite = Func<[string, Record<string, string>], string>
-export type SSRComposeRewriter = Func<[string], string>
+export type SSRComposeRewrite = { encode: Func<[string], string>[]; decode: Func<[string], string>[] }
 
 export type SSRComposeManager = {
   dependenciesMap: Map<string, SSRComposeDependency>
   projectMap: Map<string, SSRComposeProject>
-  rewriter: SSRComposeRewriter
 }

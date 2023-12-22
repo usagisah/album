@@ -9,16 +9,13 @@ import { buildCoordinate } from "./buildCoordinate.js"
 
 const rmOptions: RmOptions = { force: true, recursive: true }
 export async function buildSSR(context: AlbumContext) {
-  const { ssrCompose, outputs, logger } = context
-  const { baseOutDir, clientOutDir, ssrOutDir } = outputs
+  const { outputs, logger } = context
+  const { outDir } = outputs
   const clientConfig = (await resolveMiddlewareConfig(context, true)).viteConfigs
   const ssrConfig = (await resolveMiddlewareConfig(context)).viteConfigs
 
-  if (ssrCompose) await Promise.all([rm(clientOutDir, rmOptions), rm(ssrOutDir!, rmOptions)])
-  else {
-    await rm(baseOutDir, rmOptions)
-    await mkdir(baseOutDir, { recursive: true })
-  }
+  await rm(outDir, rmOptions)
+  await mkdir(outDir, { recursive: true })
 
   const ssrComposeDependencies = await buildCache(context)
 
