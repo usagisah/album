@@ -37,9 +37,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       useFsEvents: true,
       ignoreInitial: true,
       usePolling: false,
-      interval: 100,
-      awaitWriteFinish: true,
-      binaryInterval: 300
+      alwaysStat: false
     })
 
     const ssrCompose = !!userConfig.ssrCompose
@@ -61,7 +59,8 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       watcher,
       appManager,
       userConfigSSRCompose: userConfig.ssrCompose,
-      userConfig
+      userConfig,
+      logger
     })
 
     // outputs

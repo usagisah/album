@@ -3,10 +3,10 @@ import { existsSync, statSync } from "fs"
 import { readFile, readdir } from "fs/promises"
 import { resolve } from "path"
 import { CacheConfig } from "../context/context.start.type.js"
+import { DEP_OUT_NAME } from "../ssrCompose/constants.js"
 import { isStringEmpty } from "../utils/check/simple.js"
 import { Func } from "../utils/types/types.js"
 import { SSRComposeDependency, SSRComposeManager, SSRComposeProject } from "./ssrCompose.start.type.js"
-import { DEP_OUT_NAME } from "../ssrCompose/constants.js"
 
 export async function createModuleInfo(encodes: Func[], root?: string) {
   const projectMap = new Map<string, SSRComposeProject>()

@@ -5,6 +5,7 @@ import { dirname, parse, sep } from "path"
 import { UserConfig, mergeConfig, build as viteBuild } from "vite"
 import { AppManager } from "../app/app.dev.type.js"
 import { Inputs } from "../context/context.dev.type.js"
+import { ILogger } from "../modules/logger/logger.type.js"
 import { AlbumUserConfig, UserSSRCompose } from "../user/user.dev.type.js"
 import { isStringEmpty } from "../utils/check/simple.js"
 import { Func } from "../utils/types/types.js"
@@ -18,9 +19,10 @@ type SSRComposeConfigParams = {
   appManager: AppManager
   userConfigSSRCompose?: UserSSRCompose
   userConfig: AlbumUserConfig
+  logger: ILogger
 }
 
-export async function createSSRComposeManager({ inputs, userConfigSSRCompose, appManager, userConfig, watcher }: SSRComposeConfigParams) {
+export async function createSSRComposeManager({ inputs, userConfigSSRCompose, appManager, userConfig, watcher, logger }: SSRComposeConfigParams) {
   if (!userConfigSSRCompose) return null
   const { castExtensions, startRoot, rewrites, dependencies } = userConfigSSRCompose
 
@@ -31,7 +33,7 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
 
   const _startRoot = startRoot ? `${inputs.cwd}${sep}${startRoot}` : ""
   if (!existsSync(_startRoot) || !statSync(_startRoot).isDirectory()) throw `ssr-compose 指定的 startRoot 不合法`
-  
+
   const _dependencies = dependencies ? [...new Set(dependencies)] : []
 
   const _rewrites: SSRComposeRewrite = { encode: [], decode: [] }
@@ -60,6 +62,9 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
               if (!isStringEmpty(s)) p = s
             } catch {}
           })
+          let res = coordinate[p]
+          if (res) return res
+
           const filepath = `${localModuleRoot}${sep}${p}`
           if (!existsSync(filepath)) return null
           return (coordinate[p] = { filepath, changed: false })
@@ -68,7 +73,7 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
     })
   }
 
-  const watch = createModuleWatcher(watcher)
+  const watch = createModuleWatcher(watcher, logger)
   const build: SSRComposeBuild = async ({ coordinate, input, outDir }) => {
     const ids: string[] = []
     try {
@@ -109,6 +114,7 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
       )
       watch(input, ids, () => (coordinate.changed = true))
       coordinate.changed = false
+      ids.length = 0
     } catch {}
   }
 
@@ -123,41 +129,26 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
   return manager
 }
 
-function createModuleWatcher(watcher: FSWatcher) {
-  const counter = new Map<string, number>()
-  const deps = new Map<string, { ids: string[] }>()
-  const decrease = (input: string) => {
-    const { ids } = deps.get(input)!
-    for (const id of ids) {
-      if (!counter.has(id)) continue
-
-      const n = counter.get(id)! - 1
-      if (n <= 0) counter.delete(id)
-      else counter.set(id, n)
+function createModuleWatcher(watcher: FSWatcher, logger: ILogger) {
+  const info = new Map<string, { depWatches: Func[] }>()
+  const coordinate = new Map<string, Set<string>>()
+  const onChange = (path: string) => {
+    for (const input of coordinate.get(path)!) {
+      info.get(input)!.depWatches.forEach(f => f())
     }
-    deps.delete(input)
-    watcher.unwatch(ids)
+    logger.log(`changed: ${path}`, "ssr-compose")
   }
-  const increase = (input: string, ids: string[]) => {
-    for (const id of ids) {
-      counter.set(id, (counter.get(id) ?? 0) + 1)
-    }
-    deps.set(input, { ids })
-    watcher.add(ids)
-  }
+  watcher.on("change", onChange)
+  watcher.on("unlink", onChange)
   return function watch(input: string, ids: string[], onChange: Func) {
-    if (deps.has(input)) decrease(input)
-    increase(input, ids)
-
-    const _onChange = () => {
-      watcher.removeListener("change", _onChange)
-      watcher.removeListener("unlink", _onChange)
-
-      if (!deps.has(input)) return
-      decrease(input)
-      onChange()
+    if (info.has(input)) return
+    for (const id of ids) {
+      const inputs = coordinate.get(id)
+      if (inputs) inputs.add(input)
+      else coordinate.set(id, new Set([input]))
     }
-    watcher.on("change", _onChange)
-    watcher.on("unlink", _onChange)
+    info.set(input, { depWatches: [onChange] })
+    watcher.add(ids)
+    return
   }
 }

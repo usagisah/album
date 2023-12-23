@@ -2,7 +2,7 @@ import { Env } from "env/env.type.js"
 import { AppManager, AppManagerSSRRender } from "../app/app.start.type.js"
 import { ILogger, LoggerParams } from "../modules/logger/logger.type.js"
 import { ServerManager } from "../server/server.start.type.js"
-import { SSRComposeManager, SSRComposeRewrite } from "../ssrCompose/ssrCompose.start.type.js"
+import { SSRComposeManager } from "../ssrCompose/ssrCompose.start.type.js"
 
 export type Inputs = {
   cwd: string
