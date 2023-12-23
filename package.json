@@ -92,7 +92,7 @@
     "pretty-format": "^29.7.0",
     "resolve.exports": "^2.0.2",
     "terser": "^5.24.0",
-    "vite": "^5.0.4",
+    "vite": "^5.0.10",
     "vite-plugin-compression": "^0.5.1"
   }
 }

@@ -13,6 +13,11 @@ export class SSRComposeController {
     ctx.serverMode === "start" ? this.initStartModule(ctx as any) : this.initDevModule(ctx as any)
   }
 
+  replacer(_: string, value: any) {
+    if (value instanceof Set) return ["__$_type_set_", ...value.values()]
+    return value
+  }
+
   @Post("*")
   async ssrRemoteEntry(@Req() req: Request, @Res() res: Response, @Headers() headers: Record<string, string>, @Body() params: any) {
     if (!Object.hasOwn(headers, "album-remote-source")) return res.status(404).send()
@@ -26,7 +31,7 @@ export class SSRComposeController {
     try {
       const ssrComposeContext = this.context.createSSRComposeContext()
       const result: SSRComposeRenderRemoteComponentReturn = await ssrComposeContext.renderRemoteComponent({ props: params, sourcePath }, { req, res, headers })
-      return res.send({ code: 200, messages: "", result })
+      res.send(JSON.stringify({ code: 200, messages: "", result }, this.replacer))
     } catch (error) {
       logger.error("资源序列化失败", error, "ssr-compose")
       return res.send({ code: 500, messages: "资源序列化失败", error })
@@ -46,6 +51,7 @@ export class SSRComposeController {
     dependenciesMap.forEach((_, id) => (importerMap[id] = `/${id}`))
     this.context.createSSRComposeContext = () => {
       const ssrComposeContext: AlbumSSRComposeContext = {
+        ssrComposeRoot: "",
         sources: {},
         projectMap,
         dependenciesMap: importerMap,
@@ -84,9 +90,10 @@ export class SSRComposeController {
   async initDevModule(ctx: DevContext) {
     const moduleContext = this.context
     const { viteDevServer, appManager, ssrComposeManager, logger } = ctx
-    const { projectMap, build } = ssrComposeManager!
+    const { projectMap, build, startRoot } = ssrComposeManager!
     this.context.createSSRComposeContext = () => {
       const ssrComposeContext: AlbumSSRComposeContext = {
+        ssrComposeRoot: startRoot,
         sources: {},
         projectMap: projectMap as any,
         dependenciesMap: null as any,

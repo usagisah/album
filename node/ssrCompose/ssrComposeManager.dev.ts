@@ -1,9 +1,10 @@
 import { FSWatcher } from "chokidar"
-import { existsSync } from "fs"
+import { existsSync, statSync } from "fs"
 import { readdir } from "fs/promises"
 import { dirname, parse, sep } from "path"
 import { UserConfig, mergeConfig, build as viteBuild } from "vite"
 import { AppManager } from "../app/app.dev.type.js"
+import { Inputs } from "../context/context.dev.type.js"
 import { AlbumUserConfig, UserSSRCompose } from "../user/user.dev.type.js"
 import { isStringEmpty } from "../utils/check/simple.js"
 import { Func } from "../utils/types/types.js"
@@ -12,13 +13,14 @@ import { SSRComposeProject as StartProject } from "./ssrCompose.start.type.js"
 import { createModuleInfo } from "./ssrComposeManager.start.js"
 
 type SSRComposeConfigParams = {
+  inputs: Inputs
   watcher: FSWatcher
   appManager: AppManager
   userConfigSSRCompose?: UserSSRCompose
   userConfig: AlbumUserConfig
 }
 
-export async function createSSRComposeManager({ userConfigSSRCompose, appManager, userConfig, watcher }: SSRComposeConfigParams) {
+export async function createSSRComposeManager({ inputs, userConfigSSRCompose, appManager, userConfig, watcher }: SSRComposeConfigParams) {
   if (!userConfigSSRCompose) return null
   const { castExtensions, startRoot, rewrites, dependencies } = userConfigSSRCompose
 
@@ -27,6 +29,9 @@ export async function createSSRComposeManager({ userConfigSSRCompose, appManager
     _castExtensions.push(item.startsWith(".") ? item : `.${item}`)
   }
 
+  const _startRoot = startRoot ? `${inputs.cwd}${sep}${startRoot}` : ""
+  if (!existsSync(_startRoot) || !statSync(_startRoot).isDirectory()) throw `ssr-compose 指定的 startRoot 不合法`
+  
   const _dependencies = dependencies ? [...new Set(dependencies)] : []
 
   const _rewrites: SSRComposeRewrite = { encode: [], decode: [] }
@@ -35,7 +40,7 @@ export async function createSSRComposeManager({ userConfigSSRCompose, appManager
     _rewrites.decode.push(decode)
   }
 
-  const projectMap: Map<string, SSRComposeProject | StartProject> = (await createModuleInfo(_rewrites.encode, startRoot)).projectMap
+  const projectMap: Map<string, SSRComposeProject | StartProject> = (await createModuleInfo(_rewrites.encode, _startRoot)).projectMap
   const { modulePath, ignore } = appManager.module
   const localModuleRoot = dirname(modulePath)
   for (const fileInfo of await readdir(localModuleRoot, { withFileTypes: true })) {
@@ -90,7 +95,7 @@ export async function createSSRComposeManager({ userConfigSSRCompose, appManager
             cssMinify: false,
             rollupOptions: {
               input,
-              external: [/node_modules/, ..._dependencies]
+              external: [..._dependencies, /^@w-hite\/album/]
             },
             lib: {
               entry: input,
@@ -111,6 +116,7 @@ export async function createSSRComposeManager({ userConfigSSRCompose, appManager
     dependencies: _dependencies,
     castExtensions: _castExtensions,
     rewrites: _rewrites,
+    startRoot: _startRoot,
     projectMap,
     build
   }

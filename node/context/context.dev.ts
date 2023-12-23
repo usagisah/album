@@ -57,6 +57,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
     ])
     const ssr = !!appManager.mainSSRInput
     const ssrComposeManager = await createSSRComposeManager({
+      inputs,
       watcher,
       appManager,
       userConfigSSRCompose: userConfig.ssrCompose,

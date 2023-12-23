@@ -7,7 +7,6 @@ export type SSRComposeRewrite = { encode: Func<[string], string>[]; decode: Func
 export type SSRComposeProject = {
   local: boolean
   coordinate: SSRComposeCoordinate
-  [x: string]: any
 }
 
 export type SSRComposeBuild = Func<[{ coordinate: InferObj<SSRComposeCoordinate>; input: string; outDir: string }], Promise<void>>
@@ -16,6 +15,7 @@ export type SSRComposeManager = {
   dependencies: string[]
   castExtensions: string[]
   rewrites: SSRComposeRewrite
+  startRoot: string
   projectMap: Map<string, SSRComposeProject | StartProject>
   build: SSRComposeBuild
 }
