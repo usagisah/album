@@ -1,5 +1,5 @@
 import { Injectable, LogLevel } from "@nestjs/common"
-import { ILogger } from "./logger.type.js"
+import { ILogger } from "../../logger/logger.type.js"
 
 @Injectable()
 export class AlbumLoggerService implements ILogger {

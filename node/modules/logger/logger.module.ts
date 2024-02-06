@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from "@nestjs/common"
+import { ILogger } from "../../logger/logger.type.js"
 import { createAlbumLoggerService } from "./logger.service.js"
-import { ILogger } from "./logger.type.js"
 
 @Module({})
 export class LoggerModule {

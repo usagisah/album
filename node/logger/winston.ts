@@ -1,19 +1,16 @@
-import { gray, green, magenta, red, yellow } from "colorette"
-import day from "dayjs"
 import { resolve } from "path"
-import { format as prettyFormat } from "pretty-format"
 import { createLogger, format, transports } from "winston"
 import "winston-daily-rotate-file"
-import { isFunction, isPlainObject } from "../../utils/check/simple.js"
+import { isFunction, isPlainObject } from "../utils/check/simple.js"
+import { formatConsoleMessage } from "./format.js"
 import { DailyRotateFileTransportOptions, ILogger, LoggerParams } from "./logger.type.js"
 
-export class Logger implements ILogger {
-  static logger: Logger
-  private colors = { info: green, warn: yellow, error: red, debug: magenta }
+export class WinstonLogger implements ILogger {
+  static logger: WinstonLogger
   private logger: any
 
   constructor(params: LoggerParams = {}) {
-    if (Logger.logger) return Logger.logger
+    if (WinstonLogger.logger) return WinstonLogger.logger
     const { level = "info", enableConsole = true, consoleFormat, enableFile = false, fileOptions } = params
     const _transports: any[] = []
     if (enableConsole) {
@@ -24,7 +21,7 @@ export class Logger implements ILogger {
             format.printf(info => {
               const messages = [info.message, ...(info[Symbol.for("splat")] ?? [])]
               const context = messages.length > 1 && typeof messages.at(-1) === "string" ? messages.pop() : null
-              return this.formatConsoleMessage(info.level, context, messages)
+              return formatConsoleMessage(info.level, context, messages)
             })
         })
       )
@@ -53,7 +50,7 @@ export class Logger implements ILogger {
       level,
       transports: _transports
     })
-    Logger.logger = this
+    WinstonLogger.logger = this
   }
 
   log(message: any, ...optionalParams: any[]) {
@@ -74,16 +71,5 @@ export class Logger implements ILogger {
 
   verbose(message: any, ...optionalParams: any[]) {
     this.logger.verbose(message, ...optionalParams)
-  }
-
-  getColor(level: string) {
-    return this.colors[level] ?? gray
-  }
-
-  formatConsoleMessage(level: string, context: string | null, messages: string[]) {
-    const c = this.getColor(level)
-    const t = day().format("YYYY-MM-DD HH:mm:ss")
-    const m = messages.map(m => (typeof m === "string" ? m : prettyFormat(m, { highlight: true }))).join("")
-    return `${c("[" + level + "]")} ${red(t)} ${context ? gray("[" + context + "]") : ""} -> ${c(m)}`
   }
 }

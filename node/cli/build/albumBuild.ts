@@ -1,7 +1,7 @@
 import { resolve } from "path"
 import { processClient } from "../../app/processClient.js"
 import { createContext } from "../../context/context.dev.js"
-import { ILogger } from "../../modules/logger/logger.type.js"
+import { ILogger } from "../../logger/logger.type.js"
 import { DevServerParams } from "../cli.type.js"
 import { buildApi } from "./buildApi.js"
 import { buildClient } from "./buildClient.js"

@@ -4,7 +4,7 @@ import { rm } from "fs/promises"
 import { resolve } from "path"
 import { ServerMode } from "../cli/cli.type.js"
 import { Inputs } from "../context/context.dev.type.js"
-import { Logger } from "../modules/logger/logger.js"
+import { createAlbumLogger } from "../logger/logger.js"
 import { createPluginManager } from "../plugins/pluginManager.dev.js"
 import { isFunction, isPlainObject } from "../utils/check/simple.js"
 import { NodeArgs } from "../utils/command/args.js"
@@ -19,7 +19,7 @@ export type LoadConfigParams = {
 
 export async function loadConfig({ serverMode, inputs, args }: LoadConfigParams) {
   const { cwd, albumConfigInput } = inputs
-  if (!existsSync(albumConfigInput)) throw "好不到配置文件"
+  if (!existsSync(albumConfigInput)) throw "找不到配置文件"
 
   const output = resolve(cwd, "_$_album.config.mjs")
   await esbuild({
@@ -39,7 +39,7 @@ export async function loadConfig({ serverMode, inputs, args }: LoadConfigParams)
   }
   checkUserConfig(config)
 
-  const logger = new Logger(isPlainObject(config.logger) ? config.logger : undefined)
+  const logger = await createAlbumLogger(config.logger)
   const pluginManager = createPluginManager({ userPlugin: config.plugins, logger })
   const { config: userConfig } = await pluginManager.execute("config", { serverMode, config })
   return { userConfig, pluginManager, logger }

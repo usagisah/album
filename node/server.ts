@@ -8,8 +8,10 @@ export * from "./context/context.dev.type.js"
 
 export * from "./middlewares/middlewares.type.js"
 
+export * from "./logger/logger.js"
+export * from "./logger/logger.type.js"
+
 export * from "./modules/logger/logger.service.js"
-export * from "./modules/logger/logger.type.js"
 export * from "./modules/ssr-compose/ssr-compose.type.js"
 export * from "./modules/ssr/ssr.type.js"
 

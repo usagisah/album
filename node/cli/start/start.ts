@@ -1,5 +1,5 @@
 import { createContext } from "../../context/context.start.js"
-import { ILogger } from "../../modules/logger/logger.type.js"
+import { ILogger } from "../../logger/logger.type.js"
 import { processServer } from "../../server/processServer.start.js"
 import { StartServerParams } from "../cli.type.js"
 

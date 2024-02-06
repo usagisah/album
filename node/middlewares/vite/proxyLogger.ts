@@ -1,5 +1,5 @@
 import { createLogger } from "vite"
-import { ILogger } from "../../modules/logger/logger.type.js"
+import { ILogger } from "../../logger/logger.type.js"
 
 export function proxyLogger(logger: ILogger) {
   const viteLogger = createLogger()

@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { ServerMode } from "../../cli/cli.type.js"
 import { Env } from "../../env/env.type.js"
-import { ILogger } from "../logger/logger.type.js"
+import { ILogger } from "../../logger/logger.type.js"
 import { AlbumSSRComposeContext } from "../ssr-compose/ssr-compose.type.js"
 
 export type AlbumSSRServerData = Record<string, any>

@@ -1,5 +1,5 @@
 import EventEmitter from "events"
-import { ILogger } from "../modules/logger/logger.type.js"
+import { ILogger } from "../logger/logger.type.js"
 import { AlbumUserPlugin } from "./plugin.dev.type.js"
 
 export type PluginManagerConfig = {

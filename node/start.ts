@@ -6,7 +6,9 @@ export * from "./cli/start/start.js"
 
 export * from "./context/context.start.type.js"
 
-export * from "./modules/logger/logger.type.js"
+export * from "./logger/logger.js"
+export * from "./logger/logger.type.js"
+
 export * from "./modules/ssr-compose/ssr-compose.type.js"
 export * from "./modules/ssr/ssr.type.js"
 

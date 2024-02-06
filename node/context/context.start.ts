@@ -3,8 +3,8 @@ import { existsSync, statSync } from "fs"
 import { readFile } from "fs/promises"
 import { dirname, resolve, sep } from "path"
 import { StartServerParams } from "../cli/cli.type.js"
-import { Logger } from "../modules/logger/logger.js"
-import { ILogger } from "../modules/logger/logger.type.js"
+import { createAlbumLogger } from "../logger/logger.js"
+import { ILogger } from "../logger/logger.type.js"
 import { createSSRComposeManager } from "../ssrCompose/ssrComposeManager.start.js"
 import { isPlainObject } from "../utils/check/simple.js"
 import { resolveFilePath } from "../utils/path/resolvePath.js"
@@ -28,7 +28,7 @@ export async function createContext({ args }: StartServerParams): Promise<AlbumC
     if (!isPlainObject(cacheConfig)) throw "似乎找到了个非法的配置文件"
 
     const { logger: loggerConfig, ssr, ssrCompose, env, appConfig, serverConfig } = cacheConfig
-    logger = resolveLogger(loggerConfig)
+    logger = await createAlbumLogger(loggerConfig!)
     for (const k of Object.getOwnPropertyNames(env)) process.env[k] = env[k]
 
     let clientInput = ""
@@ -63,10 +63,4 @@ export async function createContext({ args }: StartServerParams): Promise<AlbumC
     logger! ? logger.error(e, "album") : console.error(e)
     process.exit(1)
   }
-}
-
-function resolveLogger(value: any): ILogger {
-  if (!value) return new Logger({})
-  if (value.type === "custom") value
-  return new Logger(value)
 }

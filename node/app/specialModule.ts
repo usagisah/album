@@ -2,7 +2,7 @@ import { Dirent } from "fs"
 import { readdir } from "fs/promises"
 import { basename, parse as pathParse, resolve } from "path"
 import { AlbumContext } from "../context/context.dev.type.js"
-import { ILogger } from "../modules/logger/logger.type.js"
+import { ILogger } from "../logger/logger.type.js"
 import { AppSpecialModule, AppSpecialModuleFile } from "./app.dev.type.js"
 
 export async function buildSpecialModules(context: AlbumContext): Promise<AppSpecialModule[]> {

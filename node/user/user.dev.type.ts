@@ -1,6 +1,6 @@
 import { UserConfig } from "vite"
 import { EnvValue } from "../env/env.type.js"
-import { LoggerParams } from "../modules/logger/logger.type.js"
+import { LoggerParams } from "../logger/logger.type.js"
 import { AlbumUserPlugin } from "../plugins/plugin.dev.type.js"
 import { Func } from "../utils/types/types.js"
 

@@ -3,7 +3,7 @@ import { processClient } from "../../app/processClient.js"
 import { rsBuild } from "../../builder/rspack/rspack.build.js"
 import { SYSTEM_RESTART } from "../../constants.js"
 import { createContext } from "../../context/context.dev.js"
-import { ILogger } from "../../modules/logger/logger.type.js"
+import { ILogger } from "../../logger/logger.type.js"
 import { processServer } from "../../server/processServer.dev.js"
 import { DevServerParams } from "../cli.type.js"
 
