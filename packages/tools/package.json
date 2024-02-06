@@ -1,0 +1,79 @@
+{
+  "name": "@albumjs/tools",
+  "version": "0.1.0",
+  "description": "一个组合 vite+nestjs 的集成式框架",
+  "keywords": [
+    "@albumjs",
+    "albumjs",
+    "album",
+    "@albumjs/tools"
+  ],
+  "homepage": "https://github.com/usagisah/album#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usagisah/album.git"
+  },
+  "scripts": {
+    "watch": "tsc -w"
+  },
+  "license": "MIT",
+  "author": "顾弦笙/usagisah",
+  "type": "module",
+  "exports": {
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js"
+    },
+    "./check/*": {
+      "types": "./dist/check/*.d.ts",
+      "import": "./dist/check/*.js"
+    },
+    "./command/*": {
+      "types": "./dist/command/*.d.ts",
+      "import": "./dist/command/*.js"
+    },
+    "./fs/*": {
+      "types": "./dist/fs/*.d.ts",
+      "import": "./dist/fs/*.js"
+    },
+    "./modules/*": {
+      "types": "./dist/modules/*.d.ts",
+      "import": "./dist/modules/*.js"
+    },
+    "./path/*": {
+      "types": "./dist/path/*.d.ts",
+      "import": "./dist/path/*.js"
+    },
+    "./promises/*": {
+      "types": "./dist/promises/*.d.ts",
+      "import": "./dist/promises/*.js"
+    },
+    "./request/*": {
+      "types": "./dist/request/*.d.ts",
+      "import": "./dist/request/*.js"
+    },
+    "./types/*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/types/*.js"
+    }
+  },
+  "dependencies": {
+    "@types/babel__core": "^7.20.5",
+    "colorette": "^2.0.20",
+    "dayjs": "^1.11.10",
+    "magic-string": "^0.30.5",
+    "minimist": "^1.2.8",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.5",
+    "@babel/plugin-syntax-jsx": "^7.23.3",
+    "@babel/plugin-syntax-typescript": "^7.23.3",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.10.3",
+    "esbuild": "^0.19.8",
+    "execa": "^8.0.1",
+    "pretty-format": "^29.7.0",
+    "resolve.exports": "^2.0.2"
+  }
+}
