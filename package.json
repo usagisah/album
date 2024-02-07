@@ -6,8 +6,9 @@
   "author": "顾弦笙/usagisah",
   "type": "module",
   "scripts": {
-    "preWatch": "node ./scripts/preWatch.mjs",
-    "watch:react": "npm run preWatch && pnpm -r --parallel --filter 'tools,album,plugin-react watch' watch",
+    "init": "node ./scripts/init.mjs",
+    "preBuild": "node ./scripts/preBuild.mjs",
+    "watch:react": "npm run preBuild && concurrently 'cd packages/tools && npm run watch' 'cd packages/album && npm run watch' 'cd packages/plugin-react && npm run watch'",
     "format": "prettier --write \"packages/**/*.ts\"",
     "pub": "node ./scripts/publish.mjs"
   },
@@ -24,6 +25,7 @@
     "vitest": "^1.2.2"
   },
   "dependencies": {
+    "concurrently": "^8.2.2",
     "typescript": "^5.3.2"
   }
 }

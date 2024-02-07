@@ -1,9 +1,9 @@
 import { execa } from "execa"
 import { rmSync } from "fs"
-import { rm } from "fs/promises"
+import { readFile, rm, writeFile } from "fs/promises"
 import { cpFiles, resolvePath } from "./helper.mjs"
 
-async function buildCore() {
+export async function buildCore() {
   rmSync(resolvePath("album/dist"), { force: true, recursive: true })
 
   await execa("tsc", ["--p", resolvePath("album/client/tsconfig.json")], {
@@ -16,7 +16,11 @@ async function buildCore() {
     stderr: process.stderr
   })
 
-  cpFiles(resolvePath("album"), ["package.json"], ["node_modules", "types"], "dist")
+  cpFiles(resolvePath("album"), ["node_modules", "package.json"], ["types"], "dist")
+  const pkgPath = resolvePath("album/dist/package.json")
+  const file = JSON.parse(await readFile(pkgPath, "utf-8"))
+  file.name = "albumjs"
+  await writeFile(pkgPath, JSON.stringify(file, 2), "utf-8")
 }
 
 export async function build(ps) {

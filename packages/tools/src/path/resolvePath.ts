@@ -1,6 +1,11 @@
 import { existsSync } from "fs"
 import { resolve } from "path"
 
+const cwd = process.cwd()
+export function resolvePath(...p: string[]) {
+  return resolve(cwd, ...p)
+}
+
 export type ResolveFilePathParams = {
   root?: string
   prefixes?: string[]

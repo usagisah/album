@@ -24,6 +24,10 @@
       "types": "./dist/node.d.ts",
       "import": "./dist/node.js"
     },
+    "./bundle/*": {
+      "types": "./dist/bundle/*.d.ts",
+      "import": "./dist/bundle/*.js"
+    },
     "./check/*": {
       "types": "./dist/check/*.d.ts",
       "import": "./dist/check/*.js"
@@ -63,6 +67,7 @@
     "dayjs": "^1.11.10",
     "magic-string": "^0.30.5",
     "minimist": "^1.2.8",
+    "pretty-bytes": "^6.1.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

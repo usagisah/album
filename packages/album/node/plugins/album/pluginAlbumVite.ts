@@ -2,7 +2,7 @@ import { isPlainObject } from "@albumjs/tools/node"
 import compression from "vite-plugin-compression"
 import { AlbumUserPlugin } from "../plugin.dev.type.js"
 
-type VitePluginCompression = Parameters<typeof compression>
+type VitePluginCompression = Parameters<typeof compression.default>
 
 type PluginAlbumViteConfig = {
   compression?: { enable: boolean } & VitePluginCompression

@@ -1,9 +1,9 @@
 {
-  "name": "@albumjs/core",
+  "name": "@albumjs/album",
   "version": "0.2.3",
   "description": "一个组合 vite+nestjs 的集成式框架",
   "keywords": [
-    "@albumjs/core"
+    "@albumjs/album"
   ],
   "files": [
     "dist",
@@ -18,31 +18,33 @@
   "author": "顾弦笙/usagisah",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
     "./server": {
-      "types": "./dist/server.d.ts",
-      "default": "./dist/server.js"
+      "types": "./server.d.ts",
+      "default": "./server.js"
     },
     "./start": {
-      "types": "./dist/start.d.ts",
-      "default": "./dist/start.js"
+      "types": "./start.d.ts",
+      "default": "./start.js"
     },
     "./config": {
-      "types": "./dist/config.d.ts",
-      "default": "./dist/config.js"
+      "types": "./config.d.ts",
+      "default": "./config.js"
     },
-    "./utils/*": {
-      "types": "./dist/utils/*.d.ts",
-      "default": "./dist/utils/*.js"
+    "./tools": {
+      "types": "./tools.d.ts",
+      "default": "./tools.js"
     },
     "./types/*": {
       "types": "./types/*.d.ts"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
     }
   },
-  "bin": "./dist/cli/command.js",
+  "bin": {
+    "album": "./cli/command.js"
+  },
   "scripts": {
     "watch": "tsc -p node/tsconfig.json -w & tsc -p client/tsconfig.json -w"
   },
