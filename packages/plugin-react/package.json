@@ -1,0 +1,53 @@
+{
+  "name": "@albumjs/plugin-react",
+  "version": "0.2.0",
+  "description": "albumjs 的 react 插件",
+  "keywords": [
+    "@albumjs",
+    "albumjs",
+    "@albumjs/plugin-react"
+  ],
+  "homepage": "https://github.com/usagisah/plugin-react#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usagisah/plugin-react.git"
+  },
+  "license": "MIT",
+  "author": "顾弦笙/usagisah",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/plugin.d.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./album": {
+      "types": "./album.d.ts"
+    },
+    "./dist": "./dist/*",
+    "./templates/*": "./templates/*"
+  },
+  "types": "./dist/plugin.d.ts",
+  "files": [
+    "dist",
+    "templates",
+    "album.d.ts"
+  ],
+  "scripts": {
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "albumjs": "workspace:^",
+    "@albumjs/tools": "workspace:^",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "fast-glob": "^3.3.2",
+    "path-to-regexp": "^6.2.1",
+    "react": "^18.2.0",
+    "react-router-dom": "^6.20.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.3",
+    "@types/react": "^18.2.41",
+    "@types/react-dom": "^18.2.17",
+    "vite": "^5.0.4"
+  }
+}

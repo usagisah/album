@@ -20,7 +20,7 @@ export async function buildCore() {
   const pkgPath = resolvePath("album/dist/package.json")
   const file = JSON.parse(await readFile(pkgPath, "utf-8"))
   file.name = "albumjs"
-  await writeFile(pkgPath, JSON.stringify(file, 2), "utf-8")
+  await writeFile(pkgPath, JSON.stringify(file, null, 2), "utf-8")
 }
 
 export async function build(ps) {
