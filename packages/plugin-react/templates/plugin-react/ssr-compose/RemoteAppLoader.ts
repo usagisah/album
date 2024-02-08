@@ -1,5 +1,5 @@
+import { isPlainObject } from "albumjs"
 import { SSRComposeRenderRemoteComponentReturn } from "albumjs/server"
-import { isPlainObject, isString } from "albumjs/utils/check/simple"
 import { createElement, useContext } from "react"
 import { SSRContext } from "../ssr/SSRContext"
 import { SSRComposeContext } from "./SSRComposeContext"

@@ -1,5 +1,5 @@
+import { isPlainObject } from "albumjs"
 import { AlbumSSRRenderOptions } from "albumjs/server"
-import { isPlainObject } from "albumjs/utils/check/simple"
 import { renderToPipeableStream } from "react-dom/server"
 import { createSSRRouter } from "../router/createSSRRouter"
 import { SSRComposeContext } from "../ssr-compose/SSRComposeContext"
