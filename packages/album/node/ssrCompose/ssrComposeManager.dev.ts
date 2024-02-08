@@ -99,7 +99,7 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
             cssMinify: false,
             rollupOptions: {
               input,
-              external: [..._dependencies, /^@w-hite\/album/]
+              external: [..._dependencies, /^albumjs/]
             },
             lib: {
               entry: input,

@@ -54,7 +54,8 @@ export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
       result.mainSSR = _mainSSR
       result.module = {
         path: _modulePath,
-        name: module.name ?? "modules"
+        name: module.name ?? "modules",
+        ignore: module.ignore
       }
     },
     context(param) {
@@ -71,7 +72,7 @@ export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
 
       const file = appFileManager.get("file", "album-env.d.ts")
       file.write(f => {
-        const typePlugin = `/// <reference types="@w-hite/plugin-react/album" />`
+        const typePlugin = `/// <reference types="@albumjs/plugin-react/album" />`
         return f.includes(typePlugin) ? f : `${f}\n${typePlugin}`
       })
     },

@@ -8,8 +8,8 @@ export async function createFileManager({ cwd, dumpInput }: Inputs) {
     type: "file",
     file: "album-env.d.ts",
     value: file => {
-      const typeNode = `/// <reference types="@w-hite/album/types/node" />`
-      const typeVite = `/// <reference types="@w-hite/album/types/vite-client" />`
+      const typeNode = `/// <reference types="albumjs/types/node" />`
+      const typeVite = `/// <reference types="albumjs/types/vite-client" />`
       const contents: string[] = []
       if (!file.includes(typeNode)) contents.push(typeNode)
       if (!file.includes(typeVite)) contents.push(typeVite)

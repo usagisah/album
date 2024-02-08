@@ -29,7 +29,7 @@ async function moduleToRoute(mod: AppSpecialModule, ctx: ParseRouteContext) {
   const clientCompPath = mod.routePath.replaceAll("$", ":")
   const clientRoute: ClientRoute = {
     name: routeRecordName,
-    path: clientCompPath,
+    path: clientCompPath.slice(1),
     fullPath: connectPath(parentClientPath, clientCompPath),
     component: `lazyLoad(() => import("${relative(resolve(dumpInput, "plugin-react/router"), mod.pageFile.filepath)}"))`,
     router: mod.routerFile ? relative(resolve(dumpInput, "plugin-react/router"), mod.routerFile.filepath) : null,
@@ -41,7 +41,7 @@ async function moduleToRoute(mod: AppSpecialModule, ctx: ParseRouteContext) {
   const serverRoute: ServerRoute = {
     name: routeRecordName,
     reg: pathToRegexp(serverFullPath, null, { sensitive: false }),
-    path: serverCompPath,
+    path: serverCompPath.slice(1),
     fullPath: serverFullPath,
     actionPath: mod.actionFile ? relative(resolve(dumpInput, "plugin-react/ssr"), mod.actionFile.filepath) : null,
     children: []
