@@ -8,3 +8,4 @@ node_modules
 dist
 *lock*
 .album
+e2e/helpers/.pid/*

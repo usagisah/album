@@ -44,6 +44,7 @@ export interface UserConfigServer {
 }
 
 export interface AlbumUserConfig {
+  root?: string
   env?: UserConfigEnv[]
   app?: UserConfigApp | UserConfigApp[]
   ssrCompose?: UserSSRCompose

@@ -81,6 +81,7 @@ const loggerValidator = object(
 
 export function checkUserConfig(userConfig: any) {
   const res = object({
+    root: string({ invalid_type_error: "config.root 必须是一个字符串" }).optional(),
     env: envValidator,
     app: union([appValidator, array(ssrComposeValidator)], { invalid_type_error: "config.app 必须是一个对象或者数组" }).optional(),
     ssrCompose: ssrComposeValidator,

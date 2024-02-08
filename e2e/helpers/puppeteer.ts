@@ -1,24 +1,17 @@
-import puppeteer, {
-  Browser,
-  Page,
-  ClickOptions,
-  PuppeteerLaunchOptions
-} from "puppeteer"
+import { red } from "colorette"
+import puppeteer, { Browser, ClickOptions, Page, PuppeteerLaunchOptions } from "puppeteer"
 
 export const E2E_TIMEOUT = 30 * 1000
 
 const puppeteerOptions: PuppeteerLaunchOptions = {
-  headless: false,
-  devtools: true
+  headless: "new",
+  devtools: false
 }
 
 const maxTries = 30
 export const timeout = (n: number) => new Promise(r => setTimeout(r, n))
 
-export async function expectByPolling(
-  poll: () => Promise<any>,
-  expected: string
-) {
+export async function expectByPolling(poll: () => Promise<any>, expected: string) {
   for (let tries = 0; tries < maxTries; tries++) {
     const actual = (await poll()) || ""
     if (actual.indexOf(expected) > -1 || tries === maxTries - 1) {
@@ -30,7 +23,7 @@ export async function expectByPolling(
   }
 }
 
-export function setupPuppeteer() {
+export async function setupPuppeteer(pId: string) {
   let browser: Browser
   let page: Page
 
@@ -46,13 +39,19 @@ export function setupPuppeteer() {
     })
 
     page.on("console", e => {
-      if (e.type() === "error") {
-        const err = e.args()[0]
-        console.log( err.remoteObject().description )
-        console.error(
-          `Error from Puppeteer-loaded page:\n`,
-          err.remoteObject().description
-        )
+      const t = e.type()
+      switch (t) {
+        case "error": {
+          console.log(red(`browser-log:${pId} error ${e.text()}`))
+          return
+        }
+        // case "log":
+        // case "info": {
+        //   return console.log(green(`browser-log:${pId} ${t} ${e.text()}`))
+        // }
+        // default: {
+        //   console.log(gray(`browser-log:${pId} ${t} ${e.text()}`))
+        // }
       }
     })
   })
@@ -101,10 +100,7 @@ export function setupPuppeteer() {
   }
 
   async function isChecked(selector: string) {
-    return await page.$eval(
-      selector,
-      node => (node as HTMLInputElement).checked
-    )
+    return await page.$eval(selector, node => (node as HTMLInputElement).checked)
   }
 
   async function isFocused(selector: string) {
@@ -136,10 +132,7 @@ export function setupPuppeteer() {
   }
 
   async function clearValue(selector: string) {
-    return await page.$eval(
-      selector,
-      node => ((node as HTMLInputElement).value = "")
-    )
+    return await page.$eval(selector, node => ((node as HTMLInputElement).value = ""))
   }
 
   function timeout(time: number) {

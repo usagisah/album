@@ -15,8 +15,14 @@ const args = resolveNodeArgs()
 const cli = cac("album")
 cli
   .command("dev [id]", "启动开发服务器")
+  .option("--cwd [cwd]", "设置默认的，查找根目录路径")
   .example("album dev [config.app.id]")
-  .action(async appId => {
+  .action(async (appId, options) => {
+    const { cwd } = options
+    if (cwd) {
+      process.chdir(resolve(process.cwd(), cwd))
+    }
+
     let cProcess: ExecaChildProcess | null = null
     const restart = () => {
       if (cProcess) {
