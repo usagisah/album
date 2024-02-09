@@ -11,7 +11,7 @@ import { SSRModule } from "../modules/ssr/ssr.module.js"
 import { applySSRComposeDevMiddleware } from "../ssrCompose/applySSRComposeMiddleware.dev.js"
 
 export async function processServer(context: AlbumContext) {
-  const { ssr, serverManager, pluginManager, logger, getStaticInfo } = context
+  const { ssr, ssrCompose, serverManager, pluginManager, logger, getStaticInfo } = context
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
   const m = serverManager.appModule
   const apiAppModuleInput = m.input ? resolve(m.output!, m.filename) : null
@@ -31,8 +31,8 @@ export async function processServer(context: AlbumContext) {
 
   const viteDevServer = await createServer(viteConfigs)
   serverApp.use((context.viteDevServer = viteDevServer).middlewares)
-  await applySSRComposeDevMiddleware(serverApp, context)
 
+  if (ssrCompose) await applySSRComposeDevMiddleware(serverApp, context)
   if (ssr) await moduleLoader.load(() => SSRModule)
   else await moduleLoader.load(() => SpaModule)
   return { serverApp, viteDevServer }

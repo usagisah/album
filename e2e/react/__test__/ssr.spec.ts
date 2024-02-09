@@ -29,3 +29,17 @@ it("switch router", async () => {
   await p.waitForSelector("#error")
   expect(replacePlaceholder(await html("#router"))).toBe(`<h1 id="error">page error</h1>`)
 })
+
+it("main.ssr props.query & props.params", async () => {
+  const p = page()
+
+  await p.goto("http://localhost:5311")
+  await p.waitForSelector("#router")
+  expect(JSON.parse((await text("#server-params"))!)).toEqual({})
+  expect(JSON.parse((await text("#server-query"))!)).toEqual({})
+
+  await p.goto("http://localhost:5311/about/car111/?a=1&b&=c&d=4")
+  await p.waitForSelector("#router")
+  expect(JSON.parse((await text("#server-params"))!)).toEqual({ car: "car111" })
+  expect(JSON.parse((await text("#server-query"))!)).toEqual({ a: "1", b: "", d: "4" })
+})

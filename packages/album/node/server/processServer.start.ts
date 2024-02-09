@@ -8,14 +8,14 @@ import { SSRModule } from "../modules/ssr/ssr.module.js"
 import { applySSRComposeStartMiddleware } from "../ssrCompose/applySSRComposeMiddleware.start.js"
 
 export async function processServer(context: AlbumContext) {
-  const { ssr, inputs, logger } = context
+  const { ssr, ssrCompose, inputs, logger } = context
   const { apiAppInput } = inputs
   const midConfigs = expressConfigs(context)
 
   const serverApp = await NestFactory.create(await loadRsModule(apiAppInput, false), { logger })
   const moduleLoader = serverApp.get(LazyModuleLoader)
   await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
-  await applySSRComposeStartMiddleware(serverApp, context, midConfigs)
+  if (ssrCompose) await applySSRComposeStartMiddleware(serverApp, context, midConfigs)
   for (const { enable, name, config, factory } of midConfigs) {
     if (!enable) continue
     try {

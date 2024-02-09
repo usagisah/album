@@ -6,8 +6,6 @@ import { SSRComposeModule } from "../modules/ssr-compose/ssr-compose.module.js"
 import { normalizeMidRequestOptions } from "./normalizeMidRequestOptions.js"
 
 export async function applySSRComposeDevMiddleware(app: INestApplication<any>, context: AlbumContext) {
-  const { ssrCompose } = context
-  if (!ssrCompose) return
   await app.get(LazyModuleLoader).load(() => SSRComposeModule)
 
   const { ssrComposeManager } = context

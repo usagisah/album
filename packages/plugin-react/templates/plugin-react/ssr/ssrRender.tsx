@@ -7,7 +7,7 @@ import { SSRContext } from "./SSRContext"
 import { SSRServerShared } from "./SSRServerShared"
 import { resolveActionRouteData } from "./resolveActionRouteData"
 // @ts-expect-error
-import userSsrEntry from "'$mainServerPath$'"
+import userSSREntry from "'$mainServerPath$'"
 import { Writable } from "stream"
 
 export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
@@ -16,9 +16,10 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   const { sendMode } = ssrContext.ssrRender
   const { sources } = ssrComposeContext ?? {}
   const { PreRender, mainEntryPath, browserScript } = await SSRServerShared.resolveContext(renderOptions)
-  const { App = null, Head = null, data } = await (userSsrEntry as any)(createSSRRouter(req.originalUrl), ssrContext)
 
-  Object.assign(serverRouteData, await resolveActionRouteData(ssrContext), isPlainObject(data) ? data : {})
+  const actionData = await resolveActionRouteData(ssrContext)
+  const { App = null, Head = null, data } = await (userSSREntry as any)(createSSRRouter(req.originalUrl), ssrContext)
+  Object.assign(serverRouteData, actionData, isPlainObject(data) ? data : {})
 
   let app = (
     <SSRContext.Provider value={ssrContext}>
