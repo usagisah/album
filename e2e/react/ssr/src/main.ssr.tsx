@@ -14,6 +14,6 @@ export default function mainSSR(AppRouter: AppRouterFC, props: SSRProps) {
         </div>
       </>
     ),
-    data: { aa: "server-router-mainSSR" }
+    data: { mainSSR: "server-router-mainSSR" }
   }
 }

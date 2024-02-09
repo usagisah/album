@@ -43,3 +43,10 @@ it("main.ssr props.query & props.params", async () => {
   expect(JSON.parse((await text("#server-params"))!)).toEqual({ car: "car111" })
   expect(JSON.parse((await text("#server-query"))!)).toEqual({ a: "1", b: "", d: "4" })
 })
+
+it("server router data", async () => {
+  const p = page()
+  await p.goto("http://localhost:5311/action")
+  await p.waitForSelector("#server-router-data")
+  expect(JSON.parse((await text("#server-router-data"))!)).toEqual({ action: "from page action", mainSSR: "server-router-mainSSR" })
+})

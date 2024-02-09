@@ -159,8 +159,8 @@ export class DirStruct {
       let file = this.#files.get(key) as DirStruct
       if (!file) {
         file = new DirStruct({ path: resolve(this.path, name) })
-        file.write()
         this.#files.set(key, file)
+        await file.write()
       }
       return file.add({ type, file: filePaths.slice(1), value, force })
     }
