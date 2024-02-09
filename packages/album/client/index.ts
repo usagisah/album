@@ -123,5 +123,5 @@ export function registryHookIfAbsent(name: string, value: any) {
   return false
 }
 
-export * from "@albumjs/tools/request/index"
 export * from "@albumjs/tools/check/simple"
+export * from "@albumjs/tools/request/index"

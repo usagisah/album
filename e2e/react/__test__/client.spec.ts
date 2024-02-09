@@ -51,3 +51,15 @@ it("config.app.module.ignore", async () => {
   await timeout(100)
   expect(await html("#router")).toBe(`<h1 id="error">page error</h1>`)
 })
+
+it("client-hook  useLoader, useRouter, useRoutes, useRoutesMap", async () => {
+  const p = page()
+  await p.goto("http://localhost:5211/routerHook?a=1")
+  await p.waitForSelector("div")
+  await timeout(10)
+
+  expect(JSON.parse(await html("#useLoader"))).toEqual(["success", 9])
+  expect(JSON.parse(await html("#useRouter"))).toEqual({ query: { a: 1 }, meta: { message: "routerHook page router" } })
+  expect(Number(await html("#useRoutes"))).toBeGreaterThanOrEqual(4)
+  expect(Number(await html("#useRoutesMap"))).toBeGreaterThanOrEqual(4)
+})
