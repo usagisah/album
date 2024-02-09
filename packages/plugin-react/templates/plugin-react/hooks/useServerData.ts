@@ -19,13 +19,11 @@ export function useServerData(id: string, fn: any) {
     }
 
     throw new Promise(async resolve => {
-      let res: any = null
       try {
-        res = await fn(ctx)
+        serverDynamicData[id] = await fn(ctx)
       } catch (e: any) {
         logger.error(e, "useServerData")
       } finally {
-        serverDynamicData[id] = res
         resolve(null)
       }
     })

@@ -50,3 +50,11 @@ it("server router data", async () => {
   await p.waitForSelector("#server-router-data")
   expect(JSON.parse((await text("#server-router-data"))!)).toEqual({ action: "from page action", mainSSR: "server-router-mainSSR" })
 })
+
+it("server hooks useServer, useServerData, useServerRouteData", async () => {
+  const p = page()
+  await p.goto("http://localhost:5311/hooks")
+  await p.waitForSelector("#hooks")
+  expect(JSON.parse((await text("#useServerRouteData"))!)).toEqual({ mainSSR: "server-router-mainSSR" })
+  expect(JSON.parse((await text("#useServerData"))!)).toEqual({ hooksPage: "from hooks page" })
+})

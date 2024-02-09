@@ -4,11 +4,7 @@ import { SSRContext } from "../ssr/SSRContext"
 let data: any = null
 
 export function useServerRouteData() {
-  if (import.meta.env.SSR) {
-    const { serverRouteData } = useContext(SSRContext)
-    return { ...serverRouteData }
-  }
-
+  if (import.meta.env.SSR) return { ...useContext(SSRContext)?.serverRouteData }
   if (data) return data
 
   const elem = document.getElementById("server-router-data")
