@@ -9,11 +9,20 @@ export async function processClient(context: AlbumContext) {
   await initClient(context)
 
   if (watcher) {
-    const patch = (p: string) => {
-      if (pageReg.test(p)) patchClient(context)
+    const filter = (type: string) => {
+      const { modulePath } = context.appManager.module
+      return (p: string) => {
+        if (!p.startsWith(modulePath)) {
+          return
+        }
+        if (type === "unlinkDir" || pageReg.test(p)) {
+          patchClient(context)
+        }
+      }
     }
-    watcher.on("add", patch)
-    watcher.on("unlink", patch)
-    watcher.on("unlinkDir", () => patchClient(context))
+    watcher.on("add", filter("add"))
+    watcher.on("unlink", filter("add"))
+    watcher.on("unlinkDir", filter("unlinkDir"))
+    watcher.add(context.appManager.module.modulePath)
   }
 }

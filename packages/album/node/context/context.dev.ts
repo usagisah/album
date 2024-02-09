@@ -3,6 +3,7 @@ import { watch } from "chokidar"
 import { resolve, sep } from "path"
 import { createAppManager } from "../app/appManager.dev.js"
 import { ServerMode } from "../cli/cli.type.js"
+import { SYSTEM_RESTART } from "../constants.js"
 import { registryEnv } from "../env/env.dev.js"
 import { ILogger } from "../logger/logger.type.js"
 import { createServerManager } from "../server/serverManager.dev.js"
@@ -37,6 +38,11 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       ignoreInitial: true,
       usePolling: false,
       alwaysStat: false
+    })
+    watcher.on("change", p => {
+      if (p === albumConfigInput) {
+        process.stdout.write(SYSTEM_RESTART)
+      }
     })
 
     const ssrCompose = !!userConfig.ssrCompose

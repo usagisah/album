@@ -99,6 +99,12 @@ export class DirStruct {
     return this.#files
   }
 
+  toJSON(): any {
+    return Array.from(this.#files).map(([key, value]) => {
+      return value.type === "file" ? { path: value.path, name: value.name } : [key, value.toJSON()]
+    })
+  }
+
   get<T extends FileType>(type: T, filePaths: string): (T extends "file" ? FileStruct : DirStruct) | null {
     if (!isString(filePaths)) return null
     const names = filePaths.split("/").filter(Boolean)
@@ -146,12 +152,14 @@ export class DirStruct {
     if (!["file", "dir"].includes(type)) return false
     if (isString(filePaths)) filePaths = filePaths.split("/").filter(v => v.length > 0)
     if (!Array.isArray(filePaths) || filePaths.length === 0) return false
+
     if (filePaths.length > 1) {
       const name = filePaths[0]
       const key = buildFileKey("dir", name)
-      let file = this.#files.get(key)
-      if (!file || file.type !== "dir") {
-        file = await new DirStruct({ path: resolve(this.path, name) }).write()
+      let file = this.#files.get(key) as DirStruct
+      if (!file) {
+        file = new DirStruct({ path: resolve(this.path, name) })
+        file.write()
         this.#files.set(key, file)
       }
       return file.add({ type, file: filePaths.slice(1), value, force })
@@ -162,10 +170,14 @@ export class DirStruct {
 
     const name = filePaths[0]
     let fileIns: FileStruct | DirStruct
-    if (type === "file") fileIns = await new FileStruct({ path: resolve(this.path, name) }).write(value as any, force)
-    else fileIns = await new DirStruct({ path: resolve(this.path, name) }).write(force)
+    if (type === "file") {
+      fileIns = new FileStruct({ path: resolve(this.path, name) })
+      await fileIns.write(value as any, force)
+    } else {
+      fileIns = new DirStruct({ path: resolve(this.path, name) })
+      await fileIns.write(force)
+    }
     this.#files.set(key, fileIns)
-
     return true
   }
 }
