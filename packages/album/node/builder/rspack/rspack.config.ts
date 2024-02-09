@@ -42,34 +42,35 @@ export async function createRsConfig(config: RsBuildConfig): Promise<RspackOptio
       rules: [
         {
           test: /\.node$/,
-          use: [
-            {
-              loader: "node-loader",
-              options: {
-                name: "[name].[hash].[ext]"
-              }
-            }
-          ]
+          loader: "node-loader",
+          options: {
+            name: "[name].[hash].[ext]"
+          }
         },
         {
           test: /\.ts$/,
-          use: {
-            loader: "builtin:swc-loader",
-            options: {
-              jsc: {
-                parser: {
-                  syntax: "typescript",
-                  decorators: true
-                },
-                transform: {
-                  legacyDecorator: true,
-                  decoratorMetadata: true
-                }
+          exclude: [/node_modules/],
+          loader: "builtin:swc-loader",
+          type: "javascript/auto",
+          options: {
+            jsc: {
+              parser: {
+                syntax: "typescript",
+                decorators: true
+              },
+              transform: {
+                legacyDecorator: true,
+                decoratorMetadata: true
               }
             }
           }
         }
       ]
+    },
+    experiments: {
+      rspackFuture: {
+        disableApplyEntryLazily: true
+      }
     },
     optimization: {
       minimize: isProd
