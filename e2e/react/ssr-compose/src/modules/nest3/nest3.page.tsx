@@ -8,8 +8,8 @@ const LocalAppLoader = createRemoteAppLoader({
 export default function Page() {
   return (
     <>
-      <h1 id="remote1">page remote1</h1>
-      <LocalAppLoader sourcePath="remote2/remote2.page.tsx" />
+      <h1 id="nest3">page nest3</h1>
+      <LocalAppLoader sourcePath="nest4/nest4.page.tsx" />
     </>
   )
 }

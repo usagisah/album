@@ -1,15 +1,15 @@
 import { createRemoteAppLoader } from "albumjs"
 
 const LocalAppLoader = createRemoteAppLoader({
-  remote: true,
-  url: "http://localhost:5421"
+  remote: false,
+  url: "localhost"
 })
 
 export default function Page() {
   return (
     <>
-      <h1 id="remote1">page remote1</h1>
-      <LocalAppLoader sourcePath="remote2/remote2.page.tsx" />
+      <h1 id="nest2">page nest2</h1>
+      <LocalAppLoader sourcePath="nest3/nest3.page.tsx" />
     </>
   )
 }

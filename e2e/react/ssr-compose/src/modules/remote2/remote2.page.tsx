@@ -4,7 +4,7 @@ import "./style.css"
 
 const LocalAppLoader = createRemoteAppLoader({
   remote: true,
-  url: "http://localhost:5173"
+  url: "http://localhost:5421"
 })
 const LazyComponent = lazy(() => import("./lazy"))
 

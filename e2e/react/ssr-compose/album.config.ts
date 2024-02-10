@@ -10,7 +10,7 @@ export default defineConfig({
   },
   app: [
     {
-      id: "local1",
+      id: "local",
       module: {
         path: "src/modules/local1",
         name: "modules"
@@ -19,25 +19,7 @@ export default defineConfig({
       mainSSR: "src/main.ssr"
     },
     {
-      id: "local2",
-      module: {
-        path: "src/modules/local2",
-        name: "modules"
-      },
-      ssrRender: { sendMode: "string" },
-      mainSSR: "src/main.ssr"
-    },
-    {
-      id: "local3",
-      module: {
-        path: "src/modules/local3",
-        name: "modules"
-      },
-      ssrRender: { sendMode: "string" },
-      mainSSR: "src/main.ssr"
-    },
-    {
-      id: "remote1",
+      id: "remote",
       module: {
         path: "src/modules/remote1",
         name: "modules"
@@ -46,32 +28,18 @@ export default defineConfig({
       mainSSR: "src/main.ssr"
     },
     {
-      id: "remote2",
+      id: "nest",
       module: {
-        path: "src/modules/remote2",
+        path: "src/modules/nest1",
         name: "modules"
       },
       ssrRender: { sendMode: "pipe" },
-      mainSSR: "src/main.ssr"
-    },
-    {
-      id: "remote3",
-      module: {
-        path: "src/modules/remote3",
-        name: "modules"
-      },
-      ssrRender: { sendMode: "pipe" },
-      mainSSR: "src/main.ssr"
-    },
-    {
-      id: "home",
-      module: {
-        path: "src/modules/home",
-        name: "modules"
-      },
       mainSSR: "src/main.ssr"
     }
   ],
+  server: {
+    port: 5421
+  },
   ssrCompose: {
     // <RemoteAppLoad sourcePath="compose3/page/3" />
     // rewrites: [
