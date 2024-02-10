@@ -1,7 +1,3 @@
 export default function Page() {
-  return (
-    <>
-      <h1>page error1</h1>
-    </>
-  )
+  return <h1 id="error">page error</h1>
 }

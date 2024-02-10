@@ -3,7 +3,7 @@ import { initClient } from "./initClient.js"
 import { patchClient } from "./patchClient.js"
 
 const specialModuleReg = /\.?(page|router|action)\.[a-z]+$/
-const pageModuleReg = /\.?page\.[a-z]+$/
+ 
 
 export async function processClient(context: AlbumContext) {
   const { watcher } = context

@@ -1,22 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "target": "ES2021",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "strict": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": false,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "outDir": "./dist",
     "baseUrl": ".",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": true,
+    "skipDefaultLibCheck": true,
+    "resolveJsonModule": true,
     "paths": {
       "@modules/*": [
         "src/modules/*"
@@ -28,20 +33,12 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.d.ts",
     "src/**/*.tsx",
     ".album/**/*.ts",
     ".album/**/*.tsx",
-    "album-env.d.ts",
-    "album-config.ts"
+    "**/*.d.ts"
   ],
   "exclude": [
-    "src/main.server.ts",
-    "src/api/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.server.json"
-    }
+    "node_modules"
   ]
 }

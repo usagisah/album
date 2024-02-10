@@ -31,7 +31,7 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
   }
 
   const _startRoot = startRoot ? `${inputs.cwd}${sep}${startRoot}` : ""
-  if (!existsSync(_startRoot) || !statSync(_startRoot).isDirectory()) throw `ssr-compose 指定的 startRoot 不合法`
+  if (_startRoot && (!existsSync(_startRoot) || !statSync(_startRoot).isDirectory())) throw `ssr-compose 指定的 startRoot 不合法`
 
   const _dependencies = dependencies ? [...new Set(dependencies)] : []
 

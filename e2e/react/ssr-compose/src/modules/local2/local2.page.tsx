@@ -1,21 +1,21 @@
+import { createRemoteAppLoader } from "albumjs"
 import { Suspense, lazy } from "react"
 import "./style.css"
-import { createRemoteAppLoader } from "@w-hite/album"
 
 const LocalAppLoader = createRemoteAppLoader({
   remote: false,
   url: "localhost"
 })
-const LazyComponent = lazy(() => import("./aa"))
+const LazyComponent = lazy(() => import("./lazy"))
 
-export default function Compose3Page() {
+export default function Page() {
   return (
     <>
-      <h1>page compose3+++\\\</h1>
+      <h1 id="local2">page local2</h1>
       <Suspense>
         <LazyComponent />
       </Suspense>
-      <LocalAppLoader sourcePath="compose4/page/4" />
+      <LocalAppLoader sourcePath="local3/local3.page.tsx" />
     </>
   )
 }
