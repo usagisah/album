@@ -14,7 +14,7 @@ export async function createFileManager({ cwd, dumpInput }: Inputs) {
       if (!file.includes(typeNode)) contents.push(typeNode)
       if (!file.includes(typeVite)) contents.push(typeVite)
       if (contents.length === 0) return file
-      else return file + "\n" + contents.join("\n")
+      else return contents.join("\n")
     }
   })
   return { dumpFileManager, appFileManager }

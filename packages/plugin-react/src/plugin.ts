@@ -73,7 +73,7 @@ export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
       const file = appFileManager.get("file", "album-env.d.ts")
       file.write(f => {
         const typePlugin = `/// <reference types="@albumjs/plugin-react/album" />`
-        return f.includes(typePlugin) ? f : `${f}\n${typePlugin}`
+        return f.includes(typePlugin) ? f : `${typePlugin}\n`
       })
     },
     async patchClient(param) {
