@@ -25,8 +25,7 @@ export class SSRComposeController {
 
     const albumContext = this.context.getContext()
     const { logger } = albumContext
-    const { prefix, pathname } = req.albumOptions
-    const sourcePath = prefix + pathname
+    const sourcePath = req.albumOptions.pathname
 
     try {
       const ssrComposeContext = this.context.createSSRComposeContext()

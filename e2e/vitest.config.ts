@@ -9,6 +9,11 @@ export default defineConfig({
     testTimeout: E2E_TIMEOUT,
     hookTimeout: E2E_TIMEOUT,
     restoreMocks: true,
-    globalSetup: [resolve(__dirname, "setup.global.ts")]
+    globalSetup: [resolve(__dirname, "setup.global.ts")],
+    poolOptions: {
+      threads: {
+        singleThread: true
+      }
+    }
   }
 })

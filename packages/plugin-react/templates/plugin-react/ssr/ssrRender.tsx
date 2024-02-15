@@ -32,7 +32,9 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
       </html>
     </SSRContext.Provider>
   )
-  if (ssrCompose) app = <SSRComposeContext.Provider value={ssrComposeContext!}>{app}</SSRComposeContext.Provider>
+  if (ssrCompose) {
+    app = <SSRComposeContext.Provider value={ssrComposeContext!}>{app}</SSRComposeContext.Provider>
+  }
 
   const { pipe } = renderToPipeableStream(app, {
     onShellReady() {

@@ -49,3 +49,19 @@ it("nest", async () => {
   expect(await html("#nest3")).toBe(`page nest3`)
   expect(await html("#nest4")).toBe(`page nest4`)
 })
+
+it("home", async () => {
+  const { port } = await setupProject(pId, "dev", ["home"])
+  const p = page()
+  await p.goto(`http://localhost:${port}`)
+  await p.waitForSelector("#home")
+  expect(await html("#home")).toBe(`page home`)
+})
+
+it("error", async () => {
+  const { port } = await setupProject(pId, "dev", ["error"])
+  const p = page()
+  await p.goto(`http://localhost:${port}/xx`)
+  await p.waitForSelector("#error")
+  expect(await html("#error")).toBe(`page error`)
+})
