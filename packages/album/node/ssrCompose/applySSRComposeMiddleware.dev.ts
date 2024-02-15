@@ -12,10 +12,11 @@ export async function applySSRComposeDevMiddleware(app: INestApplication<any>, c
   const { projectMap } = ssrComposeManager!
   app.use(function (req: Request, res: Response, next: NextFunction) {
     const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectMap)
-    const { prefix, url } = albumOptions
     req.albumOptions = albumOptions
-    if (!projectMap.has(prefix)) return res.status(404).send()
-    req.url = url
+    if (!projectMap.has(albumOptions.prefix)) {
+      return res.status(404).send()
+    }
+    req.url = albumOptions.url
     next()
   })
 }

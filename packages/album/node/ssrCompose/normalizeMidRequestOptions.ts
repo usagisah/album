@@ -1,22 +1,24 @@
 const placeholderHost = "a://a"
 export function normalizeMidRequestOptions(path: string, projectMap: Map<any, any>) {
   const url = new URL(placeholderHost + path)
-  let pathnames = url.pathname.split("/")
-
-  let prefix = pathnames[1].toLowerCase()
-  let pathname = ""
-  if (prefix === "") {
-    prefix = "home"
-    pathnames = ["/", "home", ...pathnames.slice(2)]
-  }
-  if (projectMap.has(prefix)) {
-    pathname = "/" + pathnames.slice(2).join("/")
-  } else {
-    prefix = "error"
-    pathname = pathnames.join("/")
-  }
-
   const originalPathname = url.pathname
+
+  let pathname = url.pathname.slice(1)
+  let [_prefix, ..._pathnames] = pathname.split("/")
+  _prefix = _prefix.toLowerCase()
+
+  if (projectMap.has(_prefix)) {
+    pathname = "/" + _prefix + "/" + _pathnames.join("/")
+  } else if (_prefix === "home" && projectMap.has("home")) {
+    pathname = "/" + _pathnames.join("/")
+  } else if (_prefix === "" && projectMap.has("home")) {
+    _prefix = "home"
+    pathname = originalPathname
+  } else {
+    _prefix = "error"
+    pathname = originalPathname
+  }
+
   url.pathname = pathname
-  return { pathname, prefix, originalPathname, url: url.toString().slice(placeholderHost.length) }
+  return { pathname, prefix: _prefix, originalPathname, url: url.toString().slice(placeholderHost.length) }
 }

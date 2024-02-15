@@ -10,6 +10,24 @@ export default defineConfig({
   },
   app: [
     {
+      id: "home",
+      module: {
+        path: "src/modules/home",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "string" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "error",
+      module: {
+        path: "src/modules/error",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "pipe" },
+      mainSSR: "src/main.ssr"
+    },
+    {
       id: "local",
       module: {
         path: "src/modules/local1",

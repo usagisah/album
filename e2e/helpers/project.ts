@@ -1,15 +1,23 @@
 import { execa } from "execa"
-import { writeFile } from "fs/promises"
+import { rm, writeFile } from "fs/promises"
 import { resolve } from "path"
 
-export function setupProject(pkgRoot: string, scriptName: string) {
-  return new Promise<void>((success, fail) => {
-    const p = execa("npm", ["run", scriptName, "--prefix", resolve(__dirname, "../", pkgRoot)])
+export function setupProject(pkgRoot: string, scriptName: string, params: string[] = []) {
+  async function kill(id?: number) {
+    if (!id) return
+    process.kill(id)
+    await rm(resolve(__dirname, ".pid", id + ""), { force: true })
+  }
+
+  return new Promise<{ kill: () => Promise<void>; port: number }>((success, fail) => {
+    const p = execa("npm", ["run", scriptName, "--prefix", resolve(__dirname, "../", pkgRoot), ...params])
+    const pid = p.pid
     p.stdout!.on("data", async chunk => {
-      if ((chunk + "").toString().includes("listen")) {
-        success()
-        if (p.pid) {
-          await writeFile(resolve(__dirname, ".pid", p.pid.toString()), "")
+      const message = chunk + ""
+      if (message.includes("listen")) {
+        success({ kill: () => kill(pid), port: Number(message.match(/localhost:(\d+)/)![1]) })
+        if (pid) {
+          await writeFile(resolve(__dirname, ".pid", pid.toString()), "")
         }
       }
     })

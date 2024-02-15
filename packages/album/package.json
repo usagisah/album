@@ -61,6 +61,7 @@
     "express": "^4.18.2",
     "helmet": "^7.1.0",
     "mlly": "^1.5.0",
+    "portfinder": "^1.0.32",
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.1",
     "sirv": "^2.0.4",

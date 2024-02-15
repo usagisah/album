@@ -3,6 +3,7 @@ import { resolve } from "path"
 import { Inputs } from "../context/context.dev.type.js"
 import { UserConfigServer } from "../user/user.dev.type.js"
 import { ServerManager } from "./server.dev.type.js"
+import portfinder from "portfinder"
 
 export async function createServerManager(input: Inputs, userConfigServer?: UserConfigServer) {
   const { port, appModule, tsconfig } = userConfigServer ?? {}
@@ -33,9 +34,15 @@ export async function createServerManager(input: Inputs, userConfigServer?: User
     }
   }
 
+  let _port = isNumber(port) ? port : 5173
+  _port = await portfinder.getPortPromise({
+    port: _port,
+    stopPort: _port + 100
+  })
+
   const appModuleFilename = "main.server.js"
   const manager: ServerManager = {
-    port: isNumber(port) ? port : 5173,
+    port: _port,
     appModule: {
       filename: appModuleFilename,
       input: _appModule,

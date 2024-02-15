@@ -73,7 +73,7 @@ export async function setupPuppeteer(pId: string) {
   }
 
   async function text(selector: string) {
-    return await page.$eval(selector, node => node.textContent)
+    return (await page.$eval(selector, node => node.textContent))!
   }
 
   async function value(selector: string) {
