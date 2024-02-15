@@ -50,9 +50,11 @@ export type SSRProps = {
   [key: string]: any
 }
 
-export let useServer = createEmptyHook<(fn: (context: SSRProps) => any) => Promise<void>>("useServer")
-
-export let useServerData: <T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>) => T = createEmptyHook<any>("useServerData")
+type UseServer = {
+  (fn: (context: SSRProps) => any): Promise<void>
+  <T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>): T
+}
+export let useServer = createEmptyHook<UseServer>("useServer")
 
 export let useServerRouteData = createEmptyHook<() => any>("useServerRouteData")
 
@@ -80,9 +82,6 @@ export function registryHook(name: string, value: any) {
     case "useServer":
       useServer = value
       return true
-    case "useServerData":
-      useServerData = value
-      return true
     case "useServerRouteData":
       useServerRouteData = value
       return true
@@ -109,9 +108,6 @@ export function registryHookIfAbsent(name: string, value: any) {
       return true
     case "useServer":
       if (!useServer) useServer = value
-      return true
-    case "useServerData":
-      if (!useServerData) useServerData = value
       return true
     case "useServerRouteData":
       if (!useServerRouteData) useServerRouteData = value

@@ -10,7 +10,7 @@ export function buildMainParams(param: PluginPatchClientParam) {
   let RemoteAppLoader = ""
 
   if (ssr) {
-    ssr_hooks_registry = 'import { useServer } from "./plugin-react/hooks/useServer"\nimport { useServerData } from "./plugin-react/hooks/useServerData"\nimport { useServerRouteData } from "./plugin-react/hooks/useServerRouteData"\nregistryHook("useServer", useServer)\nregistryHook("useServer", useServer)\nregistryHook("useServerData", useServerData)\nregistryHook("useServerRouteData", useServerRouteData)'
+    ssr_hooks_registry = 'import { useServer } from "./plugin-react/hooks/useServer"\nimport { useServerRouteData } from "./plugin-react/hooks/useServerRouteData"\nregistryHook("useServer", useServer)\nregistryHook("useServer", useServer)\nregistryHook("useServerRouteData", useServerRouteData)'
   }
 
   if (ssrCompose) {

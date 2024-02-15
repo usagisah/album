@@ -19,7 +19,6 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
     const ssrConfigs = [
       { type: "file", template: "main.ssr.tsx", params: {} },
       { type: "file", template: "plugin-react/hooks/useServer.ts", params: {} },
-      { type: "file", template: "plugin-react/hooks/useServerData.ts", params: {} },
       { type: "file", template: "plugin-react/hooks/useServerRouteData.ts", params: {} },
       {
         type: "file",

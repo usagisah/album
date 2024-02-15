@@ -1,9 +1,9 @@
-import { useServerData } from "albumjs"
+import { useServer } from "albumjs"
 import { useState } from "react"
 import "./style1.css"
 
 export default function ff() {
-  useServerData("remote3", async props => {
+  useServer("remote3", async props => {
     return { remote3: "remote3" }
   })
   const [n, add] = useState(0)

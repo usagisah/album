@@ -1,9 +1,9 @@
-import { useServerData } from "albumjs"
+import { useServer } from "albumjs"
 import { useState } from "react"
 import "./style1.css"
 
 export default function ff() {
-  useServerData("local2", async props => {
+  useServer("local2", async props => {
     return { local2: "local2" }
   })
   const [n, add] = useState(0)

@@ -1,9 +1,9 @@
-import { useServerData } from "albumjs"
+import { useServer } from "albumjs"
 import { useState } from "react"
 import "./style1.css"
 
 export default function lazy() {
-  useServerData("remote2", async props => {
+  useServer("remote2", async props => {
     return { "remote2-lazy": "remote2" }
   })
   const [n, add] = useState(0)

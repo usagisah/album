@@ -4,7 +4,6 @@ import { StaticRouter } from "react-router-dom/server"
 import { useLoader } from "../hooks/useLoader"
 import { useRouter } from "../hooks/useRouter"
 import { useServer } from "../hooks/useServer"
-import { useServerData } from "../hooks/useServerData"
 import { useServerRouteData } from "../hooks/useServerRouteData"
 import { AppRoutes, routes, routesMap } from "./routes"
 
@@ -13,7 +12,6 @@ registryHook("useRoutesMap", () => routesMap)
 registryHook("useRouter", useRouter)
 registryHook("useLoader", useLoader)
 registryHook("useServer", useServer)
-registryHook("useServerData", useServerData)
 registryHook("useServerRouteData", useServerRouteData)
 "$RemoteAppLoader$"
 

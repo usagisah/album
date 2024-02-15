@@ -22,6 +22,7 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Alb
   const baseConfig: InlineConfig = {
     base: ssrCompose && serverMode === "build" ? appId : undefined,
     root: cwd,
+    configFile: false,
     server: {
       middlewareMode: true,
       watch: {
