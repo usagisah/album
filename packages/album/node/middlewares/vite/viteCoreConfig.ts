@@ -10,9 +10,22 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Alb
   const { appId, serverMode, ssr, ssrCompose, inputs, env, logger } = context
   const { cwd } = inputs
   const [_config, pluginOptions] = !forceClient && ssr ? createSSRCoreConfig(context) : createSPACoreConfig(context)
+
   const basePlugins: PluginOption = {
     name: configName,
-    configResolved: config => (Object.assign(config.env, env), undefined)
+    config(config) {
+      if (serverMode === "build") {
+        if (!config.define) {
+          config.define = {}
+        }
+        for (const k in env) {
+          config.define["import.meta.env." + k] = `"${env[k]}"`
+        }
+      }
+    },
+    configResolved: config => {
+      ;(config as any).env = { ...env, ...config.env }
+    }
   }
   for (const key of Object.getOwnPropertyNames(pluginOptions)) {
     if (key === "name") continue

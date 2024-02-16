@@ -49,12 +49,16 @@ cli
 cli
   .command("build [id]", "打包应用")
   .example("album build [config.app.id]")
-  .action(appId => albumBuild({ appId: appId ?? "default", args }))
+  .action(appId => {
+    albumBuild({ appId: appId ?? "default", args })
+  })
 
 cli
   .command("start [root]", "启动生产服务器")
   .example("album start")
-  .action(() => albumStartServer({ args }))
+  .action(() => {
+    albumStartServer({ args })
+  })
 
 try {
   cli.help().version(version).parse()

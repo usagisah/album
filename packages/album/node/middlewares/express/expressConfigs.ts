@@ -8,6 +8,7 @@ import { AlbumServerExpressConfig } from "../middlewares.type.js"
 type Context = DevContext | StartContext
 
 export function expressConfigs(context: Context) {
+  if (context.serverMode === "build") return []
   return context.env.mode === "production" ? prodOptions(context) : devOptions(context)
 }
 
@@ -62,6 +63,6 @@ function prodOptions(context: Context): AlbumServerExpressConfig[] {
   return [
     { ...helmetConfig, enable: isStart },
     { ...compressionConfig, enable: isStart },
-    { ...sirvConfig(root, true, !ssr), enable: isStart }
+    { ...sirvConfig(root, false, !ssr), enable: isStart }
   ]
 }

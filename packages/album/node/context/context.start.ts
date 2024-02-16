@@ -40,11 +40,15 @@ export async function createContext({ args }: StartServerParams): Promise<AlbumC
       ssrInput = dirname(mainSSRInput)
       clientInput = resolve(ssrInput, "../client")
       if (!existsSync(clientInput)) throw "找不到 client 的入口文件夹，请检查目录格式是否正确"
+    } else {
+      clientInput = root
     }
 
     const { port, appModule } = serverConfig
     const apiAppInput = appModule.input
-    if (apiAppInput && (!existsSync(apiAppInput) || !statSync(apiAppInput).isFile())) throw "指定的 apiAppModule 必须是一个指向文件的路径"
+    if (apiAppInput && (!existsSync(apiAppInput) || !statSync(apiAppInput).isFile())) {
+      throw "指定的 apiAppModule 必须是一个指向文件的路径"
+    }
 
     return {
       serverMode: "start",
@@ -56,7 +60,7 @@ export async function createContext({ args }: StartServerParams): Promise<AlbumC
       cacheConfig,
       appManager: appConfig,
       serverManager: { port },
-      ssrComposeManager: await createSSRComposeManager(root, cacheConfig.ssrComposeConfig)
+      ssrComposeManager: ssrCompose && await createSSRComposeManager(root, cacheConfig.ssrComposeConfig)
     }
   } catch (e) {
     logger! ? logger.error(e, "album") : console.error(e)

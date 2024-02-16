@@ -22,7 +22,7 @@ export interface CacheConfig {
   }
   serverConfig: {
     port: number
-    appModule: { input: string }
+    appModule: { input: string | null }
   }
   ssrComposeConfig: {
     rewrites: string[]

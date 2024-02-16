@@ -19,7 +19,7 @@ export async function buildCache(context: AlbumContext) {
     appConfig: { ssrRender },
     serverConfig: {
       port,
-      appModule: { input: `${outputs.apiOutDir}${sep}${appModule.filename}` }
+      appModule: { input: appModule.input ? `${outputs.apiOutDir}${sep}${appModule.filename}` : null }
     },
     ssrComposeConfig: {
       rewrites: ssrComposeManager ? ssrComposeManager.rewrites.encode.map(f => f.toString()) : []
