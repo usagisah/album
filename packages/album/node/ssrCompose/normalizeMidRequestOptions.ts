@@ -8,7 +8,7 @@ export function normalizeMidRequestOptions(path: string, projectMap: Map<any, an
   _prefix = _prefix.toLowerCase()
 
   if (projectMap.has(_prefix)) {
-    pathname = "/" + _prefix + "/" + _pathnames.join("/")
+    pathname = "/" + _pathnames.join("/")
   } else if (_prefix === "home" && projectMap.has("home")) {
     pathname = "/" + _pathnames.join("/")
   } else if (_prefix === "" && projectMap.has("home")) {
@@ -20,5 +20,11 @@ export function normalizeMidRequestOptions(path: string, projectMap: Map<any, an
   }
 
   url.pathname = pathname
-  return { pathname, prefix: _prefix, originalPathname, url: url.toString().slice(placeholderHost.length) }
+  return {
+    pathname,
+    prefix: _prefix,
+    url: url.toString().slice(placeholderHost.length),
+    originalPathname,
+    originalUrl: path
+  }
 }

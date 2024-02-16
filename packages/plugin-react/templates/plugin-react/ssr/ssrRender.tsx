@@ -18,7 +18,7 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   const { PreRender, mainEntryPath, browserScript } = await SSRServerShared.resolveContext(renderOptions)
 
   const actionData = await resolveActionRouteData(ssrContext)
-  const { App = null, Head = null, data } = await (userSSREntry as any)(createSSRRouter(req.url), ssrContext)
+  const { App = null, Head = null, data } = await (userSSREntry as any)(createSSRRouter(req.albumOptions.originalUrl ?? req.url), ssrContext)
   Object.assign(serverRouteData, actionData, isPlainObject(data) ? data : {})
 
   let app = (

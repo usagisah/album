@@ -49,9 +49,7 @@ export async function albumBuild(params: DevServerParams) {
     await pluginManager.execute("buildEnd", {})
 
     logger.log("所有资源打包完毕", "album")
-    process.exit(0)
   } catch (e) {
     _logger! ? _logger.error(e, "album") : console.error(e)
-    process.exit(1)
   }
 }

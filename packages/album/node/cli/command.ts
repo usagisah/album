@@ -47,10 +47,18 @@ cli
   })
 
 cli
-  .command("build [id]", "打包应用")
+  .command("build [...ids]", "打包应用")
   .example("album build [config.app.id]")
-  .action(appId => {
-    albumBuild({ appId: appId ?? "default", args })
+  .action(async (appIds: string[]) => {
+    if (appIds.length === 0) {
+      await albumBuild({ appId: "default", args })
+      process.exit(0)
+    }
+
+    for (const appId of appIds) {
+      await albumBuild({ appId, args }).catch(() => null)
+    }
+    process.exit(0)
   })
 
 cli

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "album dev",
-    "build": "album build"
+    "build": "album build",
+    "start": "album start"
   },
   "dependencies": {
     "albumjs": "workspace:^",

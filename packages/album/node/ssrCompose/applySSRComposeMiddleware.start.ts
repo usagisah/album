@@ -28,7 +28,8 @@ export async function applySSRComposeStartMiddleware(app: INestApplication, cont
         res.send(file)
         return
       }
-
+      
+      debugger
       const albumOptions = normalizeMidRequestOptions(req.originalUrl, projectMap)
       const { prefix, url } = albumOptions
       const project = projectMap.get(prefix)
