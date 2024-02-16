@@ -4,6 +4,7 @@ import { AlbumContext } from "../context/context.start.type.js"
 import { expressConfigs } from "../middlewares/express/expressConfigs.js"
 import { AlbumContextModule } from "../modules/context/album-context.module.js"
 import { LoggerModule } from "../modules/logger/logger.module.js"
+import { SpaModule } from "../modules/spa/spa.module.js"
 import { SSRModule } from "../modules/ssr/ssr.module.js"
 import { applySSRComposeStartMiddleware } from "../ssrCompose/applySSRComposeMiddleware.start.js"
 
@@ -11,7 +12,6 @@ export async function processServer(context: AlbumContext) {
   const { ssr, ssrCompose, inputs, logger } = context
   const { apiAppInput } = inputs
   const midConfigs = expressConfigs(context)
-
   const serverApp = await NestFactory.create(await loadRsModule(apiAppInput, false), { logger })
   const moduleLoader = serverApp.get(LazyModuleLoader)
   await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
@@ -25,5 +25,6 @@ export async function processServer(context: AlbumContext) {
     }
   }
   if (ssr) await moduleLoader.load(() => SSRModule)
+  else await moduleLoader.load(() => SpaModule)
   return serverApp
 }

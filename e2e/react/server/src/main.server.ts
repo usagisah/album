@@ -7,7 +7,6 @@ import { AppController } from "./server/app.controller"
 })
 class AppModule {}
 
-export default (...a) => {
-  console.log(a)
+export default () => {
   return AppModule
 }

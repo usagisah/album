@@ -43,7 +43,3 @@ export type AlbumContext = {
   ssrComposeManager: SSRComposeManager
   cacheConfig: CacheConfig
 }
-
-// export interface CacheSSRCompose {
-//   dependencies?: Map<string, { filename: string; cjs: boolean }>
-// }

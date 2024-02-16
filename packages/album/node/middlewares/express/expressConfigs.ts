@@ -36,11 +36,11 @@ const compressionConfig: AlbumServerExpressConfig = {
   factory: async (...config: any[]) => compression.apply(globalThis, config)
 }
 
-const sirvConfig = function (root: string, dev: boolean, single: boolean): AlbumServerExpressConfig {
+const sirvConfig = function (root: string, dev: boolean): AlbumServerExpressConfig {
   return {
     enable: true,
     name: "sirv",
-    config: [root, { dev, gzip: true, etag: false, dotfiles: false, brotli: false, single, extensions: ["html"], maxAge: 31536000, immutable: true } as SirvOptions],
+    config: [root, { dev, gzip: true, etag: false, dotfiles: false, brotli: false, single: false, extensions: [], maxAge: 31536000, immutable: true } as SirvOptions],
     factory: async (...config: any[]) => sirv.apply(globalThis, config)
   }
 }
@@ -52,7 +52,7 @@ function devOptions(context: Context): AlbumServerExpressConfig[] {
   return [
     { ...helmetConfig, enable: isStart },
     { ...compressionConfig, enable: isStart },
-    { ...sirvConfig(root, true, !ssr), enable: isStart }
+    { ...sirvConfig(root, true), enable: isStart }
   ]
 }
 
@@ -63,6 +63,6 @@ function prodOptions(context: Context): AlbumServerExpressConfig[] {
   return [
     { ...helmetConfig, enable: isStart },
     { ...compressionConfig, enable: isStart },
-    { ...sirvConfig(root, false, !ssr), enable: isStart }
+    { ...sirvConfig(root, false), enable: isStart }
   ]
 }
