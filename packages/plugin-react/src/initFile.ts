@@ -9,7 +9,7 @@ import { renderTemplate } from "./renderTemplate.js"
 export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: ServerRoute[], param: PluginInitClientParam) {
   const pendingPromises: Promise<any>[] = []
   const { info, appManager, dumpFileManager } = param
-  const { ssr, ssrCompose, inputs } = info
+  const { appId, ssr, ssrCompose, inputs } = info
   const { dumpInput } = inputs
   const { mainSSRInput, router } = appManager
 
@@ -40,7 +40,7 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
       },
       { type: "file", template: "plugin-react/ssr/SSRServerShared.tsx", params: {} },
 
-      { type: "file", template: "plugin-react/ssr-compose/browser.ts", params: {} },
+      { type: "file", template: "plugin-react/ssr-compose/browser.ts", params: { appId } },
       { type: "file", template: "plugin-react/ssr-compose/cacheManifest.ts", params: {} },
       { type: "file", template: "plugin-react/ssr-compose/RemoteAppLoader.ts", params: {} },
       { type: "file", template: "plugin-react/ssr-compose/renderCompToString.tsx", params: {} },

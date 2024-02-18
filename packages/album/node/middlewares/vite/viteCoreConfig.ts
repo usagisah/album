@@ -46,7 +46,8 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Alb
     },
     define: {
       __app_id__: `"${appId}"`,
-      __app_id_path__: `"/${appId}"`
+      __app_id_path__: `"/${appId}"`,
+      __ssr_compose__: ssrCompose
     },
     logLevel: serverMode === "build" ? "error" : "info",
     customLogger: serverMode === "build" ? undefined : proxyLogger(logger),

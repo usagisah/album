@@ -1,4 +1,5 @@
 import { createRemoteAppLoader } from "albumjs"
+import { Suspense } from "react"
 
 const LocalAppLoader = createRemoteAppLoader({
   remote: true,
@@ -9,7 +10,9 @@ export default function Page() {
   return (
     <>
       <h1 id="remote1">page remote1</h1>
-      <LocalAppLoader sourcePath="remote2/remote2.page.tsx" />
+      <Suspense>
+        <LocalAppLoader sourcePath="remote2/remote2.page.tsx" />
+      </Suspense>
     </>
   )
 }

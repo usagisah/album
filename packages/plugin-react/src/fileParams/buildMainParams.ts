@@ -3,7 +3,7 @@ import { relative } from "path"
 
 export function buildMainParams(param: PluginPatchClientParam) {
   const { appManager, info } = param
-  const { ssr, ssrCompose, inputs } = info
+  const { appId, ssr, ssrCompose, inputs } = info
   const { dumpInput } = inputs
   const { router, mainInput } = appManager
   let ssr_hooks_registry = ""
@@ -18,6 +18,7 @@ export function buildMainParams(param: PluginPatchClientParam) {
   }
 
   return {
+    appId,
     mainPath: relative(dumpInput, mainInput),
     ssr_hooks_registry,
     RemoteAppLoader,

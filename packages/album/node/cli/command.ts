@@ -1,4 +1,4 @@
-import { resolveNodeArgs } from "@albumjs/tools/node"
+import { Obj, resolveNodeArgs } from "@albumjs/tools/node"
 import { cac } from "cac"
 import { ExecaChildProcess, execa } from "execa"
 import { readFileSync } from "fs"
@@ -55,8 +55,16 @@ cli
       process.exit(0)
     }
 
+    const errors: Obj = {}
     for (const appId of appIds) {
-      await albumBuild({ appId, args }).catch(() => null)
+      await albumBuild({ appId, args })
+        .catch(() => null)
+        .catch(e => {
+          errors[appId] = errors
+        })
+    }
+    if (errors.length > 0) {
+      throw errors
     }
     process.exit(0)
   })

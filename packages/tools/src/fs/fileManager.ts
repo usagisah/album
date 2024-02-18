@@ -1,5 +1,5 @@
-import { existsSync } from "fs"
-import { mkdir, readFile, rm, writeFile } from "fs/promises"
+import { existsSync, mkdirSync, writeFileSync } from "fs"
+import { readFile, rm } from "fs/promises"
 import { basename, resolve } from "path"
 import { isEmpty, isFunction, isString, isStringEmpty } from "../check/simple.js"
 import { Func } from "../types/types.js"
@@ -52,7 +52,7 @@ export class FileStruct {
       if (res === false || isEmpty(res)) return this
       content = res + ""
     } else throw "FileStruct.write() 参数不是合法值，请传递一个文件内容字符串或函数"
-    await writeFile(this.#path, content, "utf-8")
+    writeFileSync(this.#path, content, "utf-8")
     return this
   }
 }
@@ -87,7 +87,7 @@ export class DirStruct {
       if (force) await rm(this.#path, { recursive: true, force: true })
       else return this
     }
-    await mkdir(this.#path, { recursive: true })
+    mkdirSync(this.#path, { recursive: true })
     return this
   }
 

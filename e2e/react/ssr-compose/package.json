@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "album dev",
     "build": "album build",
-    "build:all": "album build home error local remote nest",
+    "build:all": "album build home error local1 local2 local3 remote1 remote2 remote3 nest1 nest2 nest3 nest4",
     "start": "album start"
   },
   "dependencies": {

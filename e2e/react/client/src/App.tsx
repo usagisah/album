@@ -1,7 +1,6 @@
 import { FC } from "albumjs"
 
 export const App: FC = ({ children }) => {
-  console.log( import.meta.env )
   return (
     <>
       <div id="env">

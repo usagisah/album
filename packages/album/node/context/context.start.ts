@@ -60,7 +60,7 @@ export async function createContext({ args }: StartServerParams): Promise<AlbumC
       cacheConfig,
       appManager: appConfig,
       serverManager: { port },
-      ssrComposeManager: ssrCompose && await createSSRComposeManager(root, cacheConfig.ssrComposeConfig)
+      ssrComposeManager: ssrCompose && (await createSSRComposeManager(root, cacheConfig.ssrComposeConfig))
     }
   } catch (e) {
     logger! ? logger.error(e, "album") : console.error(e)

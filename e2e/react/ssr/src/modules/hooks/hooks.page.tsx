@@ -10,9 +10,11 @@ export default function Page() {
     return { hooksPage: "from hooks page" }
   })
 
-  return <>
-    <h1 id="hooks">hooks page</h1>
-    <div id="useServerRouteData">{JSON.stringify(routeData)}</div>
-    <div id="useServer-data">{JSON.stringify(serverData)}</div>
-  </>
+  return (
+    <>
+      <h1 id="hooks">hooks page</h1>
+      <div id="useServerRouteData">{JSON.stringify(routeData)}</div>
+      <div id="useServer-data">{JSON.stringify(serverData)}</div>
+    </>
+  )
 }

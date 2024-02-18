@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const templates = new Map<string, string>()
 
-export async function renderTemplate(filePath: string, params: Record<string, string>) {
+export async function renderTemplate(filePath: string, params: Record<string, any>) {
   let file = templates.get(filePath)
   if (!file) {
     file = await readFile(resolve(__dirname, "../templates/" + filePath), "utf-8")

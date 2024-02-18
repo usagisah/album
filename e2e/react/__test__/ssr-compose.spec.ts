@@ -2,10 +2,10 @@ import { setupProject } from "../../helpers/project"
 import { setupPuppeteer } from "../../helpers/puppeteer"
 
 const pId = "react/ssr-compose"
-const { page, html, text, click, count } = await setupPuppeteer(pId)
+const { page, html, text } = await setupPuppeteer(pId)
 
 it("remote", async () => {
-  const { port } = await setupProject(pId, "dev", ["remote"])
+  const { port } = await setupProject(pId, "dev", ["remote1"])
   const p = page()
   await p.goto(`http://localhost:${port}/remote1`)
   await p.waitForSelector("#remote3")
@@ -22,7 +22,7 @@ it("remote", async () => {
 })
 
 it("local", async () => {
-  const { port } = await setupProject(pId, "dev", ["local"])
+  const { port } = await setupProject(pId, "dev", ["local1"])
   const p = page()
   await p.goto(`http://localhost:${port}/local1`)
   await p.waitForSelector("#local3")
@@ -34,12 +34,12 @@ it("local", async () => {
   expect(await html("#local2-lazy")).toBe(`<span>0</span><button>++</button>`)
   expect(await html("#local3-lazy")).toBe(`<span>0</span><button>++</button>`)
 
-  expect(JSON.parse(await text("#server-data-local2"))).toEqual({"local2":"local2"})
-  expect(JSON.parse(await text("#server-data-local3"))).toEqual({"local3-lazy":10})
+  expect(JSON.parse(await text("#server-data-local2"))).toEqual({ local2: "local2" })
+  expect(JSON.parse(await text("#server-data-local3"))).toEqual({ "local3-lazy": 10 })
 })
 
 it("nest", async () => {
-  const { port } = await setupProject(pId, "dev", ["nest"])
+  const { port } = await setupProject(pId, "dev", ["nest1"])
   const p = page()
   await p.goto(`http://localhost:${port}/nest1`)
   await p.waitForSelector("#nest4")

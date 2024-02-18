@@ -74,7 +74,7 @@ export async function createModuleInfo(encodes: Func[], root?: string) {
           } catch {}
         })
       }
-      _projectInfo.coordinate = coordinate
+      _projectInfo.coordinate = coordinateJson
 
       const depManifest: Map<string, SSRComposeDependency> = parse(depManifestFile)
       depManifest.forEach((value, id) => {

@@ -1,6 +1,6 @@
+import { resolve } from "path"
 import { defineConfig } from "vitest/config"
 import { E2E_TIMEOUT } from "./helpers/puppeteer"
-import { resolve } from "path"
 
 export default defineConfig({
   test: {

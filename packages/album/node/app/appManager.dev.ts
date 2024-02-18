@@ -20,7 +20,7 @@ export async function createAppManager(config: AppManagerConfig) {
   const appConfigs = isArray(userConfigApp) ? (userConfigApp.length > 0 ? userConfigApp : [{}]) : [userConfigApp ?? {}]
   const ids = new Set<any>([...appConfigs.map(v => v.id)])
   if (ids.size !== appConfigs.length) throw "config.app 每项必须携带唯一id，这将用于启动匹配"
-  
+
   const c = appConfigs.length === 1 ? appConfigs[0] : appConfigs.find(v => v.id === appId)
   if (!c) throw "config.app 应用列表中找不到指定的或默认的服务启动项，请使用app[].id 存在的 id 启动"
 

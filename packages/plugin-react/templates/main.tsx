@@ -24,4 +24,9 @@ const AppRouterComponent: AppRouterFC = ({ Layout = Fragment, ...props }) => (
   </BrowserRouter>
 )
 
-mainFactory(AppRouterComponent)
+const appId = "'$appId$'"
+const g: any = globalThis
+const m: any = g.__$_album_ssr_compose
+if (!__ssr_compose__ || !m || m.appId === appId) {
+  mainFactory(AppRouterComponent)
+}

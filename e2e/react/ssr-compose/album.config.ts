@@ -28,7 +28,7 @@ export default defineConfig({
       mainSSR: "src/main.ssr"
     },
     {
-      id: "local",
+      id: "local1",
       module: {
         path: "src/modules/local1",
         name: "modules"
@@ -37,7 +37,25 @@ export default defineConfig({
       mainSSR: "src/main.ssr"
     },
     {
-      id: "remote",
+      id: "local2",
+      module: {
+        path: "src/modules/local2",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "string" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "local3",
+      module: {
+        path: "src/modules/local3",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "string" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "remote1",
       module: {
         path: "src/modules/remote1",
         name: "modules"
@@ -46,9 +64,54 @@ export default defineConfig({
       mainSSR: "src/main.ssr"
     },
     {
-      id: "nest",
+      id: "remote2",
+      module: {
+        path: "src/modules/remote2",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "pipe" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "remote3",
+      module: {
+        path: "src/modules/remote3",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "pipe" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "nest1",
       module: {
         path: "src/modules/nest1",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "pipe" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "nest2",
+      module: {
+        path: "src/modules/nest2",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "pipe" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "nest3",
+      module: {
+        path: "src/modules/nest3",
+        name: "modules"
+      },
+      ssrRender: { sendMode: "pipe" },
+      mainSSR: "src/main.ssr"
+    },
+    {
+      id: "nest4",
+      module: {
+        path: "src/modules/nest4",
         name: "modules"
       },
       ssrRender: { sendMode: "pipe" },

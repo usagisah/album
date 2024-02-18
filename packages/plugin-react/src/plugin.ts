@@ -1,6 +1,6 @@
-import { AlbumContext, AlbumUserPlugin, mergeConfig } from "albumjs/server"
-import viteReactPlugin from "@vitejs/plugin-react-swc"
 import { cjsImporterToEsm, resolveDirPath, resolveFilePath } from "@albumjs/tools/node"
+import viteReactPlugin from "@vitejs/plugin-react-swc"
+import { AlbumContext, AlbumUserPlugin, mergeConfig } from "albumjs/server"
 import { readFile, writeFile } from "fs/promises"
 import { resolve, sep } from "path"
 import { build as viteBuild } from "vite"

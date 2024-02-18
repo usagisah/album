@@ -9,7 +9,7 @@
     "init": "node ./scripts/init.mjs",
     "preBuild": "node ./scripts/preBuild.mjs",
     "watch:react": "npm run preBuild && concurrently 'cd packages/tools && npm run watch' 'cd packages/album && npm run watch' 'cd packages/plugin-react && npm run watch'",
-    "format": "prettier --write \"packages/**/*.ts\"",
+    "format": "prettier --write \"packages/**/*.ts\" \"e2e/**/*.{ts,tsx}\"",
     "test:e2e": "vitest run -c e2e/vitest.config.ts",
     "pub": "node ./scripts/publish.mjs"
   },

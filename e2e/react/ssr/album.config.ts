@@ -1,9 +1,9 @@
-import { defineConfig } from "albumjs/config"
 import react from "@albumjs/plugin-react"
+import { defineConfig } from "albumjs/config"
 
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5311,
+    port: 5311
   }
 })

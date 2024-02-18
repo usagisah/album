@@ -51,5 +51,6 @@ export async function albumBuild(params: DevServerParams) {
     logger.log("所有资源打包完毕", "album")
   } catch (e) {
     _logger! ? _logger.error(e, "album") : console.error(e)
+    throw e
   }
 }

@@ -2,6 +2,7 @@ import { createRemoteAppLoader } from "./RemoteAppLoader"
 
 const _w: any = window
 _w.__$_album_ssr_compose = {
+  appId: '"$appId$"',
   sources: new Map(),
   createRemoteAppLoader,
   loadModules

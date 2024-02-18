@@ -15,7 +15,9 @@ export default function Page() {
       <Suspense>
         <LazyComponent />
       </Suspense>
-      <LocalAppLoader sourcePath="remote3/remote3.page.tsx" />
+      <Suspense>
+        <LocalAppLoader sourcePath="remote3/remote3.page.tsx" />
+      </Suspense>
     </>
   )
 }
