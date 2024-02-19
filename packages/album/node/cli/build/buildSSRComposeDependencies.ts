@@ -43,6 +43,17 @@ async function buildDependency(libPath: string, depOutDir: string, external: str
     },
     define: { "process.env.NODE_ENV": `"production"` }
   })
+
+  let file = await readFile(resolve(depOutDir, filename + ".js"), "utf-8")
+  let namespaceCount = 0
+  file = file.replace(/import \* as (\w+) from ["']([^"']+)["']/g, (_, p1, p2) => {
+    namespaceCount++
+    return `import ${p1} from "${p2}";`
+  })
+  if (namespaceCount > 0) {
+    await writeFile(refFullPath, file, "utf-8")
+  }
+
   return [
     refPath,
     {
