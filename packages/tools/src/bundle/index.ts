@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises"
 import prettyBytes, { Options } from "pretty-bytes"
 import { CompressCallback, InputType, ZlibOptions, gzip } from "zlib"
-import { isNumber, isString } from "../check/simple.js"
+import { isNumber, isString } from "../check/index.js"
 
 export type { Options } from "pretty-bytes"
 export async function resolveFileSize(filePath: string, o?: Options): Promise<string>

@@ -1,6 +1,6 @@
+import { readJSON } from "fs-extra/esm"
 import { dirname, resolve } from "path"
-import { isArray, isPlainObject, isString } from "../check/simple.js"
-import { readJson } from "../fs/readJson.js"
+import { isArray, isPlainObject, isString } from "../check/index.js"
 import { Obj } from "../types/types.js"
 
 export async function resolveTsconfigPaths(tsconfigPath: string, root?: string): Promise<Obj<string>>
@@ -8,7 +8,7 @@ export async function resolveTsconfigPaths(tsconfig: Obj, root?: string): Promis
 export async function resolveTsconfigPaths(tsconfigPath: unknown, root?: string): Promise<Obj<string>>
 export async function resolveTsconfigPaths(tsconfig: any, root?: string): Promise<Obj<string>> {
   const alias: Obj<string> = {}
-  const _config = isPlainObject(tsconfig) ? tsconfig : await readJson(tsconfig)
+  const _config = isPlainObject(tsconfig) ? tsconfig : await readJSON(tsconfig, {})
   if (!_config) return alias
 
   const _root = isString(root) ? root : isString(tsconfig) ? dirname(tsconfig) : process.cwd()

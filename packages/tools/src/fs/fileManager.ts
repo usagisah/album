@@ -1,183 +1,108 @@
-import { existsSync, mkdirSync, writeFileSync } from "fs"
-import { readFile, rm } from "fs/promises"
-import { basename, resolve } from "path"
-import { isEmpty, isFunction, isString, isStringEmpty } from "../check/simple.js"
-import { Func } from "../types/types.js"
+import { outputFile } from "fs-extra/esm"
+import { mkdir, readFile, rm } from "fs/promises"
+import { basename, join } from "path"
+import { isBlank, isEmpty, isFunction } from "../check/index.js"
 
-const GAP = "//"
-
-function buildFileKey(type: FileType, name: string) {
-  return type + GAP + name
+export interface FileManagerOptions {
+  root: string
 }
 
-export type FileType = "file" | "dir"
+export type FileType = "dir" | "file"
 
-export class FileStruct {
-  #type: "file" = "file"
-  #name: string
-  #path: string
-
-  constructor(params: { path: string }) {
-    const { path } = params
-    if (isStringEmpty(path)) throw "new FileStruct() 参数path必须是一个不为空的字符串"
-    this.#name = basename(path)
-    this.#path = path
-  }
-
-  get type() {
-    return this.#type
-  }
-
-  get name() {
-    return this.#name
-  }
-
-  get path() {
-    return this.#path
-  }
-
-  async read() {
-    return await readFile(this.#path, "utf-8").catch(() => "")
-  }
-
-  async write(value: string, force?: boolean): Promise<FileStruct>
-  async write(fn: Func<[string]>, force?: boolean): Promise<FileStruct>
-  async write(param: any, force = true): Promise<any> {
-    if (existsSync(this.#path) && !force) return this
-
-    let content = ""
-    if (isString(param)) content = param
-    else if (isFunction(param)) {
-      const res = await param(await this.read())
-      if (res === false || isEmpty(res)) return this
-      content = res + ""
-    } else throw "FileStruct.write() 参数不是合法值，请传递一个文件内容字符串或函数"
-    writeFileSync(this.#path, content, "utf-8")
-    return this
-  }
+export interface FileDescription {
+  type: string
+  name: string
+  path: string
 }
 
-export class DirStruct {
-  #type: "dir" = "dir"
-  #name: string
-  #path: string
-  #files = new Map<string, FileStruct | DirStruct>()
+export interface FileTreeNode extends FileDescription {
+  children: FileTreeNode[]
+}
 
-  constructor(params: { path: string }) {
-    const { path } = params
-    if (isStringEmpty(path)) throw "new FileStruct() 参数path必须是一个不为空的字符串"
-    this.#name = basename(path)
-    this.#path = path
-  }
+export async function createFileManager(options: FileManagerOptions) {
+  const { root } = options
+  const files = new Map<string, FileDescription>()
 
-  get type() {
-    return this.#type
-  }
-
-  get name() {
-    return this.#name
-  }
-
-  get path() {
-    return this.#path
-  }
-
-  async write(force = false) {
-    if (existsSync(this.#path)) {
-      if (force) await rm(this.#path, { recursive: true, force: true })
-      else return this
+  async function add(type: "dir", path: string, options?: { force?: boolean }): Promise<void>
+  async function add(type: "file", path: string, options?: { value?: string | ((value: string) => any | Promise<any>); force?: boolean }): Promise<void>
+  async function add(type: FileType, path: string, options?: any) {
+    if (type !== "dir" && type !== "file") {
+      throw `FileManager.add type is must be FileType("dir" | "file")`
     }
-    mkdirSync(this.#path, { recursive: true })
-    return this
+    if (path.startsWith("/")) {
+      path = path.slice(1)
+    }
+
+    const { value, force = false } = options ?? {}
+    const fileKey = buildFileKey(type, path)
+    const exist = files.has(fileKey)
+
+    if (force && exist) {
+      await del(type, path).then(() => write({ fileKey, type, path, value }))
+    } else if (!exist) {
+      await write({ fileKey, type, path, value })
+    }
   }
 
-  keys() {
-    return [...this.#files.keys()].map(n => n.split(GAP))
+  async function write(options: { fileKey: string; type: FileType; path: string; check?: boolean; value?: string | ((value: string) => any | Promise<any>) }) {
+    const { fileKey, path, type, check, value } = options
+    if (check && !files.has(fileKey)) {
+      throw `FileManager path-file is not exist`
+    }
+
+    if (type === "dir") {
+      await mkdir(path, { recursive: true })
+      files.set(fileKey, { type: "dir", name: basename(path), path })
+      return
+    }
+
+    const filepath = join(root, path)
+    let fileContent = value as string
+    try {
+      if (isFunction(value)) {
+        const file = await readFile(filepath, "utf-8")
+        const res = await value(file)
+        if (res === false || isEmpty(res)) {
+          return
+        }
+        fileContent = res + ""
+      }
+      await outputFile(filepath, fileContent, "utf-8")
+      files.set(fileKey, { type: "file", name: basename(path), path })
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  values() {
-    return this.#files
+  async function del(type: FileType, path: string) {
+    const fileKey = buildFileKey(type, path)
+    const description = files.get(fileKey)
+    if (description) {
+      await rm(description.path, { force: true, recursive: true })
+      removeSubFiles(path)
+    }
   }
-
-  toJSON(): any {
-    return Array.from(this.#files).map(([key, value]) => {
-      return value.type === "file" ? { path: value.path, name: value.name } : [key, value.toJSON()]
+  function removeSubFiles(prePath: string) {
+    const delFiles: string[] = []
+    files.forEach(({ type, path }) => {
+      if (path.startsWith(prePath)) {
+        delFiles.push(buildFileKey(type as FileType, path))
+      }
     })
+    delFiles.map(k => files.delete(k))
   }
 
-  get<T extends FileType>(type: T, filePaths: string): (T extends "file" ? FileStruct : DirStruct) | null {
-    if (!isString(filePaths)) return null
-    const names = filePaths.split("/").filter(Boolean)
-    const target = names.length - 1
-    let files = this.#files
-    for (let index = 0; index < names.length; index++) {
-      const n = names[index]
-      if (index === target) {
-        const res: any = files.get(buildFileKey(type as FileType, n))
-        return res ?? null
-      }
-
-      const _file = files.get(buildFileKey("dir", n))
-      if (!_file || _file.type !== "dir") return null
-      files = _file.values()
-    }
-    return null
+  async function setFile(path: string, value: string | ((value: string) => any | Promise<any>)) {
+    return write({ fileKey: buildFileKey("file", path), type: "file", path, check: true, value })
   }
 
-  async remove(type: FileType, filePaths: string | string[]): Promise<boolean> {
-    if (isString(filePaths)) {
-      filePaths = filePaths.split("/").filter(Boolean)
-    }
-    if (!Array.isArray(filePaths) || filePaths.length === 0) {
-      return false
-    }
-
-    if (filePaths.length > 1) {
-      const dir = this.#files.get(buildFileKey("dir", filePaths[0])) as DirStruct
-      return dir ? dir.remove(type, filePaths.slice(1)) : false
-    }
-
-    const key = buildFileKey(type, filePaths[0])
-    const file = this.#files.get(key)
-    if (file) {
-      await rm(file.path)
-      this.#files.delete(key)
-      return true
-    }
-    return false
+  function buildFileKey(type: FileType, path: string) {
+    return type + "//" + path
   }
 
-  async add(options: { type: FileType; file: string | string[]; value?: string | Func<[string]>; force?: boolean }): Promise<boolean> {
-    let { type, file: filePaths, value = "", force } = options
-    if (!["file", "dir"].includes(type)) return false
-    if (isString(filePaths)) filePaths = filePaths.split("/").filter(v => v.length > 0)
-    if (!Array.isArray(filePaths) || filePaths.length === 0) return false
-
-    if (filePaths.length > 1) {
-      const name = filePaths[0]
-      const key = buildFileKey("dir", name)
-      let file = this.#files.get(key) as DirStruct
-      if (!file) {
-        file = new DirStruct({ path: resolve(this.path, name) })
-        this.#files.set(key, file)
-        await file.write()
-      }
-      return file.add({ type, file: filePaths.slice(1), value, force })
-    }
-
-    const key = buildFileKey(type, filePaths[0])
-    if (this.#files.get(key)) return false
-
-    const name = filePaths[0]
-    let fileIns: FileStruct | DirStruct
-    if (type === "file") {
-      fileIns = new FileStruct({ path: resolve(this.path, name) })
-      await fileIns.write(value as any, force)
-    } else {
-      fileIns = new DirStruct({ path: resolve(this.path, name) })
-      await fileIns.write(force)
-    }
-    this.#files.set(key, fileIns)
-    return true
+  if (isBlank(root)) {
+    throw "FileStruct() 参数path必须是一个不为空的字符串"
   }
+  await mkdir(root, { recursive: true })
+  return { add, del, setFile }
 }
