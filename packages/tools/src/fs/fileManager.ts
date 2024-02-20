@@ -106,3 +106,5 @@ export async function createFileManager(options: FileManagerOptions) {
   await mkdir(root, { recursive: true })
   return { add, del, setFile }
 }
+
+export type FileManager = ReturnType<Awaited<typeof createFileManager>>

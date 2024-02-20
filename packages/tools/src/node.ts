@@ -1,5 +1,7 @@
 export * from "./check/index.js"
 
+export * from "./command/index.js"
+
 export * from "./modules/index.js"
 
 export * from "./fs/index.js"

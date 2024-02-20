@@ -1,2 +1,2 @@
-import * as dayjs from "dayjs"
+import dayjs from "dayjs"
 export default dayjs
