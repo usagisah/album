@@ -1,4 +1,5 @@
-import { GuardLoader, GuardRouteProps, LocalData, RouterRoute, useRoutesMap, queryString } from "albumjs"
+import { queryString } from "@albumjs/album/tools"
+import { GuardLoader, GuardRouteProps, LocalData, RouterRoute, useRoutesMap } from "album"
 import { useContext, useEffect, useRef, useState } from "react"
 import { NavigateFunction, matchPath, useLocation, useNavigate, useParams } from "react-router-dom"
 import { callPromiseWithCatch } from "../utils/callWithCatch"

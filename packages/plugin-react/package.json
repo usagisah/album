@@ -36,7 +36,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "albumjs": "workspace:^",
+    "@albumjs/album": "workspace:^",
     "@albumjs/tools": "workspace:^",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "fast-glob": "^3.3.2",

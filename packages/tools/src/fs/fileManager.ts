@@ -33,15 +33,14 @@ export async function createFileManager(options: FileManagerOptions) {
       path = path.slice(1)
     }
 
-    const { value, force = false } = options ?? {}
+    const { value, force = true } = options ?? {}
     const fileKey = buildFileKey(type, path)
     const exist = files.has(fileKey)
 
     if (force && exist) {
-      await del(type, path).then(() => write({ fileKey, type, path, value }))
-    } else if (!exist) {
-      await write({ fileKey, type, path, value })
+      await del(type, path)
     }
+    await write({ fileKey, type, path, value })
   }
 
   async function write(options: { fileKey: string; type: FileType; path: string; check?: boolean; value?: string | ((value: string) => any | Promise<any>) }) {
@@ -60,7 +59,7 @@ export async function createFileManager(options: FileManagerOptions) {
     let fileContent = value as string
     try {
       if (isFunction(value)) {
-        const file = await readFile(filepath, "utf-8")
+        const file = await readFile(filepath, "utf-8").catch(() => "")
         const res = await value(file)
         if (res === false || isEmpty(res)) {
           return
@@ -107,4 +106,4 @@ export async function createFileManager(options: FileManagerOptions) {
   return { add, del, setFile }
 }
 
-export type FileManager = ReturnType<Awaited<typeof createFileManager>>
+export type FileManager = Awaited<ReturnType<typeof createFileManager>>

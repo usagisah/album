@@ -1,5 +1,5 @@
-import { SSRComposeRenderProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "albumjs/server"
-import { SSRComposeProject as StartProject } from "albumjs/start"
+import { SSRComposeRenderProps, SSRComposeRenderRemoteComponentOptions, SSRComposeRenderRemoteComponentReturn } from "@albumjs/album/server"
+import { SSRComposeProject as StartProject } from "@albumjs/album/start"
 import { SSRServerShared } from "../ssr/SSRServerShared"
 import { loadCacheManifest } from "./cacheManifest"
 import { renderComponentToString } from "./renderCompToString"

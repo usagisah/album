@@ -1,3 +1,4 @@
+import { resolve } from "path"
 import { InlineConfig, PluginOption, mergeConfig } from "vite"
 import { AlbumContext } from "../../context/context.dev.type.js"
 import { AlbumServerViteConfig } from "../middlewares.type.js"
@@ -8,7 +9,7 @@ import { createSSRCoreConfig } from "./ssrConfig.js"
 const configName = "album:core"
 export function viteCoreOptions(context: AlbumContext, forceClient = false): AlbumServerViteConfig {
   const { appId, serverMode, ssr, ssrCompose, inputs, env, logger } = context
-  const { cwd } = inputs
+  const { cwd, dumpInput } = inputs
   const [_config, pluginOptions] = !forceClient && ssr ? createSSRCoreConfig(context) : createSPACoreConfig(context)
 
   const basePlugins: PluginOption = {
@@ -48,6 +49,12 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Alb
       __app_id__: `"${appId}"`,
       __app_id_path__: `"/${appId}"`,
       __ssr_compose__: ssrCompose
+    },
+    resolve: {
+      alias: {
+        album: resolve(dumpInput, "album.client.ts"),
+        "album/server": resolve(dumpInput, "album.server.ts")
+      }
     },
     logLevel: serverMode === "build" ? "error" : "info",
     customLogger: serverMode === "build" ? undefined : proxyLogger(logger),

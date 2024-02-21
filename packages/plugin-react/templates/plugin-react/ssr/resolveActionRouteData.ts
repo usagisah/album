@@ -1,5 +1,5 @@
+import { AlbumSSRContext } from "@albumjs/album/server"
 import { isPlainObject } from "albumjs"
-import { AlbumSSRContext } from "albumjs/server"
 import { matchPath } from "react-router-dom"
 import { serverRoutes } from "../router/routes.ssr"
 

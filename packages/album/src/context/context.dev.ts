@@ -46,8 +46,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
     })
 
     const ssrCompose = !!userConfig.ssrCompose
-    const [{ appFileManager, dumpFileManager }, env, appManager, serverManager] = await waitPromiseAll([
-      createFileManager(inputs),
+    const [env, appManager, serverManager] = await waitPromiseAll([
       registryEnv(serverMode, inputs, userConfig.env),
       createAppManager({
         appId,
@@ -67,6 +66,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       userConfig,
       logger
     })
+    const { appFileManager, dumpFileManager } = await createFileManager(ssr, inputs)
 
     // outputs
     const baseOutDir = `${cwd}${sep}dist`

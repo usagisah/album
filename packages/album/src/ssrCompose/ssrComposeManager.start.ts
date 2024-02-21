@@ -42,7 +42,13 @@ export async function createModuleInfo(encodes: Func[], root?: string) {
       const _ssrSSRManifestFile = readFile(resolve(ssrInput, ".vite/ssr-manifest.json"), "utf-8")
       const _coordinateFile = readFile(resolve(clientInput, ".vite/coordinate.json"), "utf-8")
       const _composeManifest = readFile(resolve(root, name, ".ssr-compose-dependencies", "manifest.json"), "utf-8")
-      const [clientManifestFile, ssrManifestFile, ssrSSRManifestFile, coordinateFile, depManifestFile] = await Promise.all([_clientManifestFile, _ssrManifestFile, _ssrSSRManifestFile, _coordinateFile, _composeManifest])
+      const [clientManifestFile, ssrManifestFile, ssrSSRManifestFile, coordinateFile, depManifestFile] = await Promise.all([
+        _clientManifestFile,
+        _ssrManifestFile,
+        _ssrSSRManifestFile,
+        _coordinateFile,
+        _composeManifest
+      ])
       _projectInfo.ssrSSRManifest = JSON.parse(ssrSSRManifestFile)
 
       const clientManifestJson = (_projectInfo.clientManifest = JSON.parse(clientManifestFile))

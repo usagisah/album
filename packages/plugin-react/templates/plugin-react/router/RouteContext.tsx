@@ -1,4 +1,4 @@
-import { LocalData } from "albumjs"
+import { LocalData } from "album"
 import { createContext } from "react"
 
 export type RouteLoaderStage = "loading" | "success" | "fail"

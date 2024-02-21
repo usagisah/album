@@ -1,4 +1,4 @@
-import { AppSpecialModule } from "albumjs/server"
+import { AppSpecialModule } from "@albumjs/album/server"
 import { relative, resolve } from "path"
 import { pathToRegexp } from "path-to-regexp"
 import { ClientRoute, ParseRouteContext, ServerRoute } from "./plugin.type.js"

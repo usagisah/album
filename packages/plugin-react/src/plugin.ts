@@ -1,6 +1,6 @@
+import { AlbumContext, AlbumUserPlugin, mergeConfig } from "@albumjs/album/server"
 import { cjsImporterToEsm, resolveDirPath, resolveFilePath } from "@albumjs/tools/node"
 import viteReactPlugin from "@vitejs/plugin-react-swc"
-import { AlbumContext, AlbumUserPlugin, mergeConfig } from "albumjs/server"
 import { readFile, writeFile } from "fs/promises"
 import { resolve, sep } from "path"
 import { build as viteBuild } from "vite"
@@ -62,19 +62,13 @@ export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
       albumContext = param.albumContext
     },
     async initClient(param) {
-      const { result, info, appManager, appFileManager } = param
+      const { result, info, appManager } = param
       const { ssr, inputs } = info
       const { specialModules } = appManager
       const { clientRoutes, serverRoutes } = await buildReactRoutes(inputs.dumpInput, specialModules)
       await pluginInitFile(clientRoutes, serverRoutes, param)
       result.realClientInput = resolve(inputs.dumpInput, "main.tsx")
       if (ssr) result.realSSRInput = resolve(inputs.dumpInput, "main.ssr.tsx")
-
-      const file = appFileManager.get("file", "album-env.d.ts")
-      file.write(f => {
-        const typePlugin = `/// <reference types="@albumjs/plugin-react/album" />`
-        return f.includes(typePlugin) ? f : `${typePlugin}\n`
-      })
     },
     async patchClient(param) {
       const { info, appManager } = param

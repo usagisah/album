@@ -1,4 +1,4 @@
-import { GuardOnEnter, FC, RouterRoute } from "albumjs"
+import { GuardOnEnter, FC, RouterRoute } from "album"
 import { Routes, Route } from "react-router-dom";
 import { GuardRoute } from "./GuardRoute"
 import { lazyLoad } from "./lazyLoad"

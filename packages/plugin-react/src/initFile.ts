@@ -1,10 +1,14 @@
-import { PluginInitClientParam } from "albumjs/server"
+import { PluginInitClientParam } from "@albumjs/album/server"
+import { createCommonJS } from "@albumjs/tools/lib/mlly"
+import { readFile } from "fs/promises"
 import { relative, resolve } from "path"
 import { buildMainParams } from "./fileParams/buildMainParams.js"
 import { buildRoutesParams } from "./fileParams/buildRoutesParams.js"
 import { buildRoutesSSRParams } from "./fileParams/buildRoutesSSRParams.js"
 import { ClientRoute, ServerRoute } from "./plugin.type.js"
 import { renderTemplate } from "./renderTemplate.js"
+
+const { __dirname } = createCommonJS(import.meta.url)
 
 export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: ServerRoute[], param: PluginInitClientParam) {
   const pendingPromises: Promise<any>[] = []
@@ -13,7 +17,7 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
   const { dumpInput } = inputs
   const { mainSSRInput, router } = appManager
 
-  pendingPromises.push(...common(clientRoutes, param))
+  pendingPromises.push(...mountEntry(param), ...common(clientRoutes, param))
 
   if (ssr) {
     const ssrConfigs = [
@@ -51,9 +55,7 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
 
     pendingPromises.push(
       ...ssrConfigs.map(async f => {
-        return dumpFileManager.add({
-          type: f.type as "file",
-          file: f.template,
+        return dumpFileManager.add(f.type as any, f.template, {
           value: await renderTemplate(f.template, f.params)
         })
       })
@@ -61,6 +63,51 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
   }
 
   await Promise.all(pendingPromises)
+}
+
+function mountEntry({ info, appFileManager, dumpFileManager }: PluginInitClientParam) {
+  const { ssr, ssrCompose } = info
+  const pendingSetFiles: Promise<any>[] = [
+    appFileManager.setFile("album-env.d.ts", f => {
+      const typePlugin = `/// <reference types=".album/plugin-react" />`
+      return f.includes(typePlugin) ? f : `${f}\n${typePlugin}\n`
+    }),
+    dumpFileManager.add("file", "plugin-react.d.ts", {
+      async value() {
+        let code = await readFile(resolve(__dirname, "../album.d.ts"), "utf-8")
+        if (!ssrCompose) {
+          code = remoteBlock(code, "ssr-compose")
+        }
+        return code
+      }
+    }),
+    dumpFileManager.setFile("album.client.ts", () => {
+      const code = [
+        `import { routes, routesMap } from "./plugin-react/router/routes"`,
+        `export { useRouter } from "./plugin-react/hooks/useRouter"`,
+        `export { useLoader } from "./plugin-react/hooks/useLoader"`,
+        `export const useRoutes = () => routes`,
+        `export const useRoutesMap = () => routesMap`
+      ]
+      if (ssrCompose) {
+        code.push(`export { createRemoteAppLoader } from "./plugin-react/ssr-compose/RemoteAppLoader"`)
+      }
+      return code.join("\n") + "\n"
+    })
+  ]
+  if (ssr) {
+    dumpFileManager.setFile("album.server.ts", f => {
+      const code = [`export { useServer } from "./plugin-react/hooks/useServer"`, `export { useServerRouteData } from "./plugin-react/hooks/useServerRouteData"`]
+      if (ssrCompose) {
+        code.push(`export { createRemoteAppLoader } from "./plugin-react/ssr-compose/RemoteAppLoader"`)
+      }
+      return code.join("\n") + "\n"
+    })
+  }
+  return pendingSetFiles
+}
+function remoteBlock(code: string, title: string) {
+  return code.replace(new RegExp(`/\\* -+ ${title} -+ \\*/[\\s\\S]+/\\* -+ ${title}-end -+ \\*/\\n`), "")
 }
 
 function common(clientRoutes: any[], param: PluginInitClientParam) {
@@ -76,9 +123,7 @@ function common(clientRoutes: any[], param: PluginInitClientParam) {
     { type: "file", template: "main.tsx", params: buildMainParams(param) }
   ]
   return clientConfigs.map(async f => {
-    return dumpFileManager.add({
-      type: f.type as "file",
-      file: f.template,
+    return dumpFileManager.add(f.type as any, f.template, {
       value: await renderTemplate(f.template, f.params)
     })
   })

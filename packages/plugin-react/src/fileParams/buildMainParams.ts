@@ -1,4 +1,4 @@
-import { PluginPatchClientParam } from "albumjs/server"
+import { PluginPatchClientParam } from "@albumjs/album/server"
 import { relative } from "path"
 
 export function buildMainParams(param: PluginPatchClientParam) {
@@ -10,7 +10,8 @@ export function buildMainParams(param: PluginPatchClientParam) {
   let RemoteAppLoader = ""
 
   if (ssr) {
-    ssr_hooks_registry = 'import { useServer } from "./plugin-react/hooks/useServer"\nimport { useServerRouteData } from "./plugin-react/hooks/useServerRouteData"\nregistryHook("useServer", useServer)\nregistryHook("useServer", useServer)\nregistryHook("useServerRouteData", useServerRouteData)'
+    ssr_hooks_registry =
+      'import { useServer } from "./plugin-react/hooks/useServer"\nimport { useServerRouteData } from "./plugin-react/hooks/useServerRouteData"\nregistryHook("useServer", useServer)\nregistryHook("useServer", useServer)\nregistryHook("useServerRouteData", useServerRouteData)'
   }
 
   if (ssrCompose) {

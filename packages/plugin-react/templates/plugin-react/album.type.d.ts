@@ -1,2 +1,2 @@
-/// <reference types="albumjs/types/vite-client" />
-/// <reference types="albumjs/types/express" />
+/// <reference types="@albumjs/album/types/vite-client" />
+/// <reference types="@albumjs/album/types/express" />

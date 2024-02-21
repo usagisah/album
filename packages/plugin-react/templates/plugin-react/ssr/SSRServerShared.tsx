@@ -1,4 +1,4 @@
-import { AlbumSSRRenderOptions } from "albumjs/server"
+import { AlbumSSRRenderOptions } from "@albumjs/album/server"
 import { readFileSync } from "fs"
 import { dirname, relative, resolve } from "path"
 import { ReactNode } from "react"

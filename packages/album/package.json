@@ -19,27 +19,23 @@
   "type": "module",
   "exports": {
     "./server": {
-      "types": "./server.d.ts",
-      "default": "./server.js"
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
     },
     "./start": {
-      "types": "./start.d.ts",
-      "default": "./start.js"
+      "types": "./dist/start.d.ts",
+      "default": "./dist/start.js"
     },
     "./config": {
-      "types": "./config.d.ts",
-      "default": "./config.js"
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
     },
     "./tools": {
-      "types": "./tools.d.ts",
-      "default": "./tools.js"
+      "types": "./dist/tools.d.ts",
+      "default": "./dist/tools.js"
     },
     "./types/*": {
       "types": "./types/*.d.ts"
-    },
-    ".": {
-      "types": "./index.d.ts",
-      "default": "./index.js"
     }
   },
   "bin": {

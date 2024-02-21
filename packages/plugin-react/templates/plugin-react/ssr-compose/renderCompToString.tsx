@@ -1,4 +1,4 @@
-import { SSRComposeRenderRemoteComponentOptions } from "albumjs/server"
+import { SSRComposeRenderRemoteComponentOptions } from "@albumjs/album/server"
 import { renderToPipeableStream } from "react-dom/server"
 import { Writable } from "stream"
 import { SSRContext } from "../ssr/SSRContext"

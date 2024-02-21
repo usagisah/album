@@ -1,5 +1,5 @@
-import { SSRComposeCoordinate as DevCoordinate, SSRComposeRenderRemoteComponentOptions } from "albumjs/server"
-import { SSRComposeCoordinate as StartCoordinate, SSRComposeProject as StartProject } from "albumjs/start"
+import { SSRComposeCoordinate as DevCoordinate, SSRComposeRenderRemoteComponentOptions } from "@albumjs/album/server"
+import { SSRComposeCoordinate as StartCoordinate, SSRComposeProject as StartProject } from "@albumjs/album/start"
 import { createHash } from "crypto"
 import { existsSync, readFileSync, rmSync } from "fs"
 import { writeFile } from "fs/promises"
