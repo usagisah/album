@@ -1,4 +1,4 @@
-import { UserConfigEnv } from "albumjs/server"
+import { UserConfigEnv } from "@albumjs/album/server"
 
 export default {
   common: { p: "file-common-p" },

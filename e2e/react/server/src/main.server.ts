@@ -1,4 +1,4 @@
-import { Module } from "albumjs/server"
+import { Module } from "@albumjs/album/server"
 import { AppController } from "./server/app.controller"
 
 @Module({

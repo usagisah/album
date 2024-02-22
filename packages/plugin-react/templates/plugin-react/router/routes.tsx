@@ -1,9 +1,6 @@
-import { GuardOnEnter, FC, RouterRoute } from "album"
-import { Routes, Route } from "react-router-dom";
-import { GuardRoute } from "./GuardRoute"
-import { lazyLoad } from "./lazyLoad"
+import { GuardOnEnter, FC, RouterRoute, lazyLoad, GuardRoute } from "album"
+import { Routes, Route } from "react-router-dom"
 "$str_imports$"
-
 type Props = {
   onEnter?: GuardOnEnter
 }

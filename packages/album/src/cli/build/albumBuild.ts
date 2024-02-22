@@ -2,6 +2,7 @@ import { resolve } from "path"
 import { processClient } from "../../app/processClient.js"
 import { createContext } from "../../context/context.dev.js"
 import { ILogger } from "../../logger/logger.type.js"
+import { createSSRComposeManager } from "../../ssrCompose/ssrComposeManager.dev.js"
 import { DevServerParams } from "../cli.type.js"
 import { buildApi } from "./buildApi.js"
 import { buildClient } from "./buildClient.js"
@@ -12,6 +13,8 @@ export async function albumBuild(params: DevServerParams) {
   let _logger: ILogger
   try {
     const context = await createContext({ appId, args, serverMode: "build" })
+    context.ssrComposeManager = await createSSRComposeManager(context)
+
     const { serverMode, ssr, ssrCompose, inputs, outputs, env, appManager, pluginManager, logger } = context
     const { cwd } = inputs
     const { clientOutDir, ssrOutDir } = outputs

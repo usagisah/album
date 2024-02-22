@@ -53,7 +53,8 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Alb
     resolve: {
       alias: {
         album: resolve(dumpInput, "album.client.ts"),
-        "album/server": resolve(dumpInput, "album.server.ts")
+        "album.server": resolve(dumpInput, "album.server.ts"),
+        "album.dependency": resolve(dumpInput, "album.dependency.ts")
       }
     },
     logLevel: serverMode === "build" ? "error" : "info",

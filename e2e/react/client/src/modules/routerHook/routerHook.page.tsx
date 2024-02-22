@@ -1,4 +1,4 @@
-import { useLoader, useRouter, useRoutes, useRoutesMap } from "albumjs"
+import { useLoader, useRouter, useRoutes, useRoutesMap } from "album"
 
 export default function Page() {
   const loader = useLoader()

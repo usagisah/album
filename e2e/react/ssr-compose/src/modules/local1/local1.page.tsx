@@ -1,4 +1,4 @@
-import { createRemoteAppLoader } from "albumjs"
+import { createRemoteAppLoader } from "album"
 
 const LocalAppLoader = createRemoteAppLoader({
   remote: false,

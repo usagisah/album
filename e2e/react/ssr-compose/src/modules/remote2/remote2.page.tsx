@@ -1,4 +1,4 @@
-import { createRemoteAppLoader } from "albumjs"
+import { createRemoteAppLoader } from "album"
 import { Suspense, lazy } from "react"
 import "./style.css"
 

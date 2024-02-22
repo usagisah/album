@@ -1,9 +1,9 @@
 import { queryString } from "@albumjs/album/tools"
 import { GuardLoader, GuardRouteProps, LocalData, RouterRoute, useRoutesMap } from "album"
-import { useContext, useEffect, useRef, useState } from "react"
+import { RouteContext, RouteContextValue, RouteLoaderValue } from "album.dependency"
+import React from "react"
 import { NavigateFunction, matchPath, useLocation, useNavigate, useParams } from "react-router-dom"
 import { callPromiseWithCatch } from "../utils/callWithCatch"
-import { RouteContext, RouteContextValue, RouteLoaderValue } from "./RouteContext"
 
 export function GuardRoute(props: GuardRouteProps) {
   const { children, onEnter, route } = props
@@ -11,15 +11,15 @@ export function GuardRoute(props: GuardRouteProps) {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const parentContext = useContext(RouteContext)
-  const local: LocalData = useRef<any>({}).current
-  const context = useRef<RouteContextValue>({
+  const parentContext = React.useContext(RouteContext)
+  const local: LocalData = React.useRef<any>({}).current
+  const context = React.useRef<RouteContextValue>({
     localData: local,
     parentContext: null,
     loader: null
   } as any).current
 
-  const [Component, setComponent] = useState(!parentContext && onEnter ? null : children)
+  const [Component, setComponent] = React.useState(!parentContext && onEnter ? null : children)
 
   if (parentContext) {
     Object.assign(local, parentContext.localData)
@@ -37,7 +37,7 @@ export function GuardRoute(props: GuardRouteProps) {
     context.loader = new Map()
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     _doEach()
   }, [location.pathname])
 

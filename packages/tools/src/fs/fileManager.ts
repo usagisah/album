@@ -5,6 +5,7 @@ import { isBlank, isEmpty, isFunction } from "../check/index.js"
 
 export interface FileManagerOptions {
   root: string
+  create?: boolean
 }
 
 export type FileType = "dir" | "file"
@@ -20,7 +21,7 @@ export interface FileTreeNode extends FileDescription {
 }
 
 export async function createFileManager(options: FileManagerOptions) {
-  const { root } = options
+  const { root, create = true } = options
   const files = new Map<string, FileDescription>()
 
   async function add(type: "dir", path: string, options?: { force?: boolean }): Promise<void>
@@ -39,14 +40,19 @@ export async function createFileManager(options: FileManagerOptions) {
 
     if (force && exist) {
       await del(type, path)
+      await write({ fileKey, type, path, value: value ?? "" })
+      return
     }
-    await write({ fileKey, type, path, value })
+    if (!exist) {
+      await write({ fileKey, type, path, value: value ?? "" })
+      return
+    }
   }
 
   async function write(options: { fileKey: string; type: FileType; path: string; check?: boolean; value?: string | ((value: string) => any | Promise<any>) }) {
     const { fileKey, path, type, check, value } = options
     if (check && !files.has(fileKey)) {
-      throw `FileManager path-file is not exist`
+      throw `FileManager path-file is not exist. (${path})`
     }
 
     if (type === "dir") {
@@ -56,7 +62,7 @@ export async function createFileManager(options: FileManagerOptions) {
     }
 
     const filepath = join(root, path)
-    let fileContent = value as string
+    let fileContent = value + ""
     try {
       if (isFunction(value)) {
         const file = await readFile(filepath, "utf-8").catch(() => "")
@@ -74,6 +80,10 @@ export async function createFileManager(options: FileManagerOptions) {
   }
 
   async function del(type: FileType, path: string) {
+    if (path.startsWith("/")) {
+      path = path.slice(1)
+    }
+
     const fileKey = buildFileKey(type, path)
     const description = files.get(fileKey)
     if (description) {
@@ -92,7 +102,10 @@ export async function createFileManager(options: FileManagerOptions) {
   }
 
   async function setFile(path: string, value: string | ((value: string) => any | Promise<any>)) {
-    return write({ fileKey: buildFileKey("file", path), type: "file", path, check: true, value })
+    if (path.startsWith("/")) {
+      path = path.slice(1)
+    }
+    return write({ fileKey: buildFileKey("file", path), type: "file", path, check: true, value: value ?? "" })
   }
 
   function buildFileKey(type: FileType, path: string) {
@@ -102,7 +115,9 @@ export async function createFileManager(options: FileManagerOptions) {
   if (isBlank(root)) {
     throw "FileStruct() 参数path必须是一个不为空的字符串"
   }
-  await mkdir(root, { recursive: true })
+  if (create) {
+    await mkdir(root, { recursive: true })
+  }
   return { add, del, setFile }
 }
 

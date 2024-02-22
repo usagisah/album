@@ -23,15 +23,21 @@ export async function createServerManager(input: Inputs, userConfigServer?: User
 
   let _tsconfig: Obj | null = null
   if (_appModule) {
-    if (isPlainObject(tsconfig)) _tsconfig = tsconfig
-    if (isString(tsconfig)) {
-      const configPath = await resolveFilePath({
+    if (isPlainObject(tsconfig)) {
+      _tsconfig = tsconfig
+    }
+
+    let configPath = tsconfig
+    if (!isString(tsconfig)) {
+      configPath = await resolveFilePath({
         root: cwd,
         prefixes: ["./", "server"],
         name: "tsconfig.server",
         exts: ["json"]
       })
-      if (configPath) _tsconfig = await readJson(configPath)
+    }
+    if (isString(configPath)) {
+      _tsconfig = await readJson(configPath)
     }
   }
 

@@ -1,7 +1,7 @@
 import { SSRComposeRenderRemoteComponentOptions } from "@albumjs/album/server"
+import { SSRContext } from "album.dependency"
 import { renderToPipeableStream } from "react-dom/server"
 import { Writable } from "stream"
-import { SSRContext } from "../ssr/SSRContext"
 import { SSRComposeContext } from "./SSRComposeContext"
 
 export function renderComponentToString(filePath: string, renderOptions: SSRComposeRenderRemoteComponentOptions) {

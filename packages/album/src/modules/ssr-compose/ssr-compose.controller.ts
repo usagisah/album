@@ -46,7 +46,7 @@ export class SSRComposeController {
       if (projectMap.has("error")) return await import(projectMap.get("error")!.mainServerInput)
       return () => ({})
     }
-    const importerMap = {}
+    const importerMap = { "album.dependency": "/album.dependency" }
     dependenciesMap.forEach((_, id) => (importerMap[id] = `/${id}`))
     this.context.createSSRComposeContext = () => {
       const ssrComposeContext: AlbumSSRComposeContext = {

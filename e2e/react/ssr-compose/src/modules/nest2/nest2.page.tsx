@@ -1,4 +1,4 @@
-import { createRemoteAppLoader } from "albumjs"
+import { createRemoteAppLoader } from "album"
 import { Suspense } from "react"
 
 const LocalAppLoader = createRemoteAppLoader({

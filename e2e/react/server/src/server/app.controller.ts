@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from "albumjs/server"
+import { Controller, Get, Post } from "@albumjs/album/server"
 
 @Controller()
 export class AppController {

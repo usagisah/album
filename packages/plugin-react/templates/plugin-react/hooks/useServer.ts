@@ -1,11 +1,11 @@
-import { useContext } from "react"
+import React from "react"
 import { SSRContext } from "../ssr/SSRContext"
 
 const map = new Map<string, any>()
 
 export function useServer(p1: any, p2?: any) {
   if (import.meta.env.SSR) {
-    const ctx = useContext(SSRContext)
+    const ctx = React.useContext(SSRContext)
     const { serverDynamicData, logger } = ctx
 
     try {

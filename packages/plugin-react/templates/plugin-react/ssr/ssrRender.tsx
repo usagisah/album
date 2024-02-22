@@ -1,9 +1,9 @@
 import { AlbumSSRRenderOptions } from "@albumjs/album/server"
-import { isPlainObject } from "albumjs"
+import { isPlainObject } from "@albumjs/album/tools"
+import { SSRContext } from "album.dependency"
 import { renderToPipeableStream } from "react-dom/server"
 import { createSSRRouter } from "../router/createSSRRouter"
 import { SSRComposeContext } from "../ssr-compose/SSRComposeContext"
-import { SSRContext } from "./SSRContext"
 import { SSRServerShared } from "./SSRServerShared"
 import { resolveActionRouteData } from "./resolveActionRouteData"
 // @ts-expect-error

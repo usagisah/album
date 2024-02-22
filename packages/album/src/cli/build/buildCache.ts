@@ -11,7 +11,7 @@ export async function buildCache(context: AlbumContext) {
   const { appModule, port } = serverManager
 
   logger.log("正在创建缓存文件，请耐心等待...", "album")
-  const ssrComposeDependencies = ssrComposeManager && ssrComposeManager.dependencies.length > 0 ? await buildSSRComposeDependencies(context) : null
+  const ssrComposeDependencies = ssrComposeManager && (await buildSSRComposeDependencies(context))
   const config: CacheConfig = {
     ssr,
     ssrCompose,

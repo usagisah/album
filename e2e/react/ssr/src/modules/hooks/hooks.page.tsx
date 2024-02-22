@@ -1,4 +1,4 @@
-import { useServer, useServerRouteData } from "albumjs"
+import { useServer, useServerRouteData } from "album.server"
 
 export default function Page() {
   useServer(async () => {

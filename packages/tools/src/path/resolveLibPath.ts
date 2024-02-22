@@ -44,8 +44,17 @@ export async function resolveLibPath(libPath: string) {
   if (subpath) {
     if (subpath.startsWith("/")) subpath = subpath.slice(1)
     return {
+      /**
+       * 在应用中引入的名称路径
+       */
       refPath: [_scope, _name, _subpath].filter(Boolean).join("/"),
+      /**
+       * 名称路径指向的真实入口文件路径
+       */
       refFullPath: resolve(modulePath, subpath),
+      /**
+       * node_modules 路径
+       */
       node_modules,
       scope: _scope,
       name: _name,

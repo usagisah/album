@@ -67,43 +67,53 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
 
 function mountEntry({ info, appFileManager, dumpFileManager }: PluginInitClientParam) {
   const { ssr, ssrCompose } = info
+  /* -------------- common -------------- */
   const pendingSetFiles: Promise<any>[] = [
     appFileManager.setFile("album-env.d.ts", f => {
-      const typePlugin = `/// <reference types=".album/plugin-react" />`
-      return f.includes(typePlugin) ? f : `${f}\n${typePlugin}\n`
+      const typePlugin = `/// <reference types=".album/plugin-react/plugin-react" />`
+      return f.includes(typePlugin) ? f : `${f}${typePlugin}\n`
     }),
-    dumpFileManager.add("file", "plugin-react.d.ts", {
+    dumpFileManager.add("file", "plugin-react/plugin-react.d.ts", {
       async value() {
         let code = await readFile(resolve(__dirname, "../album.d.ts"), "utf-8")
+        if (!ssr) {
+          code = remoteBlock(code, "ssr")
+        }
         if (!ssrCompose) {
           code = remoteBlock(code, "ssr-compose")
         }
         return code
       }
     }),
-    dumpFileManager.setFile("album.client.ts", () => {
+    dumpFileManager.setFile("album.dependency.ts", f => {
       const code = [
-        `import { routes, routesMap } from "./plugin-react/router/routes"`,
         `export { useRouter } from "./plugin-react/hooks/useRouter"`,
         `export { useLoader } from "./plugin-react/hooks/useLoader"`,
-        `export const useRoutes = () => routes`,
-        `export const useRoutesMap = () => routesMap`
+        `export { RouteContext } from "./plugin-react/router/RouteContext"`,
+        `export { lazyLoad } from "./plugin-react/router/lazyLoad"`
       ]
+      if (ssr) {
+        code.push(
+          `export { useServer } from "./plugin-react/hooks/useServer"`,
+          `export { useServerRouteData } from "./plugin-react/hooks/useServerRouteData"`,
+          `export { SSRContext } from "./plugin-react/ssr/SSRContext"`
+        )
+      }
       if (ssrCompose) {
         code.push(`export { createRemoteAppLoader } from "./plugin-react/ssr-compose/RemoteAppLoader"`)
       }
-      return code.join("\n") + "\n"
+      return `${f}${code.join("\n")}\n`
+    }),
+    dumpFileManager.setFile("album.client.ts", f => {
+      const code = [
+        `import { routes, routesMap } from "./plugin-react/router/routes"`,
+        `export const useRoutes = () => routes`,
+        `export const useRoutesMap = () => routesMap`,
+        `export { GuardRoute } from "./plugin-react/router/GuardRoute"`
+      ]
+      return `${f}\n${code.join("\n")}\n`
     })
   ]
-  if (ssr) {
-    dumpFileManager.setFile("album.server.ts", f => {
-      const code = [`export { useServer } from "./plugin-react/hooks/useServer"`, `export { useServerRouteData } from "./plugin-react/hooks/useServerRouteData"`]
-      if (ssrCompose) {
-        code.push(`export { createRemoteAppLoader } from "./plugin-react/ssr-compose/RemoteAppLoader"`)
-      }
-      return code.join("\n") + "\n"
-    })
-  }
   return pendingSetFiles
 }
 function remoteBlock(code: string, title: string) {

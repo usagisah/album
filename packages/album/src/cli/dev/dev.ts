@@ -5,6 +5,7 @@ import { SYSTEM_RESTART } from "../../constants.js"
 import { createContext } from "../../context/context.dev.js"
 import { ILogger } from "../../logger/logger.type.js"
 import { processServer } from "../../server/processServer.dev.js"
+import { createSSRComposeManager } from "../../ssrCompose/ssrComposeManager.dev.js"
 import { DevServerParams } from "../cli.type.js"
 
 export async function albumDevServer(params: DevServerParams) {
@@ -13,8 +14,10 @@ export async function albumDevServer(params: DevServerParams) {
   const context = await createContext({ appId, args, serverMode: "dev" })
   try {
     const { serverMode, ssrCompose, ssr, inputs, env, serverManager, pluginManager, logger } = context
-    const { port, appModule, tsconfig } = serverManager
+    context.ssrComposeManager = await createSSRComposeManager(context)
+
     _logger = logger
+    const { port, appModule, tsconfig } = serverManager
 
     await pluginManager.execute("context", { albumContext: context })
     await processClient(context)

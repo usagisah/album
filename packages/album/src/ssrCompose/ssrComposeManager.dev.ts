@@ -5,8 +5,9 @@ import { readdir } from "fs/promises"
 import { dirname, parse, sep } from "path"
 import { UserConfig, mergeConfig, build as viteBuild } from "vite"
 import { AppManager } from "../app/app.dev.type.js"
-import { Inputs } from "../context/context.dev.type.js"
+import { AlbumContext, Inputs } from "../context/context.dev.type.js"
 import { ILogger } from "../logger/logger.type.js"
+import { resolveAlbumViteConfig } from "../middlewares/resolveMiddlewareConfig.js"
 import { AlbumUserConfig, UserSSRCompose } from "../user/user.dev.type.js"
 import { SSRComposeBuild, SSRComposeCoordinate, SSRComposeManager, SSRComposeProject, SSRComposeRewrite } from "./ssrCompose.dev.type.js"
 import { SSRComposeProject as StartProject } from "./ssrCompose.start.type.js"
@@ -21,7 +22,10 @@ type SSRComposeConfigParams = {
   logger: ILogger
 }
 
-export async function createSSRComposeManager({ inputs, userConfigSSRCompose, appManager, userConfig, watcher, logger }: SSRComposeConfigParams) {
+export async function createSSRComposeManager(context: AlbumContext) {
+  const { inputs, appManager, userConfig, watcher, logger } = context
+  const userConfigSSRCompose = userConfig.ssrCompose
+
   if (!userConfigSSRCompose) return null
   const { castExtensions, startRoot, rewrites, dependencies } = userConfigSSRCompose
 
@@ -77,7 +81,7 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
     const ids: string[] = []
     try {
       await viteBuild(
-        mergeConfig(userConfig.vite ?? {}, {
+        mergeConfig(resolveAlbumViteConfig(context), {
           mode: "development",
           logLevel: "error",
           plugins: [
@@ -99,7 +103,7 @@ export async function createSSRComposeManager({ inputs, userConfigSSRCompose, ap
             cssMinify: false,
             rollupOptions: {
               input,
-              external: [..._dependencies, /^albumjs/]
+              external: [..._dependencies, /^album/]
             },
             lib: {
               entry: input,

@@ -27,7 +27,7 @@ declare module "album" {
   export interface RouterRoute extends _RouterRoute {}
 }
 
-declare module "album/server" {
+declare module "album.server" {
   export interface SSRProps {
     mode: string
     serverMode: string
@@ -49,3 +49,5 @@ declare module "album/server" {
     [key: string]: any
   }
 }
+
+declare module "album.dependency" {}

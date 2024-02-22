@@ -1,4 +1,4 @@
-import { LocalData } from "albumjs"
+import { LocalData } from "album"
 
 export default {
   loader: async (data: LocalData) => {

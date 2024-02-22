@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, lazy } from "react"
+import React, { ReactNode } from "react"
 
 export function lazyLoad(
   factory: () => Promise<{
@@ -6,10 +6,10 @@ export function lazyLoad(
   }>,
   fallback?: ReactNode
 ) {
-  const Component = lazy(factory)
+  const Component = React.lazy(factory)
   return (
-    <Suspense fallback={fallback}>
+    <React.Suspense fallback={fallback}>
       <Component />
-    </Suspense>
+    </React.Suspense>
   )
 }

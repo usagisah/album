@@ -1,4 +1,4 @@
-import { useServer } from "albumjs"
+import { useServer } from "album.server"
 import { useState } from "react"
 import "./style1.css"
 

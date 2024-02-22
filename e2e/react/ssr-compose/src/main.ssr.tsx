@@ -1,4 +1,4 @@
-import { AppRouterFC, SSRProps } from "albumjs"
+import { AppRouterFC, SSRProps } from "album"
 import { App } from "./App"
 import { Head } from "./Head"
 

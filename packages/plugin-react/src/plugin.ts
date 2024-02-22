@@ -99,12 +99,13 @@ export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
         const { clientOutDir } = outputs
         const { dependencies } = ssrComposeManager
         await viteBuild({
+          mode: "production",
           plugins: [viteReactPlugin(pluginReact)],
           logLevel: "error",
           build: {
             reportCompressedSize: false,
             rollupOptions: {
-              external: dependencies,
+              external: [...dependencies, "album.dependency"],
               input: resolve(dumpInput, "plugin-react/ssr-compose/browser.ts"),
               output: {
                 entryFileNames: `browser.js`

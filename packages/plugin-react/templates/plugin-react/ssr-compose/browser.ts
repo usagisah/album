@@ -1,4 +1,4 @@
-import { createRemoteAppLoader } from "./RemoteAppLoader"
+import { createRemoteAppLoader } from "album.dependency"
 
 const _w: any = window
 _w.__$_album_ssr_compose = {

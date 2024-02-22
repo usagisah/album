@@ -2,7 +2,6 @@ import { AppRouterFunComponent } from "album"
 import { Fragment } from "react"
 import { BrowserRouter } from "react-router-dom"
 import { AppRoutes } from "./plugin-react/router/routes"
-
 // @ts-expect-error
 import mainFactory from "'$mainPath$'"
 

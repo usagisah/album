@@ -7,7 +7,6 @@ import { SYSTEM_RESTART } from "../constants.js"
 import { registryEnv } from "../env/env.dev.js"
 import { ILogger } from "../logger/logger.type.js"
 import { createServerManager } from "../server/serverManager.dev.js"
-import { createSSRComposeManager } from "../ssrCompose/ssrComposeManager.dev.js"
 import { loadConfig } from "../user/loadConfig.dev.js"
 import { AlbumContext, Inputs, Outputs } from "./context.dev.type.js"
 import { createFileManager } from "./fileManager.dev.js"
@@ -58,15 +57,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       createServerManager(inputs, userConfig.server)
     ])
     const ssr = !!appManager.mainSSRInput
-    const ssrComposeManager = await createSSRComposeManager({
-      inputs,
-      watcher,
-      appManager,
-      userConfigSSRCompose: userConfig.ssrCompose,
-      userConfig,
-      logger
-    })
-    const { appFileManager, dumpFileManager } = await createFileManager(ssr, inputs)
+    const { appFileManager, dumpFileManager } = await createFileManager(ssr, ssrCompose, inputs)
 
     // outputs
     const baseOutDir = `${cwd}${sep}dist`
@@ -95,7 +86,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       dumpFileManager: dumpFileManager as any,
       appManager,
       serverManager,
-      ssrComposeManager,
+      ssrComposeManager: null,
       pluginManager,
       userConfig,
 
@@ -107,6 +98,6 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
     }
   } catch (e) {
     _logger.error(e, "album")
-    process.exit(1)
+    throw e
   }
 }

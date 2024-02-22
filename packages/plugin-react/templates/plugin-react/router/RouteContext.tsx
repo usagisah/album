@@ -1,5 +1,5 @@
-import { LocalData } from "album"
-import { createContext } from "react"
+import type { LocalData } from "album"
+import React from "react"
 
 export type RouteLoaderStage = "loading" | "success" | "fail"
 export type RouteLoaderValue = { value: any; pending: ((stage: RouteLoaderStage, value: any) => any)[]; stage: RouteLoaderStage }
@@ -10,4 +10,4 @@ export type RouteContextValue = {
   parentContext?: RouteContextValue
 }
 
-export const RouteContext = createContext<RouteContextValue>(null as any)
+export const RouteContext = React.createContext<RouteContextValue>(null as any)

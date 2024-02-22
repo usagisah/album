@@ -10,7 +10,7 @@
     "start": "album start"
   },
   "dependencies": {
-    "albumjs": "workspace:^",
+    "@albumjs/album": "workspace:^",
     "@albumjs/plugin-react": "workspace:^",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

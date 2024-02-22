@@ -1,4 +1,4 @@
-import { AlbumSSRContext } from "@albumjs/album/server"
-import { createContext } from "react"
+import type { AlbumSSRContext } from "@albumjs/album/server"
+import React from "react"
 
-export const SSRContext = createContext<AlbumSSRContext>({} as any)
+export const SSRContext = React.createContext<AlbumSSRContext>(null as any)

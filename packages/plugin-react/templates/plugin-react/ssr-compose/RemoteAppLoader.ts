@@ -1,6 +1,6 @@
 import { SSRComposeRenderRemoteComponentReturn } from "@albumjs/album/server"
-import { isPlainObject, isString } from "albumjs"
-import { createElement, useContext } from "react"
+import { isPlainObject, isString } from "@albumjs/album/tools"
+import React from "react"
 import { SSRContext } from "../ssr/SSRContext"
 import { SSRComposeContext } from "./SSRComposeContext"
 
@@ -30,9 +30,9 @@ export function createRemoteAppLoader(props: { remote: boolean; url: string }) {
 
     const _sourcePath = url + "_" + sourcePath
     if (import.meta.env.SSR) {
-      const ssrContext = useContext(SSRContext)
+      const ssrContext = React.useContext(SSRContext)
       const { serverDynamicData, req: request, res: response, headers, logger } = ssrContext
-      const composeContext = useContext(SSRComposeContext)
+      const composeContext = React.useContext(SSRComposeContext)
       const { sources, renderRemoteComponent } = composeContext
       const _props = JSON.stringify(props)
 
@@ -41,7 +41,7 @@ export function createRemoteAppLoader(props: { remote: boolean; url: string }) {
 
       const _cache = _source?.cache[_props]
       if (_cache) {
-        return createElement(isString(wrapperName) && wrapperName.length > 0 ? wrapperName : "div", {
+        return React.createElement(isString(wrapperName) && wrapperName.length > 0 ? wrapperName : "div", {
           ...(isPlainObject(wrapperProps) ? wrapperProps : {}),
           dangerouslySetInnerHTML: { __html: _cache.html }
         })
@@ -123,9 +123,9 @@ export function createRemoteAppLoader(props: { remote: boolean; url: string }) {
       console.error("[error]", "ssr-compose -> ", `无法找到匹配的资源（${sourcePath}），请检查服务器数据拉取是否存在问题`)
       return null
     }
-    return createElement(isString(wrapperName) && wrapperName.length > 0 ? wrapperName : "div", {
+    return React.createElement(isString(wrapperName) && wrapperName.length > 0 ? wrapperName : "div", {
       ...(isPlainObject(wrapperProps) ? wrapperProps : {}),
-      children: createElement(Component, { ...props })
+      children: React.createElement(Component, { ...props })
     })
   }
   return RemoteAppLoader

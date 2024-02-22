@@ -9,18 +9,11 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": false,
-    "experimentalDecorators": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "outDir": "./dist",
     "baseUrl": ".",
-    "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": true,
-    "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "paths": {
       "@modules/*": [
@@ -36,7 +29,9 @@
     "src/**/*.tsx",
     ".album/**/*.ts",
     ".album/**/*.tsx",
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "env.ts",
+    "album.config.ts"
   ],
   "exclude": [
     "node_modules"

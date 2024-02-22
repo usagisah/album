@@ -1,7 +1,7 @@
+import { defineAlbumConfig } from "@albumjs/album/config"
 import react from "@albumjs/plugin-react"
-import { defineConfig } from "albumjs/config"
 
-export default defineConfig({
+export default defineAlbumConfig({
   plugins: [react()],
   env: [{ common: { a: "config-common-a" }, production: { b: "config-dev-b" }, development: { b: "config-dev-b" } }, "env"],
   server: {

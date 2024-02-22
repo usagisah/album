@@ -28,6 +28,9 @@ declare module "album" {
     [key: string]: any
   }
   export type AppRouterFunComponent = FC<{ Layout: FC<any>; onEnter?: GuardOnEnter }>
+
+  export function GuardRoute(props: GuardRouteProps): ReactNode
+  export function lazyLoad(factory: () => Promise<{ default: any }>, fallback?: ReactNode): ReactNode
   /* -------------- router-end -------------- */
 
   /* -------------- ssr-compose -------------- */
@@ -53,7 +56,7 @@ declare module "album" {
   /* -------------- hooks-end -------------- */
 }
 
-declare module "album/server" {
+declare module "album.server" {
   /* -------------- hooks -------------- */
   export function useServer(fn: (context: SSRProps) => any): Promise<void>
   export function useServer<T>(id: string, fn: (ctx: SSRProps) => T | Promise<T>): T
