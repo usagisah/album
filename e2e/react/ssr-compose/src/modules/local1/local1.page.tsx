@@ -1,4 +1,5 @@
 import { createRemoteAppLoader } from "album"
+import "./local1.css"
 
 const LocalAppLoader = createRemoteAppLoader({
   remote: false,

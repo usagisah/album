@@ -71,7 +71,12 @@ export class SSRServerShared {
     this.browserScript = "/" + relative(cwd, resolve(root, "plugin-react/ssr-compose/browser.ts"))
     this.PreRender = () => (
       <>
-        <script type="module" dangerouslySetInnerHTML={{ __html: `import { injectIntoGlobalHook } from "/@react-refresh";injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;` }}></script>
+        <script
+          type="module"
+          dangerouslySetInnerHTML={{
+            __html: `import { injectIntoGlobalHook } from "/@react-refresh";injectIntoGlobalHook(window);window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;`
+          }}
+        ></script>
         <script type="module" src="/@vite/client"></script>
       </>
     )

@@ -59,8 +59,8 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
         }
       }
 
-      let clientScript = ""
       if (ssrCompose) {
+        const code = sendMode === "string" ? readPipeStreamCode(pipe) : ""
         let cssCode = ""
         let jsCode = ""
         for (const sourcePath of Object.getOwnPropertyNames(sources)) {
@@ -72,30 +72,44 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
           source.importPaths.forEach(p => (importers += `"${p}",`))
           jsCode += `{sid:"${sourcePath}",type:1,paths:[${importers}]},`
         }
-        const loadCode = `const {loadModules}=window.__$_album_ssr_compose;const m=await loadModules([${cssCode + jsCode}]);`
-        clientScript = `<script type="module">await import("${browserScript}");${loadCode}import("${mainEntryPath}");</script>`
+        const clientScript = [
+          `<script type="module">`,
+          `await import("${browserScript}");`,
+          `const {loadModules}=window.__$_album_ssr_compose;const m=await loadModules([${cssCode + jsCode}]);`,
+          `import("${mainEntryPath}");`,
+          "</script>"
+        ]
+        return res.write(code + clientJsonData + clientScript.join(""))
       }
 
       if (sendMode === "string") {
-        let code = ""
-        pipe(
-          new Writable({
-            write(c, _, cb) {
-              code += c.toString()
-              cb()
-            }
-          })
-        )
+        const code = readPipeStreamCode(pipe)
         const flag = "</head>"
         const index = code.indexOf(flag)
         if (index > -1) {
-          res.send(code.replace(flag, flag + clientJsonData + clientScript))
+          res.send(code.replace(flag, flag + clientJsonData))
         } else {
-          res.send(clientJsonData + clientScript + code)
+          res.send(clientJsonData + code)
         }
-      } else {
-        res.write(clientJsonData + clientScript + `<script type="module" src="${mainEntryPath}"><\/script>`)
+        return
       }
+      if (sendMode === "pipe" && !ssrCompose) {
+        return res.send(clientJsonData + `<script type="module" src="${mainEntryPath}"><\/script>`)
+      }
+      return res.status(500).send("")
     }
   })
+}
+
+function readPipeStreamCode(pipe: (destination: Writable) => Writable) {
+  let code = ""
+  pipe(
+    new Writable({
+      write(c, _, cb) {
+        code += c.toString()
+        cb()
+      }
+    })
+  )
+  return code
 }
