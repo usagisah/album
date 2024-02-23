@@ -7,7 +7,7 @@
     "incremental": true,
     "declaration": true,
     "sourceMap": true,
-    "removeComments": true,
+    "removeComments": false,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "strictNullChecks": false,

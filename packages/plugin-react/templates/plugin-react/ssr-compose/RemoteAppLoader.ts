@@ -30,8 +30,8 @@ export function createRemoteAppLoader(props: { remote: boolean; url: string }) {
 
     const _sourcePath = url + "_" + sourcePath
     if (import.meta.env.SSR) {
-      const ssrContext = React.useContext(SSRContext)
-      const { serverDynamicData, req: request, res: response, headers, logger } = ssrContext
+      const { context, getSSRProps } = React.useContext(SSRContext)
+      const { serverDynamicData, req: request, res: response, headers, logger } = context
       const composeContext = React.useContext(SSRComposeContext)
       const { sources, renderRemoteComponent } = composeContext
       const _props = JSON.stringify(props)

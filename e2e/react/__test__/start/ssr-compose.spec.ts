@@ -3,7 +3,7 @@ import { setupPuppeteer } from "../../../helpers/puppeteer"
 
 const pId = "react/ssr-compose"
 const { page, html, text } = await setupPuppeteer(pId)
-const { port } = await setupProject(pId, "start", ["dist"])
+const port = await setupProject(pId, "start", ["dist"])
 
 it("remote", async () => {
   const p = page()

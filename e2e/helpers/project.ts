@@ -1,16 +1,13 @@
 import { red } from "colorette"
 import { execa } from "execa"
-import { rm, writeFile } from "fs/promises"
+import { writeFile } from "fs/promises"
 import { resolve } from "path"
+import { killActiveProject } from "./killActiveProject"
 
 export function setupProject(pkgRoot: string, scriptName: string, params: string[] = []) {
-  async function kill(id?: number) {
-    if (!id) return
-    process.kill(id)
-    await rm(resolve(__dirname, ".pid", id + ""), { force: true })
-  }
+  return new Promise<number>(async (success, fail) => {
+    await killActiveProject()
 
-  return new Promise<{ kill: () => Promise<void>; port: number }>((success, fail) => {
     const pkgPath = resolve(__dirname, "../", pkgRoot)
     const p = execa("npm", ["run", scriptName, "--prefix", pkgPath, ...params])
     const pid = p.pid
@@ -21,7 +18,7 @@ export function setupProject(pkgRoot: string, scriptName: string, params: string
         return fail(pkgPath)
       }
       if (message.includes("listen")) {
-        success({ kill: () => kill(pid), port: Number(message.match(/localhost:(\d+)/)![1]) })
+        success(Number(message.match(/localhost:(\d+)/)![1]))
         if (pid) {
           await writeFile(resolve(__dirname, ".pid", pid.toString()), "")
         }

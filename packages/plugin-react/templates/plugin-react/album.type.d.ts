@@ -5,7 +5,7 @@
 import { Context } from "react"
 declare module "album.dependency" {
   export const RouteContext: Context<any>
-  export const SSRContext: Context<any>
+  export const SSRContext: Context<{ context: any; getSSRProps: () => any }>
   export type RouteLoaderStage = "loading" | "success" | "fail"
   export type RouteLoaderValue = { value: any; pending: ((stage: RouteLoaderStage, value: any) => any)[]; stage: RouteLoaderStage }
   export type RouteContextValue = {

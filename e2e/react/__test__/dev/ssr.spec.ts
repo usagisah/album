@@ -1,6 +1,6 @@
-import { setupProject } from "../../helpers/project"
-import { setupPuppeteer } from "../../helpers/puppeteer"
-import { replacePlaceholder } from "../../helpers/ssr"
+import { setupProject } from "../../../helpers/project"
+import { setupPuppeteer } from "../../../helpers/puppeteer"
+import { replacePlaceholder } from "../../../helpers/ssr"
 
 const pId = "react/ssr"
 await setupProject(pId, "dev")

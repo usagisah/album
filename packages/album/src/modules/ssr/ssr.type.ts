@@ -45,6 +45,7 @@ export type AlbumSSRContext = {
 
 export type AlbumSSRRenderOptions = {
   ssrContext: AlbumSSRContext
+  getSSRProps: () => Record<any, any>
   ssrComposeContext: AlbumSSRComposeContext | null
 }
 

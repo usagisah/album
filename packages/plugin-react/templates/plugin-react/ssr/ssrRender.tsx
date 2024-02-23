@@ -11,18 +11,18 @@ import userSSREntry from "'$mainServerPath$'"
 import { Writable } from "stream"
 
 export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
-  const { ssrContext, ssrComposeContext } = renderOptions
+  const { ssrContext, getSSRProps, ssrComposeContext } = renderOptions
   const { logger, ssrCompose, req, res, serverRouteData, serverDynamicData } = ssrContext
   const { sendMode } = ssrContext.ssrRender
   const { sources } = ssrComposeContext ?? {}
   const { PreRender, mainEntryPath, browserScript } = await SSRServerShared.resolveContext(renderOptions)
 
-  const actionData = await resolveActionRouteData(ssrContext)
-  const { App = null, Head = null, data } = await (userSSREntry as any)(createSSRRouter(req.albumOptions?.originalUrl ?? req.url), ssrContext)
+  const actionData = await resolveActionRouteData(ssrContext, getSSRProps)
+  const { App = null, Head = null, data } = await (userSSREntry as any)(createSSRRouter(req.albumOptions?.originalUrl ?? req.url), getSSRProps())
   Object.assign(serverRouteData, actionData, isPlainObject(data) ? data : {})
 
   let app = (
-    <SSRContext.Provider value={ssrContext}>
+    <SSRContext.Provider value={{ context: ssrContext, getSSRProps }}>
       <html lang="en">
         <head>
           <PreRender />

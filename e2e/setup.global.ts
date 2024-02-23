@@ -1,7 +1,7 @@
 import { green } from "colorette"
 import { execa } from "execa"
-import { readdir, rm } from "fs/promises"
 import { resolve } from "path"
+import { killActiveProject } from "./helpers/killActiveProject"
 
 export async function setup() {
   const target = process.argv.slice(5)
@@ -19,21 +19,9 @@ export async function setup() {
       process.stdout.write(green(`build ${target[0]} success\n`))
     }
   }
-  await clearProject()
+  await killActiveProject()
 }
 
 export async function teardown() {
-  await clearProject()
-}
-
-async function clearProject() {
-  const pid = await readdir(resolve(__dirname, "./helpers/.pid"))
-  return Promise.all(
-    pid.map(async id => {
-      try {
-        process.kill(Number(id))
-      } catch {}
-      return await rm(resolve(__dirname, "./helpers/.pid", id), { force: true })
-    })
-  )
+  await killActiveProject()
 }

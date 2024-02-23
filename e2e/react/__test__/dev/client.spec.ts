@@ -1,5 +1,5 @@
-import { setupProject } from "../../helpers/project"
-import { setupPuppeteer, timeout } from "../../helpers/puppeteer"
+import { setupProject } from "../../../helpers/project"
+import { setupPuppeteer, timeout } from "../../../helpers/puppeteer"
 
 const pId = "react/client"
 await setupProject(pId, "dev")

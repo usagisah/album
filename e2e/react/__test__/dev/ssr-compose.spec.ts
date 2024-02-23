@@ -1,11 +1,11 @@
-import { setupProject } from "../../helpers/project"
-import { setupPuppeteer } from "../../helpers/puppeteer"
+import { setupProject } from "../../../helpers/project"
+import { setupPuppeteer } from "../../../helpers/puppeteer"
 
 const pId = "react/ssr-compose"
 const { page, html, text } = await setupPuppeteer(pId)
 
 it("remote", async () => {
-  const { port } = await setupProject(pId, "dev", ["remote1"])
+  const port = await setupProject(pId, "dev", ["remote1"])
   const p = page()
   await p.goto(`http://localhost:${port}/remote1`)
   await p.waitForSelector("#remote3")
@@ -22,7 +22,7 @@ it("remote", async () => {
 })
 
 it("local", async () => {
-  const { port } = await setupProject(pId, "dev", ["local1"])
+  const port = await setupProject(pId, "dev", ["local1"])
   const p = page()
   await p.goto(`http://localhost:${port}/local1`)
   await p.waitForSelector("#local3")
@@ -39,7 +39,7 @@ it("local", async () => {
 })
 
 it("nest", async () => {
-  const { port } = await setupProject(pId, "dev", ["nest1"])
+  const port = await setupProject(pId, "dev", ["nest1"])
   const p = page()
   await p.goto(`http://localhost:${port}/nest1`)
   await p.waitForSelector("#nest4")
@@ -51,7 +51,7 @@ it("nest", async () => {
 })
 
 it("home", async () => {
-  const { port } = await setupProject(pId, "dev", ["home"])
+  const port = await setupProject(pId, "dev", ["home"])
   const p = page()
   await p.goto(`http://localhost:${port}`)
   await p.waitForSelector("#home")
@@ -59,7 +59,7 @@ it("home", async () => {
 })
 
 it("error", async () => {
-  const { port } = await setupProject(pId, "dev", ["error"])
+  const port = await setupProject(pId, "dev", ["error"])
   const p = page()
   await p.goto(`http://localhost:${port}/xx`)
   await p.waitForSelector("#error")

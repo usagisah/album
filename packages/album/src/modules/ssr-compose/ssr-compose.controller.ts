@@ -64,22 +64,15 @@ export class SSRComposeController {
             return res.status(404).send()
           }
 
-          const { ssrContext } = moduleContext.createSSRRenderOptions(ctrl)
+          const { ssrContext, getSSRProps } = moduleContext.createSSRRenderOptions(ctrl)
           const renderOptions: SSRComposeRenderRemoteComponentOptions = {
             renderProps,
             ssrContext,
+            getSSRProps,
             ssrComposeContext
           }
           return userComposeRender(renderOptions)
         },
-        // existsProject(prefix, sourcePath) {
-        //   let value = coordinateInputs.get(prefix)
-        //   if (!value) value = coordinateInputs.get("error")
-        //   if (!value) return null
-        //   const _value = (value as SSRComposeStartCoordinateValue).coordinate[sourcePath]
-        //   if (!_value) return null
-        //   return value
-        // },
         ssrComposeBuild: null as any
       }
       return ssrComposeContext
@@ -107,10 +100,11 @@ export class SSRComposeController {
             return res.status(404).send()
           }
 
-          const { ssrContext } = moduleContext.createSSRRenderOptions(ctrl)
+          const { ssrContext, getSSRProps } = moduleContext.createSSRRenderOptions(ctrl)
           const renderOptions: SSRComposeRenderRemoteComponentOptions = {
             renderProps,
             ssrContext,
+            getSSRProps,
             ssrComposeContext
           }
           return userComposeRender(renderOptions)

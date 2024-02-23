@@ -36,6 +36,17 @@ export class SSRController {
     let createOptions = this.context.createSSRRenderOptions
     if (!Reflect.has(createOptions, "overwrite")) {
       createOptions = this.context.createSSRRenderOptions = ({ req, res, headers }) => {
+        const getSSRProps = (p = {}) => {
+          const c = userSSRRenderOptions.ssrContext
+          return {
+            query: { ...c.query },
+            headers: { ...c.headers },
+            params: { ...c.params },
+            albumOptions: { ...c.albumOptions },
+            logger,
+            ...p
+          }
+        }
         const userSSRRenderOptions: AlbumSSRRenderOptions = {
           ssrContext: {
             serverMode,
@@ -56,8 +67,10 @@ export class SSRController {
             serverDynamicData: {},
             serverRouteData: {}
           },
+          getSSRProps,
           ssrComposeContext: null
         }
+
         return userSSRRenderOptions
       }
       Object.defineProperty(createOptions, "overwrite", { configurable: false, enumerable: false, get: () => true })
@@ -97,6 +110,17 @@ export class SSRController {
     let createOptions = this.context.createSSRRenderOptions
     if (!Reflect.has(createOptions, "overwrite")) {
       createOptions = this.context.createSSRRenderOptions = function ({ req, res, headers }) {
+        const getSSRProps = (p = {}) => {
+          const c = userSSRRenderOptions.ssrContext
+          return {
+            query: { ...c.query },
+            headers: { ...c.headers },
+            params: { ...c.params },
+            albumOptions: { ...c.albumOptions },
+            logger,
+            ...p
+          }
+        }
         const userSSRRenderOptions: AlbumSSRRenderOptions = {
           ssrContext: {
             serverMode,
@@ -117,6 +141,7 @@ export class SSRController {
             serverDynamicData: {},
             serverRouteData: {}
           },
+          getSSRProps,
           ssrComposeContext: null
         }
         return userSSRRenderOptions

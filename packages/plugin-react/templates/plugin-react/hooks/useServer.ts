@@ -5,12 +5,12 @@ const map = new Map<string, any>()
 
 export function useServer(p1: any, p2?: any) {
   if (import.meta.env.SSR) {
-    const ctx = React.useContext(SSRContext)
-    const { serverDynamicData, logger } = ctx
+    const { context, getSSRProps } = React.useContext(SSRContext)
+    const { serverDynamicData, logger } = context
 
     try {
       if (!p2) {
-        return p1(ctx)
+        return p1(getSSRProps())
       }
 
       if (Reflect.has(serverDynamicData, p1)) {
@@ -22,7 +22,7 @@ export function useServer(p1: any, p2?: any) {
 
     throw new Promise(async resolve => {
       try {
-        serverDynamicData[p1] = await p2(ctx)
+        serverDynamicData[p1] = await p2(getSSRProps())
       } catch (e: any) {
         logger.error(e, "useServer")
       } finally {

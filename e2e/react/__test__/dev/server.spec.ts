@@ -1,4 +1,4 @@
-import { setupProject } from "../../helpers/project"
+import { setupProject } from "../../../helpers/project"
 
 const pId = "react/server"
 await setupProject(pId, "dev")

@@ -6,13 +6,13 @@ import { SSRComposeContext } from "./SSRComposeContext"
 
 export function renderComponentToString(filePath: string, renderOptions: SSRComposeRenderRemoteComponentOptions) {
   return new Promise<Record<string, any>>(async (resolve, reject) => {
-    const { renderProps, ssrContext, ssrComposeContext } = renderOptions
+    const { renderProps, ssrContext, getSSRProps, ssrComposeContext } = renderOptions
     const { serverDynamicData } = ssrContext
     const _serverDynamicData = (ssrContext.serverDynamicData = {})
     const Component: any = await import(/*@vite-ignore*/ filePath).then(m => m.default)
     const app = (
       <SSRComposeContext.Provider value={ssrComposeContext!}>
-        <SSRContext.Provider value={ssrContext}>
+        <SSRContext.Provider value={{ context: ssrContext, getSSRProps }}>
           <Component {...renderProps.props} />
         </SSRContext.Provider>
       </SSRComposeContext.Provider>
