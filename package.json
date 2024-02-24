@@ -6,7 +6,8 @@
   "author": "顾弦笙/usagisah",
   "type": "module",
   "scripts": {
-    "watch:react": "concurrently 'cd packages/tools && npm run watch' 'cd packages/album && npm run watch' 'cd packages/plugin-react && npm run watch'",
+    "watch:react": "concurrently 'cd packages/tools && npm run watch' 'cd packages/album && npm run watch' 'cd packages/plugin-react && npm run watch' 'cd packages/cli && npm run watch'",
+    "watch:cli": "concurrently 'cd packages/tools && npm run watch' 'cd packages/cli && npm run watch'",
     "format": "prettier --write \"packages/**/*.ts\" \"e2e/**/*.{ts,tsx}\"",
     "test:e2e": "vitest run -c e2e/vitest.config.ts",
     "test:e2e:react-start": "vitest run -c e2e/vitest.config.ts react/__test__/start",

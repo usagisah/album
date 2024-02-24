@@ -1,4 +1,4 @@
-import { any, array, boolean, function as function_, literal, number, object, record, string, union } from "@albumjs/tools/check/zod"
+import { any, array, boolean, function as function_, literal, number, object, record, string, union } from "@albumjs/tools/lib/zod"
 import { isRegExp } from "@albumjs/tools/node"
 
 const regexp = (message = "不是一个正则表达式") => {
