@@ -22,6 +22,10 @@
       "types": "./dist/server.d.ts",
       "default": "./dist/server.js"
     },
+    "./service": {
+      "types": "./dist/service.d.ts",
+      "default": "./dist/service.js"
+    },
     "./start": {
       "types": "./dist/start.d.ts",
       "default": "./dist/start.js"
@@ -37,9 +41,6 @@
     "./types/*": {
       "types": "./types/*.d.ts"
     }
-  },
-  "bin": {
-    "album": "./dist/cli/command.js"
   },
   "scripts": {
     "watch": "tsc -w"

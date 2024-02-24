@@ -9,6 +9,7 @@
     "start": "album start"
   },
   "dependencies": {
+    "@albumjs/cli": "workspace:^",
     "@albumjs/album": "workspace:^",
     "@albumjs/plugin-react": "workspace:^",
     "react": "^18.2.0",

@@ -2,7 +2,7 @@ import { Obj } from "@albumjs/tools/node"
 import { createContext } from "../../context/context.start.js"
 import { ILogger } from "../../logger/logger.type.js"
 import { processServer } from "../../server/processServer.start.js"
-import { StartServerParams } from "../cli.type.js"
+import { StartServerParams } from "../service.type.js"
 
 export async function albumStartServer(params: StartServerParams) {
   let _logger: ILogger = console

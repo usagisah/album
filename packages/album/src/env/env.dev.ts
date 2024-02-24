@@ -1,5 +1,5 @@
-import { ServerMode } from "../cli/cli.type.js"
 import { Inputs } from "../context/context.dev.type.js"
+import { ServerMode } from "../service/service.type.js"
 import { UserConfigEnv } from "../user/user.dev.type.js"
 import { createEmptyEnvValue } from "./createEmptyEnvValue.js"
 import { Env, EnvValue } from "./env.type.js"

@@ -6,7 +6,7 @@ import { createContext } from "../../context/context.dev.js"
 import { ILogger } from "../../logger/logger.type.js"
 import { processServer } from "../../server/processServer.dev.js"
 import { createSSRComposeManager } from "../../ssrCompose/ssrComposeManager.dev.js"
-import { DevServerParams } from "../cli.type.js"
+import { DevServerParams } from "../service.type.js"
 
 export async function albumDevServer(params: DevServerParams) {
   let { appId = "default", args } = params
