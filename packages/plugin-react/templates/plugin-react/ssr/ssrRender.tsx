@@ -36,6 +36,7 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
     app = <SSRComposeContext.Provider value={ssrComposeContext!}>{app}</SSRComposeContext.Provider>
   }
 
+  const complete = () => setTimeout(() => res.send())
   const { pipe } = renderToPipeableStream(app, {
     onShellReady() {
       res.header("content-type", "text/html")
@@ -58,9 +59,12 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
           logger.error("server-router-data 必须能够被 JSON.stringify 序列化", "失败信息", serverRouteData, "ssrRender")
         }
       }
+      res.write(clientJsonData)
 
       if (ssrCompose) {
         const code = sendMode === "string" ? readPipeStreamCode(pipe) : ""
+        res.write(code)
+
         let cssCode = ""
         let jsCode = ""
         for (const sourcePath of Object.getOwnPropertyNames(sources)) {
@@ -79,24 +83,19 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
           `import("${mainEntryPath}");`,
           "</script>"
         ]
-        return res.write(code + clientJsonData + clientScript.join(""))
+        res.write(clientScript.join(""))
+        return complete()
       }
 
       if (sendMode === "string") {
-        const code = readPipeStreamCode(pipe)
-        const flag = "</head>"
-        const index = code.indexOf(flag)
-        if (index > -1) {
-          res.send(code.replace(flag, flag + clientJsonData))
-        } else {
-          res.send(clientJsonData + code)
-        }
-        return
+        res.write(readPipeStreamCode(pipe))
+        return complete()
       }
-      if (sendMode === "pipe" && !ssrCompose) {
-        return res.write(clientJsonData + `<script type="module" src="${mainEntryPath}"><\/script>`)
+      if (sendMode === "pipe") {
+        res.write(`<script type="module" src="${mainEntryPath}"><\/script>`)
+        return complete()
       }
-      return res.status(500).send("")
+      return res.status(500), complete()
     }
   })
 }

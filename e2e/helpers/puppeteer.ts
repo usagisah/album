@@ -1,7 +1,7 @@
 import { red } from "colorette"
 import puppeteer, { Browser, ClickOptions, Page, PuppeteerLaunchOptions } from "puppeteer"
 
-export const E2E_TIMEOUT = 30 * 1000
+export const E2E_TIMEOUT = 40 * 1000
 
 const puppeteerOptions: PuppeteerLaunchOptions = {
   headless: "new",

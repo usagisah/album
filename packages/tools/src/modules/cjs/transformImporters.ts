@@ -1,6 +1,9 @@
 import { parse, traverse } from "@babel/core"
 import MS from "magic-string"
+import { createCommonJS } from "mlly"
 import { makeLegalIdentifier } from "../makeLegalIdentifier.js"
+
+const { require } = createCommonJS(import.meta.url)
 
 function createMakeLegalName() {
   const counter = { true: 0, false: 0 }
@@ -13,7 +16,7 @@ function createMakeLegalName() {
 export function cjsImporterToEsm(code: string, cjsModules: string[]) {
   const str = new MS(code)
   const makeLegalName = createMakeLegalName()
-  traverse(parse(code, { plugins: ["@babel/plugin-syntax-jsx", ["@babel/plugin-syntax-typescript", { isTSX: true }]] })!, {
+  traverse(parse(code, { plugins: [require("@babel/plugin-syntax-jsx"), [require("@babel/plugin-syntax-typescript"), { isTSX: true }]] })!, {
     ExportAllDeclaration({ node }) {
       const importedName = node.source.value
       if (!cjsModules.includes(importedName)) return

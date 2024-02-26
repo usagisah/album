@@ -13,7 +13,7 @@ export function expressConfigs(context: Context) {
 }
 
 const helmetConfig: AlbumServerExpressConfig = {
-  enable: false,
+  enable: true,
   name: "helmet",
   config: [
     {
@@ -40,7 +40,7 @@ const sirvConfig = function (root: string, dev: boolean): AlbumServerExpressConf
   return {
     enable: true,
     name: "sirv",
-    config: [root, { dev, gzip: true, etag: false, dotfiles: false, brotli: false, single: false, extensions: [], maxAge: 31536000, immutable: true } as SirvOptions],
+    config: [root, { dev, gzip: false, etag: false, dotfiles: false, brotli: false, single: false, extensions: [], maxAge: /*31536000*/undefined, immutable: false } as SirvOptions],
     factory: async (...config: any[]) => sirv.apply(globalThis, config)
   }
 }
