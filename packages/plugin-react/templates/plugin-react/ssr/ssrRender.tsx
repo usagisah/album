@@ -94,7 +94,7 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
         return
       }
       if (sendMode === "pipe" && !ssrCompose) {
-        return res.send(clientJsonData + `<script type="module" src="${mainEntryPath}"><\/script>`)
+        return res.write(clientJsonData + `<script type="module" src="${mainEntryPath}"><\/script>`)
       }
       return res.status(500).send("")
     }

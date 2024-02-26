@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "src/main.server.ts",
+    "src/server/**/*.ts"
+  ]
+}

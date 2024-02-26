@@ -49,5 +49,10 @@
   ],
   "exclude": [
     "node_modules"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.server.json"
+    }
   ]
 }
