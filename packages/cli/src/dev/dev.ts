@@ -25,7 +25,7 @@ export default function command(cli: CAC, args: ParsedArgs) {
           cProcess.kill()
           cProcess = null
         }
-        cProcess = execa("node", [resolve(__dirname, "./dev.server.default.js"), "--color", JSON.stringify({ appId: appId ?? "default", args })], {
+        cProcess = execa("node", [resolve(__dirname, "./dev.server.setup.js"), "--color", JSON.stringify({ appId: appId ?? "default", args })], {
           cwd: process.cwd(),
           stderr: process.stderr
         })

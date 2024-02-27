@@ -1,0 +1,20 @@
+import { execaCommand } from "execa"
+import { resolve } from "path"
+
+const cwd = process.cwd()
+const target = process.argv.slice(5)
+const buildStart = async () => {
+  // process.stdout.write(green(`building... ${target[0] ?? "all"}\n`))
+  const clientPromise = execaCommand(`cd ${resolve(cwd, "e2e/react/client")} && pnpm build`, { shell: true })
+  const serverPromise = execaCommand(`cd ${resolve(cwd, "e2e/react/server")} && pnpm build`, { shell: true })
+  const ssrPromise = execaCommand(`cd ${resolve(cwd, "e2e/react/ssr")} && pnpm build`, { shell: true })
+  const composePromise = execaCommand(`cd ${resolve(cwd, "e2e/react/ssr-compose")} && pnpm build:all`, { shell: true })
+  const err = await Promise.allSettled([clientPromise, serverPromise, ssrPromise, composePromise]).then(r => r.filter(r => r.status === "rejected"))
+  if (err.length > 0) {
+    throw err.map(e => e.reason)
+  }
+}
+if (target.length === 0 || (target.length === 1 && target[0] === "react/__test__/start")) {
+  await buildStart()
+}
+execaCommand("vitest run -c e2e/vitest.config.ts", { stdout: process.stdout, shell: true })

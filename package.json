@@ -10,7 +10,8 @@
     "watch:cli": "concurrently 'cd packages/tools && npm run watch' 'cd packages/cli && npm run watch'",
     "build": "node scripts/build.mjs",
     "format": "prettier --write \"packages/**/*.ts\" \"e2e/**/*.{ts,tsx}\"",
-    "test:e2e": "vitest run -c e2e/vitest.config.ts",
+    "test:e2e": "node scripts/e2e.mjs",
+    "test:e2e1": "vitest run -c e2e/vitest.config.ts",
     "test:e2e:react-start": "vitest run -c e2e/vitest.config.ts react/__test__/start",
     "pub": "node ./scripts/publish.mjs"
   },

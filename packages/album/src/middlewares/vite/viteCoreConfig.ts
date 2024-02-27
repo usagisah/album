@@ -34,6 +34,7 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Alb
   }
 
   const baseConfig: InlineConfig = {
+    mode: serverMode === "dev" ? "development" : "production",
     base: ssrCompose && serverMode === "build" ? appId : undefined,
     root: cwd,
     configFile: false,
