@@ -1,6 +1,6 @@
 export const pkgBuild = {
   album: {
-    bundler: "esbuild:decorator",
+    bundler: "tsc",
     entries: [{ name: "server" }, { name: "service" }, { name: "config" }, { name: "start" }, { name: "tools", options: {} }]
   },
   cli: {

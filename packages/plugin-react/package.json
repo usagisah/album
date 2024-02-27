@@ -39,15 +39,14 @@
     "@albumjs/album": "workspace:^",
     "@albumjs/tools": "workspace:^",
     "@vitejs/plugin-react-swc": "^3.5.0",
-    "fast-glob": "^3.3.2",
     "path-to-regexp": "^6.2.1",
     "react": "^18.2.0",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "vite": "^5.0.4"
   },
   "devDependencies": {
     "@types/node": "^20.10.3",
     "@types/react": "^18.2.41",
-    "@types/react-dom": "^18.2.17",
-    "vite": "^5.0.4"
+    "@types/react-dom": "^18.2.17"
   }
 }

@@ -3,7 +3,7 @@ import { execa } from "execa"
 import { rm } from "fs/promises"
 import minimist from "minimist"
 import { resolve } from "path"
-import { pkgPreset } from "./config/index.mjs"
+import { pkgBuild, pkgPreset } from "./config/index.mjs"
 
 const cwd = process.cwd()
 const args = minimist(process.argv.slice(2))
@@ -28,30 +28,34 @@ async function build(pkg) {
   console.log(gray(`clear dist success`))
 
   const { bundler, entries } = pkgBuild[pkg]
+  const tscBuildParams = ["--sourcemap", "false", "--incremental", "false", "--removeComments", "true"]
   if (bundler === "tsc") {
-    await execa("tsc", ["-p", tsconfig, "--sourcemap", "false", "--incremental", "false"])
+    await execa("tsc", ["-p", tsconfig, ...tscBuildParams])
     return console.log(green("build dts,bundle success"))
   }
 
-  await execa("tsc", ["-p", tsconfig, "--emitDeclarationOnly", "true", "--incremental", "false"])
+  await execa("tsc", ["-p", tsconfig, "--emitDeclarationOnly", "true", ...tscBuildParams])
   console.log(green(`build dts success`))
 
-  const nodeOptions = {
-    entryPoints: [entries.map(item => resolve(cwd, "packages", pkg, "src", item.name))],
+  const { readJson } = await import("@albumjs/tools/lib/fs-extra")
+  const packageJson = await readJson(resolve(cwd, "packages", pkg, "package.json"))
+  const esbuildNodeOptions = {
+    entryPoints: entries.map(item => resolve(cwd, "packages", pkg, "src", item.name + ".ts")),
     platform: "node",
     format: "esm",
     bundle: true,
     tsconfig,
     minify: false,
-    outdir: dist
+    outdir: dist,
+    external: [...Object.keys(packageJson.dependencies)]
   }
   if (bundler === "esbuild") {
     const { build } = await import("@albumjs/tools/lib/esbuild")
-    await build(nodeOptions)
+    await build(esbuildNodeOptions)
   }
   if (bundler === "esbuild:decorator") {
-    const { esbuildWithDecorator } = await import("@albumjs/tools/bundle")
-    await esbuildWithDecorator(nodeOptions)
+    const { esbuildWithDecorator } = await import("@albumjs/tools/bundle/index")
+    await esbuildWithDecorator(esbuildNodeOptions)
   }
   console.log(green(`build bundle success`))
 }

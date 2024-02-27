@@ -66,16 +66,16 @@
     }
   },
   "dependencies": {
-    "@types/babel__core": "^7.20.5",
-    "@types/fs-extra": "^11.0.4",
-    "@types/inquirer": "^9.0.7",
-    "@types/serialize-javascript": "^5.0.4",
+    "@babel/core": "^7.23.5",
+    "@babel/plugin-syntax-jsx": "^7.23.3",
+    "@babel/plugin-syntax-typescript": "^7.23.3",
     "cac": "^6.7.14",
     "chokidar": "^3.5.3",
     "colorette": "^2.0.20",
     "dayjs": "^1.11.10",
     "esbuild": "^0.19.8",
     "execa": "^8.0.1",
+    "fast-glob": "^3.3.2",
     "fs-extra": "^11.2.0",
     "inquirer": "^9.2.15",
     "magic-string": "^0.30.5",
@@ -90,10 +90,11 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.5",
-    "@babel/plugin-syntax-jsx": "^7.23.3",
-    "@babel/plugin-syntax-typescript": "^7.23.3",
+    "@types/babel__core": "^7.20.5",
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
     "@types/minimist": "^1.2.5",
-    "@types/node": "^20.10.3"
+    "@types/node": "^20.10.3",
+    "@types/serialize-javascript": "^5.0.4"
   }
 }
