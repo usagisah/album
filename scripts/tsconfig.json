@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "baseUrl": ".",
+    "noEmit": true,
+    "allowJs": true
+  },
+  "include": [
+    "./**/*.mjs"
+  ]
+}

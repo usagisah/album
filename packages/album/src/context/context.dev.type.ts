@@ -1,5 +1,5 @@
+import { FSWatcher } from "@albumjs/tools/lib/chokidar"
 import { FileManager } from "@albumjs/tools/node"
-import { FSWatcher } from "chokidar"
 import { ViteDevServer } from "vite"
 import { AppManager } from "../app/app.dev.type.js"
 import { Env } from "../env/env.type.js"

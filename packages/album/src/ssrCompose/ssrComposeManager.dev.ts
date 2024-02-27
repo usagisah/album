@@ -1,5 +1,5 @@
+import { FSWatcher } from "@albumjs/tools/lib/chokidar"
 import { Func, isBlank } from "@albumjs/tools/node"
-import { FSWatcher } from "chokidar"
 import { existsSync, statSync } from "fs"
 import { readdir } from "fs/promises"
 import { dirname, parse, sep } from "path"

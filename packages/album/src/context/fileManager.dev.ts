@@ -1,6 +1,6 @@
+import { createCommonJS } from "@albumjs/tools/lib/mlly"
 import { createFileManager as _createFileManager } from "@albumjs/tools/node"
 import { readFile } from "fs/promises"
-import { createCommonJS } from "mlly"
 import { resolve } from "path"
 import { Inputs } from "./context.dev.type.js"
 

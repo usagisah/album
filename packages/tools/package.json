@@ -71,6 +71,7 @@
     "@types/inquirer": "^9.0.7",
     "@types/serialize-javascript": "^5.0.4",
     "cac": "^6.7.14",
+    "chokidar": "^3.5.3",
     "colorette": "^2.0.20",
     "dayjs": "^1.11.10",
     "esbuild": "^0.19.8",

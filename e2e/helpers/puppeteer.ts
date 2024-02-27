@@ -1,4 +1,4 @@
-import { red } from "colorette"
+import { red } from "@albumjs/tools/lib/colorette"
 import puppeteer, { Browser, ClickOptions, Page, PuppeteerLaunchOptions } from "puppeteer"
 
 export const E2E_TIMEOUT = 40 * 1000

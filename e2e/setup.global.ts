@@ -1,5 +1,5 @@
-import { green } from "colorette"
-import { execaCommand } from "execa"
+import { green } from "@albumjs/tools/lib/colorette"
+import { execaCommand } from "@albumjs/tools/lib/execa"
 import { resolve } from "path"
 import { killActiveProject } from "./helpers/killActiveProject"
 

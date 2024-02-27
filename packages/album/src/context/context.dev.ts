@@ -1,5 +1,5 @@
+import { watch } from "@albumjs/tools/lib/chokidar"
 import { NodeArgs, waitPromiseAll } from "@albumjs/tools/node"
-import { watch } from "chokidar"
 import { resolve, sep } from "path"
 import { createAppManager } from "../app/appManager.dev.js"
 import { SYSTEM_RESTART } from "../constants.js"
