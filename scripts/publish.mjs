@@ -9,7 +9,6 @@ console.clear()
 const cwd = process.cwd()
 const args = minimist(process.argv.slice(2))
 const pubVersion = args._[0]
-const { p } = args
 const { pubPkg } = await q.prompt([
   {
     type: "checkbox",
@@ -45,7 +44,6 @@ const pkgJson = {
 pubPkg.reduce((job, pkg) => job.then(() => publish(pkg)), Promise.resolve())
 
 async function publish(pkg) {
-  debugger
   const info = pkgJson[pkg]
   const restore = await overwritePkgJson(info)
   console.log(yellow(`/* -------------- publish:${pkg} -------------- */`))
@@ -58,9 +56,10 @@ async function publish(pkg) {
     }
   ])
   if (!check) {
+    await restore()
     throw `pub (${pkg}) fail`
   }
-  await execaCommand(`cd ${resolve(info.path, "../")} ${p ? `&& ${p}` : ""} && npm publish --access public`, { shell: true })
+  await execaCommand(`cd ${resolve(info.path, "../")} && npm publish --access public`, { shell: true})
   await restore()
   console.log(green(`pub success`))
 }
@@ -70,28 +69,28 @@ async function overwritePkgJson(info) {
   const _json = JSON.parse(JSON.stringify(originJson))
   const { dependencies, devDependencies } = _json
 
-  const resolveVersion = async (key, val) => {debugger
+  const resolveVersion = async (key, val) => {
     if (key.startsWith("@albumjs/") && val === "workspace:^") {
       const refName = key.split("/")[1]
       let refJson = pkgJson[refName].json
       if (!refJson) {
-        refJson = await readJson(pkgJson[refName].path)
+        refJson = pkgJson[refName].json = await readJson(pkgJson[refName].path)
       }
       return "^" + refJson.version
     }
     return val
   }
   for (const key in dependencies ?? {}) {
-    _json.dependencies[key] = resolveVersion(key, dependencies[key])
+    _json.dependencies[key] = await resolveVersion(key, dependencies[key])
   }
   for (const key in devDependencies ?? {}) {
-    _json.devDependencies[key] = resolveVersion(key, devDependencies[key])
+    _json.devDependencies[key] = await resolveVersion(key, devDependencies[key])
   }
 
   _json.version = originJson.version = pubVersion
   if (!info.json) {
     info.json = originJson
   }
-  await writeJson(info.path, _json)
-  return async () => writeJson(info.path, originJson)
+  await writeJson(info.path, _json, { spaces: 2 })
+  return async () => writeJson(info.path, originJson, { spaces: 2 })
 }
