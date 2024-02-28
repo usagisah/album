@@ -1,13 +1,15 @@
 {
   "name": "@albumjs/album",
-  "version": "0.2.3",
+  "version": "0.1.0",
   "description": "一个组合 vite+nestjs 的集成式框架",
   "keywords": [
-    "@albumjs/album"
+    "@albumjs/album",
+    "album"
   ],
   "files": [
     "dist",
-    "types"
+    "types",
+    "template"
   ],
   "homepage": "https://github.com/usagisah/album#readme",
   "repository": {

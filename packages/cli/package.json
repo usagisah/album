@@ -1,12 +1,14 @@
 {
   "name": "@albumjs/cli",
-  "version": "0.2.3",
-  "description": "一个组合 vite+nestjs 的集成式框架",
+  "version": "0.1.0",
+  "description": "一个组合 ",
   "keywords": [
-    "@albumjs/cli"
+    "@albumjs/cli",
+    "album"
   ],
   "files": [
-    "dist"
+    "dist",
+    ".create.preset"
   ],
   "homepage": "https://github.com/usagisah/album#readme",
   "repository": {

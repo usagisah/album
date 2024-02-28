@@ -1,5 +1,5 @@
 {
-  "name": "@w-hite/album",
+  "name": "albumjs",
   "description": "一个组合 vite+nestjs 的集成式框架",
   "private": true,
   "license": "MIT",

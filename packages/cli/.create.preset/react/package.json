@@ -8,9 +8,9 @@
     "start": "album start"
   },
   "dependencies": {
-    "@albumjs/album": "link:/Users/guxiansheng/Desktop/npm_hub_code/album/packages/album",
-    "@albumjs/cli": "link:/Users/guxiansheng/Desktop/npm_hub_code/album/packages/cli",
-    "@albumjs/plugin-react": "link:/Users/guxiansheng/Desktop/npm_hub_code/album/packages/plugin-react",
+    "@albumjs/album": "^0.1.0",
+    "@albumjs/cli": "^0.1.0",
+    "@albumjs/plugin-react": "^0.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.1",

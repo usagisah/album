@@ -1,11 +1,10 @@
 {
   "name": "@albumjs/plugin-react",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "albumjs 的 react 插件",
   "keywords": [
-    "@albumjs",
-    "albumjs",
-    "@albumjs/plugin-react"
+    "@albumjs/plugin-react",
+    "album"
   ],
   "homepage": "https://github.com/usagisah/plugin-react#readme",
   "repository": {
@@ -40,13 +39,15 @@
     "@albumjs/tools": "workspace:^",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "path-to-regexp": "^6.2.1",
-    "react": "^18.2.0",
-    "react-router-dom": "^6.20.1",
     "vite": "^5.0.4"
   },
   "devDependencies": {
     "@types/node": "^20.10.3",
     "@types/react": "^18.2.41",
     "@types/react-dom": "^18.2.17"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-router-dom": "^6.20.1"
   }
 }
