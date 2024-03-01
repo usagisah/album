@@ -1,6 +1,6 @@
 {
   "name": "@albumjs/tools",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "一个组合 vite+nestjs 的集成式框架",
   "keywords": [
     "@albumjs",
@@ -87,6 +87,7 @@
     "resolve.exports": "^2.0.2",
     "serialize-javascript": "^6.0.2",
     "strip-ansi": "^7.1.0",
+    "typescript": "^5.3.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {

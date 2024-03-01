@@ -59,7 +59,7 @@ async function publish(pkg) {
     await restore()
     throw `pub (${pkg}) fail`
   }
-  await execaCommand(`cd ${resolve(info.path, "../")} && npm publish --access public`, { shell: true})
+  await execaCommand(`cd ${resolve(info.path, "../")} && npm publish --access public`, { shell: true })
   await restore()
   console.log(green(`pub success`))
 }
