@@ -1,4 +1,4 @@
 export const pkgPreset = {
-  all: ["tools", "cli", "album", "plugin-react"],
-  react: ["tools", "cli", "album", "plugin-react"]
+  all: ["tools", "album", "plugin-react", "cli"],
+  react: ["tools", "album", "plugin-react", "cli"]
 }

@@ -5,7 +5,7 @@ import q from "@albumjs/tools/lib/inquirer"
 import { ParsedArgs } from "@albumjs/tools/lib/minimist"
 import { Obj } from "@albumjs/tools/node"
 import { existsSync } from "fs"
-import { basename, resolve } from "path"
+import { basename, relative, resolve } from "path"
 
 let manifest: Obj = null
 let __dirname: string
@@ -13,10 +13,10 @@ export default async function command(cli: CAC, args: ParsedArgs, dirname: strin
   __dirname = dirname
   manifest = await readJson(resolve(__dirname, "../.create.preset/manifest.json"))
   cli
-    .command("create [preset] [project]", "创建一个项目")
+    .command("create [project] [preset]", "创建一个项目")
     .option("-o, --outDir", "在指定位置创建项目")
     .option("-l, --list", "查看所有预设模版列表")
-    .action(async (preset: string, project: string, options: Obj) => {
+    .action(async (project: string, preset: string, options: Obj) => {
       if (options.list) {
         return console.log(green(JSON.stringify(Object.keys(manifest), null, 2)))
       }
@@ -28,6 +28,7 @@ export default async function command(cli: CAC, args: ParsedArgs, dirname: strin
       console.log(green(` 项目创建成功`))
       console.log(green(` 使用模版: ${basename(_preset)}`))
       console.log(green(` 创建路径: ${_outDir}`))
+      console.log(green(` cd ${relative(process.cwd(), _outDir)} && pnpm install`))
       console.log("\n")
     })
 }
@@ -58,13 +59,8 @@ async function resolvePreset(preset: string) {
     })
 }
 
-async function resolveProject(optionOutDir: string, project: string) {
-  let outDir: string
-  if (optionOutDir) {
-    outDir = project ? resolve(optionOutDir, project) : optionOutDir
-  } else {
-    outDir = resolve(process.cwd(), project ?? "album")
-  }
+async function resolveProject(project: string, optionOutDir: string) {
+  const outDir = optionOutDir ?? resolve(process.cwd(), project ?? "album")
   if (!existsSync(outDir)) {
     return outDir
   }
