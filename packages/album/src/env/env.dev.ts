@@ -12,12 +12,14 @@ export async function registryEnv(serverMode: ServerMode, inputs: Inputs, env?: 
     const common = {}
     const development = {}
     const production = {}
-    for (const item of env) {
-      const res = await transformEnvValue(cwd, item)
-      Object.assign(common, res.common)
-      Object.assign(development, res.development)
-      Object.assign(production, res.production)
-    }
+    await Promise.all(
+      env.map(async item => {
+        const res = await transformEnvValue(cwd, item)
+        Object.assign(common, res.common)
+        Object.assign(development, res.development)
+        Object.assign(production, res.production)
+      })
+    )
     envValue = { common, development, production }
   } else {
     envValue = createEmptyEnvValue()

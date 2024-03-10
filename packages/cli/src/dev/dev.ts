@@ -2,7 +2,6 @@ import { CAC } from "@albumjs/tools/lib/cac"
 import { ExecaChildProcess, execa } from "@albumjs/tools/lib/execa"
 import { ParsedArgs } from "@albumjs/tools/lib/minimist"
 import { dirname, resolve } from "path"
-import { Writable } from "stream"
 import { fileURLToPath } from "url"
 import { SYSTEM_RESTART } from "../constants.js"
 
@@ -29,15 +28,10 @@ export default function command(cli: CAC, args: ParsedArgs) {
           cwd: process.cwd(),
           stderr: process.stderr
         })
-        cProcess.stdout!.pipe(
-          new Writable({
-            write(c, _, cb) {
-              if (c.toString().includes(SYSTEM_RESTART)) restart()
-              else process.stdout.write(c)
-              cb()
-            }
-          })
-        )
+        cProcess.stdout.on("data", (c: Buffer) => {
+          if (c.toString().includes(SYSTEM_RESTART)) restart()
+          else process.stdout.write(c)
+        })
       }
       restart()
     })

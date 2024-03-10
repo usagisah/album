@@ -1,8 +1,7 @@
 import { Controller, Get, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
-import { existsSync } from "fs"
 import { readFile } from "fs/promises"
-import { resolve, sep } from "path"
+import { resolve } from "path"
 import { AlbumContext as DevContext } from "../../context/context.dev.type.js"
 import { AlbumContext as StartContext } from "../../context/context.start.type.js"
 import { AlbumContextService } from "../context/album-context.service.js"
@@ -29,11 +28,13 @@ export class SpaController {
   async devSpaRender(req: Request, res: Response) {
     const { url, originalUrl } = req
     const { inputs, viteDevServer } = this.context.getContext() as DevContext
-    const htmlPath = inputs.cwd + sep + "index.html"
-    if (!existsSync(htmlPath)) return res.status(404).send()
-    let html = await readFile(inputs.cwd + sep + "index.html", "utf-8")
-    html = await viteDevServer!.transformIndexHtml(url, html, originalUrl)
-    res.send(html)
+    try {
+      let html = await readFile(resolve(inputs.cwd, "index.html"), "utf-8")
+      html = await viteDevServer!.transformIndexHtml(url, html, originalUrl)
+      res.send(html)
+    } catch (e) {
+      return res.status(404).send()
+    }
   }
 
   async startSpaRender(req: Request, res: Response) {

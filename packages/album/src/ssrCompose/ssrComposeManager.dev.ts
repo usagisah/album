@@ -4,23 +4,12 @@ import { existsSync, statSync } from "fs"
 import { readdir } from "fs/promises"
 import { dirname, parse, sep } from "path"
 import { UserConfig, mergeConfig, build as viteBuild } from "vite"
-import { AppManager } from "../app/app.dev.type.js"
-import { AlbumContext, Inputs } from "../context/context.dev.type.js"
+import { AlbumContext } from "../context/context.dev.type.js"
 import { ILogger } from "../logger/logger.type.js"
 import { resolveAlbumViteConfig } from "../middlewares/resolveMiddlewareConfig.js"
-import { AlbumUserConfig, UserSSRCompose } from "../user/user.dev.type.js"
 import { SSRComposeBuild, SSRComposeCoordinate, SSRComposeManager, SSRComposeProject, SSRComposeRewrite } from "./ssrCompose.dev.type.js"
 import { SSRComposeProject as StartProject } from "./ssrCompose.start.type.js"
 import { createModuleInfo } from "./ssrComposeManager.start.js"
-
-type SSRComposeConfigParams = {
-  inputs: Inputs
-  watcher: FSWatcher
-  appManager: AppManager
-  userConfigSSRCompose?: UserSSRCompose
-  userConfig: AlbumUserConfig
-  logger: ILogger
-}
 
 export async function createSSRComposeManager(context: AlbumContext) {
   const { inputs, appManager, userConfig, watcher, logger } = context
@@ -35,10 +24,8 @@ export async function createSSRComposeManager(context: AlbumContext) {
   }
 
   const _startRoot = startRoot ? `${inputs.cwd}${sep}${startRoot}` : ""
-  if (_startRoot && (!existsSync(_startRoot) || !statSync(_startRoot).isDirectory())) throw `ssr-compose 指定的 startRoot 不合法`
-
   const _dependencies = dependencies ? [...new Set(dependencies)] : []
-
+  
   const _rewrites: SSRComposeRewrite = { encode: [], decode: [] }
   for (const { encode, decode } of rewrites ?? []) {
     _rewrites.encode.push(encode)

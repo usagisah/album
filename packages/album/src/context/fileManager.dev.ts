@@ -13,23 +13,18 @@ export async function createFileManager(ssr: boolean, ssrCompose: boolean, { cwd
     readFile(resolve(__dirname, "../../types/album.d.ts"), "utf-8")
   ])
   const pendingPromises: Promise<any>[] = [
-    dumpFileManager.add("file", "album.client.ts", { value: tempFiles[0], force: true }),
-    dumpFileManager.add("file", "album.d.ts", { value: tempFiles[2], force: true }),
+    dumpFileManager.add("file", "album.client.ts", { value: tempFiles[0] }),
+    dumpFileManager.add("file", "album.d.ts", { value: tempFiles[2] }),
     appFileManager.add("file", "album-env.d.ts", {
       force: true,
-      value: () => {
-        const contents: string[] = [
-          `/// <reference types="@albumjs/album/types/node" />`,
-          `/// <reference types="@albumjs/album/types/vite-client" />`,
-          `/// <reference types=".album/album" />`
-        ]
-        return contents.join("\n") + "\n"
-      }
+      value:
+        [`/// <reference types="@albumjs/album/types/node" />`, `/// <reference types="@albumjs/album/types/vite-client" />`, `/// <reference types=".album/album" />`].join("\n") +
+        "\n"
     }),
     dumpFileManager.add("file", "album.dependency.ts")
   ]
   if (ssr) {
-    pendingPromises.push(dumpFileManager.add("file", "album.server.ts", { value: tempFiles[1], force: true }))
+    pendingPromises.push(dumpFileManager.add("file", "album.server.ts", { value: tempFiles[1] }))
   }
   await Promise.all(pendingPromises)
   return { dumpFileManager, appFileManager }

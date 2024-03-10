@@ -1,5 +1,4 @@
 import { isBlank } from "@albumjs/tools/node"
-import { existsSync } from "fs"
 import { AlbumContext } from "../context/context.dev.type.js"
 import { buildSpecialModules } from "./specialModule.js"
 
@@ -19,8 +18,8 @@ export async function initClient(context: AlbumContext) {
   })
 
   let { realClientInput, realSSRInput } = result
-  if (isBlank(realClientInput) || !existsSync(realClientInput!)) throw `client 客户端真实指向入口(client)不存在(${realClientInput})`
-  if (ssr && (isBlank(realSSRInput) || !existsSync(realSSRInput!))) throw `client 客户端真实指向入口(SSR)不存在(${realSSRInput})`
+  if (isBlank(realClientInput)) throw `client 客户端真实指向入口(client)不存在(${realClientInput})`
+  if (ssr && isBlank(realSSRInput)) throw `client 客户端真实指向入口(SSR)不存在(${realSSRInput})`
 
   appManager.realClientInput = realClientInput!
   appManager.realSSRInput = realSSRInput ?? ""
