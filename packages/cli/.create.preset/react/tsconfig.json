@@ -23,7 +23,7 @@
         "src/modules/common/*"
       ],
       "@components/*": [
-        "src/src/components/*"
+        "src/components/*"
       ],
       "@assets/*": [
         "src/assets/*"
@@ -36,6 +36,9 @@
       ],
       "@store/*": [
         "src/store/*"
+      ],
+      "@constants/*": [
+        "src/constants/*"
       ]
     }
   },
