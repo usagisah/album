@@ -1,1 +1,1 @@
-export const SYSTEM_RESTART = "__$_ALBUM_SERVER_RESTART_"
+export const SYSTEM_RESTART = "_" + Date.now().toString(16)

@@ -2,7 +2,6 @@ import { watch } from "@albumjs/tools/lib/chokidar"
 import { NodeArgs, waitPromiseAll } from "@albumjs/tools/node"
 import { resolve, sep } from "path"
 import { createAppManager } from "../app/appManager.dev.js"
-import { SYSTEM_RESTART } from "../constants.js"
 import { registryEnv } from "../env/env.dev.js"
 import { ILogger } from "../logger/logger.type.js"
 import { createServerManager } from "../server/serverManager.dev.js"
@@ -12,6 +11,7 @@ import { AlbumContext, Inputs, Outputs } from "./context.dev.type.js"
 import { createFileManager } from "./fileManager.dev.js"
 
 export type ContextParams = {
+  SYSTEM_RESTART: string
   appId: string
   serverMode: ServerMode
   args: NodeArgs
@@ -20,7 +20,7 @@ export type ContextParams = {
 export async function createContext(params: ContextParams): Promise<AlbumContext> {
   let _logger: ILogger = console
   try {
-    const { appId, serverMode, args } = params
+    const { appId, serverMode, args, SYSTEM_RESTART } = params
 
     const cwd = process.cwd()
     const dumpInput = `${cwd}${sep}.album`

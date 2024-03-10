@@ -1,7 +1,7 @@
 import { blueBright } from "@albumjs/tools/lib/colorette"
 import { processClient } from "../../app/processClient.js"
 import { rsBuild } from "../../builder/rspack/rspack.build.js"
-import { SYSTEM_RESTART } from "../../constants.js"
+import { DEFAULT_SYSTEM_RESTART } from "../../constants.js"
 import { createContext } from "../../context/context.dev.js"
 import { ILogger } from "../../logger/logger.type.js"
 import { processServer } from "../../server/processServer.dev.js"
@@ -9,9 +9,9 @@ import { createSSRComposeManager } from "../../ssrCompose/ssrComposeManager.dev.
 import { DevServerParams } from "../service.type.js"
 
 export async function albumDevServer(params: DevServerParams) {
-  let { appId = "default", args } = params
+  let { appId = "default", args, SYSTEM_RESTART = DEFAULT_SYSTEM_RESTART } = params
   let _logger: ILogger = console
-  const context = await createContext({ appId, args, serverMode: "dev" })
+  const context = await createContext({ appId, args, serverMode: "dev", SYSTEM_RESTART })
   try {
     const { serverMode, ssrCompose, ssr, inputs, env, serverManager, pluginManager, logger } = context
     context.ssrComposeManager = await createSSRComposeManager(context)
