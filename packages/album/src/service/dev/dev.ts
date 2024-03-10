@@ -51,7 +51,7 @@ export async function albumDevServer(params: DevServerParams) {
           else {
             console.clear()
             logger.log("restart...\n", "album")
-            return process.stdout.write(SYSTEM_RESTART)
+            return process.stderr.write(SYSTEM_RESTART)
           }
           await listenServer().then(devLogger)
         }

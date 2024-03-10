@@ -18,7 +18,6 @@ export type LoadConfigParams = {
 
 export async function loadConfig({ serverMode, inputs, args }: LoadConfigParams) {
   const { cwd, albumConfigInput } = inputs
-  if (!existsSync(albumConfigInput)) throw "找不到配置文件"
 
   const output = resolve(cwd, "_$_album.config.mjs")
   await esbuild({
@@ -34,7 +33,7 @@ export async function loadConfig({ serverMode, inputs, args }: LoadConfigParams)
     if (isFunction(exports)) exports = exports(serverMode, args)
     if (isPlainObject(exports)) config = exports as any
   } finally {
-    await rm(output, { force: true, recursive: true })
+    rm(output, { force: true, recursive: true })
   }
   checkUserConfig(config)
 

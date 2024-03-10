@@ -40,7 +40,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
     })
     watcher.on("change", p => {
       if (p === albumConfigInput) {
-        process.stdout.write(SYSTEM_RESTART)
+        process.stderr.write(SYSTEM_RESTART)
       }
     })
 
