@@ -20,6 +20,11 @@ export async function processServer(context: AlbumContext) {
   await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
   await pluginManager.execute("server", { info: getStaticInfo(), app: serverApp })
 
+  serverApp.use(async (_, __, next) => {
+    await context.clientManager.ready
+    next()
+  })
+
   for (const { enable, name, config, factory } of midConfigs) {
     if (!enable) continue
     try {

@@ -6,7 +6,7 @@ const specialModuleReg = /\.?(page|router|action)\.[a-z]+$/
 
 export async function processClient(context: AlbumContext) {
   const { watcher } = context
-  await initClient(context)
+  context.clientManager.ready = initClient(context)
 
   if (watcher) {
     const filter = (type: string) => {

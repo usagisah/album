@@ -20,7 +20,7 @@ export async function albumDevServer(params: DevServerParams) {
     const { port, appModule, tsconfig } = serverManager
 
     await pluginManager.execute("context", { albumContext: context })
-    await processClient(context)
+    processClient(context)
 
     const devLogger = () => logger.log(`dev config: `, { appId, mode: env.mode, serverMode, ssrCompose, ssr, listen: blueBright(`http://localhost:${port}`) }, "album")
     const listenServer = async () => {

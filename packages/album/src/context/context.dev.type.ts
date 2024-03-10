@@ -44,8 +44,8 @@ export type AlbumContext = {
   env: Env
   outputs: Outputs
 
-  appFileManager: FileManager
-  dumpFileManager: FileManager
+  fileManager: Promise<{ appFileManager: FileManager; dumpFileManager: FileManager }>
+  clientManager: { ready: Promise<any> }
 
   appManager: AppManager
   serverManager: ServerManager

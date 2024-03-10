@@ -57,7 +57,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       createServerManager(inputs, userConfig.server)
     ])
     const ssr = !!appManager.mainSSRInput
-    const { appFileManager, dumpFileManager } = await createFileManager(ssr, ssrCompose, inputs)
+    const fileManager = createFileManager(ssr, ssrCompose, inputs)
 
     // outputs
     const baseOutDir = `${cwd}${sep}dist`
@@ -82,8 +82,9 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
       outputs,
       env,
 
-      appFileManager: appFileManager as any,
-      dumpFileManager: dumpFileManager as any,
+      fileManager,
+      clientManager: { ready: Promise.resolve(true) },
+
       appManager,
       serverManager,
       ssrComposeManager: null,
