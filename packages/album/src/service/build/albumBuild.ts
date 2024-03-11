@@ -1,6 +1,7 @@
-import { resolve } from "path"
 import { processClient } from "../../app/processClient.js"
+import { DEFAULT_SYSTEM_RESTART } from "../../constants.js"
 import { createContext } from "../../context/context.dev.js"
+import { formatSetupInfo } from "../../logger/format.js"
 import { ILogger } from "../../logger/logger.type.js"
 import { createSSRComposeManager } from "../../ssrCompose/ssrComposeManager.dev.js"
 import { DevServerParams } from "../service.type.js"
@@ -12,40 +13,19 @@ export async function albumBuild(params: DevServerParams) {
   let { appId = "default", args } = params
   let _logger: ILogger
   try {
-    const context = await createContext({ appId, args, serverMode: "build" })
+    const context = await createContext({ appId, args, serverMode: "build", SYSTEM_RESTART: DEFAULT_SYSTEM_RESTART })
     context.ssrComposeManager = await createSSRComposeManager(context)
 
-    const { serverMode, ssr, ssrCompose, inputs, outputs, env, appManager, pluginManager, logger } = context
-    const { cwd } = inputs
+    const { ssr, outputs, pluginManager, logger } = context
     const { clientOutDir, ssrOutDir } = outputs
     _logger = logger
 
     await pluginManager.execute("context", { albumContext: context })
     await processClient(context)
 
-    logger.log(
-      "build config: ",
-      {
-        appId,
-        mode: env.mode,
-        serverMode,
-        ssrCompose,
-        client: {
-          clientInput: resolve(cwd, appManager.mainInput),
-          clientOutDir
-        },
-        ssr: {
-          enable: ssr,
-          ...(ssr
-            ? {
-                serverInput: resolve(cwd, appManager.mainSSRInput!),
-                ssrOutDir
-              }
-            : {})
-        }
-      },
-      "album"
-    )
+    const buildInfo: [string, string][] = [["clientOutDir", clientOutDir]]
+    if (ssr) buildInfo.push(["ssrOutDir", ssrOutDir])
+    console.log(formatSetupInfo(appId, context, buildInfo))
 
     await (ssr ? buildSSR(context) : buildClient(context))
     await buildApi(context)

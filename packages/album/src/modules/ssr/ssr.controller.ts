@@ -104,7 +104,8 @@ export class SSRController {
 
   async initDevModule(ctx: DevContext) {
     const { serverMode, ssr, ssrCompose, inputs, env, appManager, viteDevServer, logger } = ctx
-    const { ssrRender, realClientInput, realSSRInput } = appManager
+    // dev下受惰性创建文件的影响，真实客户端入口属性，在这里直接解构可能是空的
+    const { ssrRender } = appManager
     const { cwd, dumpInput } = inputs
 
     let createOptions = this.context.createSSRRenderOptions
@@ -127,7 +128,7 @@ export class SSRController {
             ssr,
             ssrCompose,
             env,
-            inputs: { cwd, root: dumpInput, clientEntryInput: realClientInput },
+            inputs: { cwd, root: dumpInput, clientEntryInput: appManager.realClientInput },
             ssrRender,
 
             req,
@@ -156,7 +157,7 @@ export class SSRController {
     }
 
     this.ssrRender = async options => {
-      const userSSRRender = (await viteDevServer!.ssrLoadModule(realSSRInput!)).ssrRender
+      const userSSRRender = (await viteDevServer!.ssrLoadModule(appManager.realSSRInput)).ssrRender
       const userSSRRenderOptions = createOptions(options)
       if (ssrCompose) userSSRRenderOptions.ssrComposeContext = this.context.createSSRComposeContext()
       return userSSRRender(userSSRRenderOptions)
