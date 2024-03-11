@@ -26,7 +26,7 @@ export default function command(cli: CAC, args: ParsedArgs) {
         }
         cProcess = execa("node", [resolve(__dirname, "./dev.server.setup.js"), "--color", JSON.stringify({ appId: appId ?? "default", args, SYSTEM_RESTART })], {
           cwd: process.cwd(),
-          stdout: process.stdout,
+          stdout: process.stdout
         })
         cProcess.stderr.on("data", (c: Buffer) => {
           if (c.toString().includes(SYSTEM_RESTART)) restart()

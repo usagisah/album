@@ -4,9 +4,9 @@ import { patchClient } from "./patchClient.js"
 
 const specialModuleReg = /\.?(page|router|action)\.[a-z]+$/
 
-export async function processClient(context: AlbumContext) {
+export function processClient(context: AlbumContext) {
   const { watcher } = context
-  context.clientManager.ready = initClient(context)
+  const ready = initClient(context)
 
   if (watcher) {
     const filter = (type: string) => {
@@ -25,4 +25,6 @@ export async function processClient(context: AlbumContext) {
     watcher.on("unlinkDir", filter("unlinkDir"))
     watcher.add(context.appManager.module.modulePath)
   }
+
+  return { ready }
 }

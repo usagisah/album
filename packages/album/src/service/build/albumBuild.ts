@@ -21,7 +21,7 @@ export async function albumBuild(params: DevServerParams) {
     _logger = logger
 
     await pluginManager.execute("context", { albumContext: context })
-    await processClient(context)
+    await processClient(context).ready
 
     const buildInfo: [string, string][] = [["clientOutDir", clientOutDir]]
     if (ssr) buildInfo.push(["ssrOutDir", ssrOutDir])

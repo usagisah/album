@@ -8,7 +8,7 @@ const { page, html, text } = await setupPuppeteer(pId)
 it("env", async () => {
   const p = page()
   await p.goto("http://localhost:5211")
-  await p.waitForSelector("div")
+  await p.waitForSelector("#env")
   expect(await html("#env")).toBe("<p>config-common-a</p><p>config-dev-b</p><p>file-common-p</p><p>file-dev-z</p>")
 })
 
@@ -16,7 +16,7 @@ it("switch router", async () => {
   const p = page()
 
   await p.goto("http://localhost:5211")
-  await p.waitForSelector("div")
+  await p.waitForSelector("#router")
   expect(await text("#router")).toBe("page home")
 
   await p.goto("http://localhost:5211/about")

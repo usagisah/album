@@ -22,7 +22,7 @@ export async function albumDevServer(params: DevServerParams) {
     const { port, appModule, tsconfig } = serverManager
 
     await pluginManager.execute("context", { albumContext: context })
-    processClient(context)
+    context.clientManager = processClient(context)
 
     const devLogger = () => {
       console.log(formatSetupInfo(appId, context, [["takes", ((performance.now() - markStart) / 1000).toFixed(2) + "s"]]))

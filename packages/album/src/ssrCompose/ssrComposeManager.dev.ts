@@ -1,6 +1,6 @@
 import { FSWatcher } from "@albumjs/tools/lib/chokidar"
 import { Func, isBlank } from "@albumjs/tools/node"
-import { existsSync, statSync } from "fs"
+import { existsSync } from "fs"
 import { readdir } from "fs/promises"
 import { dirname, parse, sep } from "path"
 import { UserConfig, mergeConfig, build as viteBuild } from "vite"
@@ -25,7 +25,7 @@ export async function createSSRComposeManager(context: AlbumContext) {
 
   const _startRoot = startRoot ? `${inputs.cwd}${sep}${startRoot}` : ""
   const _dependencies = dependencies ? [...new Set(dependencies)] : []
-  
+
   const _rewrites: SSRComposeRewrite = { encode: [], decode: [] }
   for (const { encode, decode } of rewrites ?? []) {
     _rewrites.encode.push(encode)

@@ -5,7 +5,7 @@ export const E2E_TIMEOUT = 40 * 1000
 
 const puppeteerOptions: PuppeteerLaunchOptions = {
   headless: "new",
-  devtools: false,
+  devtools: true,
   args: ["-no-sandbox", "--disable-setuid-sandbox", "--disable-cache"]
 }
 

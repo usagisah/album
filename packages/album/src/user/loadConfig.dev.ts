@@ -1,6 +1,5 @@
 import { build as esbuild } from "@albumjs/tools/lib/esbuild"
 import { isFunction, isPlainObject, NodeArgs } from "@albumjs/tools/node"
-import { existsSync } from "fs"
 import { rm } from "fs/promises"
 import { resolve } from "path"
 import { Inputs } from "../context/context.dev.type.js"

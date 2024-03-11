@@ -4,7 +4,6 @@ import { AlbumContext } from "../../context/context.dev.type.js"
 const configName = "album:ssr"
 export function createSSRCoreConfig(context: AlbumContext): [InlineConfig, PluginOption] {
   const { outputs, appManager } = context
-  const { realSSRInput } = appManager
   const { ssrOutDir } = outputs
   const config: InlineConfig = {
     appType: "custom",
@@ -14,7 +13,7 @@ export function createSSRCoreConfig(context: AlbumContext): [InlineConfig, Plugi
       ssr: true,
       outDir: ssrOutDir!,
       rollupOptions: {
-        input: realSSRInput!
+        input: appManager.realSSRInput
       }
     }
   }
