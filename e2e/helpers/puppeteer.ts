@@ -4,6 +4,8 @@ import puppeteer, { Browser, ClickOptions, Page, PuppeteerLaunchOptions } from "
 export const E2E_TIMEOUT = 40 * 1000
 
 const puppeteerOptions: PuppeteerLaunchOptions = {
+  // devtools: true,
+  // headless: false,
   headless: "new",
   devtools: true,
   args: ["-no-sandbox", "--disable-setuid-sandbox", "--disable-cache"]

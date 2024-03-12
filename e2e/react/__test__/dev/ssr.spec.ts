@@ -1,10 +1,10 @@
 import { setupProject } from "../../../helpers/project"
-import { setupPuppeteer } from "../../../helpers/puppeteer"
+import { setupPuppeteer, timeout } from "../../../helpers/puppeteer"
 import { replacePlaceholder } from "../../../helpers/ssr"
 
 const pId = "react/ssr"
 await setupProject(pId, "dev")
-const { page, html, text } = await setupPuppeteer(pId)
+const { page, html, text, click, count } = await setupPuppeteer(pId)
 
 it("switch router", async () => {
   const p = page()
@@ -28,6 +28,25 @@ it("switch router", async () => {
   await p.goto("http://localhost:5311/xx/xx")
   await p.waitForSelector("#error")
   expect(replacePlaceholder(await html("#router"))).toBe(`<h1 id="error">page error</h1>`)
+})
+
+it("use react-router-dom switch router", async () => {
+  const p = page()
+
+  await p.goto("http://localhost:5311/push")
+  await p.waitForSelector("#push")
+
+  await click("#btn1")
+  await timeout(100)
+  expect(await count("#p1")).toBe(1)
+
+  await click("#btn2")
+  await timeout(100)
+  expect(await count("#p2")).toBe(1)
+
+  await click("#btn3")
+  await timeout(100)
+  expect(await count("#home")).toBe(1)
 })
 
 it("main.ssr props.query & props.params", async () => {
