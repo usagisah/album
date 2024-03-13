@@ -32,7 +32,7 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
           RemoteAppLoader: ssrCompose ? `import { createRemoteAppLoader } from "../ssr-compose/RemoteAppLoader"\nregistryHook("createRemoteAppLoader", createRemoteAppLoader)` : ""
         }
       },
-      { type: "file", template: "plugin-react/router/routes.ssr.tsx", params: buildRoutesSSRParams(serverRoutes) },
+      { type: "file", template: "plugin-react/router/routes.ssr.tsx", params: buildRoutesSSRParams(serverRoutes, appManager.router.redirect) },
       { type: "file", template: "plugin-react/ssr/resolveActionRouteData.ts", params: {} },
       { type: "file", template: "plugin-react/ssr/SSRContext.ts", params: {} },
       {
@@ -65,7 +65,7 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
   await Promise.all(pendingPromises)
 }
 
-function mountEntry({ info, appManager, appFileManager, dumpFileManager }: PluginInitClientParam) {
+function mountEntry({ info, appFileManager, dumpFileManager }: PluginInitClientParam) {
   const { ssr, ssrCompose } = info
   /* -------------- common -------------- */
   const pendingSetFiles: Promise<any>[] = [

@@ -1,9 +1,12 @@
 import { AlbumSSRRenderOptions } from "@albumjs/album/server"
 import { isPlainObject } from "@albumjs/album/tools"
 import { SSRContext } from "album.dependency"
+import { MainSSRApp } from "album.server"
 import { renderToPipeableStream } from "react-dom/server"
+import { matchPath } from "react-router-dom"
 import { Writable } from "stream"
 import { createSSRRouter } from "../router/createSSRRouter"
+import { redirectRoutes } from "../router/routes.ssr"
 import { SSRComposeContext } from "../ssr-compose/SSRComposeContext"
 import { SSRServerShared } from "./SSRServerShared"
 import { resolveActionRouteData } from "./resolveActionRouteData"
@@ -16,8 +19,17 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   const { sources } = ssrComposeContext ?? {}
   const { PreRender, mainEntryPath, browserScript } = await SSRServerShared.resolveContext(renderOptions)
 
+  const requestUrlOptions = req.albumOptions ?? { originalUrl: req.url, pathname: req.path }
+  const { App, Head, data, redirect } = normalizeFactoryResult(requestUrlOptions.pathname, await (mainSSR as any)(createSSRRouter(requestUrlOptions.originalUrl), getSSRProps()))
+  if (redirect) {
+    const url = new URL("http://usagisah.cc" + redirect)
+    for (const key in req.query) {
+      url.searchParams.append(key, (req.query as any)[key])
+    }
+    return res.redirect(302, url.pathname + url.search)
+  }
+
   const actionData = await resolveActionRouteData(ssrContext, getSSRProps)
-  const { App = null, Head = null, data } = await (mainSSR as any)(createSSRRouter(req.albumOptions?.originalUrl ?? req.url), getSSRProps())
   Object.assign(serverRouteData, actionData, isPlainObject(data) ? data : {})
 
   let app = (
@@ -110,4 +122,23 @@ function readPipeStreamCode(pipe: (destination: Writable) => Writable) {
     })
   )
   return code
+}
+
+function normalizeFactoryResult(url: string, app: MainSSRApp) {
+  const _app: Record<any, any> = { App: null, Head: null, data: {}, redirect: null }
+  if (typeof app === "string") {
+    _app.redirect = app
+    return _app
+  }
+
+  const res = redirectRoutes.find(item => matchPath(item.from, url))
+  if (res) {
+    _app.redirect = res.to
+    return _app
+  }
+
+  if (app.App) _app.App = app.App
+  if (app.Head) _app.Head = app.Head
+  if (app.data) _app.data = app.data
+  return _app
 }

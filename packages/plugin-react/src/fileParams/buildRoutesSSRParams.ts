@@ -1,6 +1,6 @@
 import { ServerRoute } from "../plugin.type.js"
 
-export function buildRoutesSSRParams(serverRoutes: ServerRoute[]) {
+export function buildRoutesSSRParams(serverRoutes: ServerRoute[], redirect: Record<string, string>) {
   const serverRoutesArray = serverRoutes.map(route => {
     const { name, reg, actionPath, fullPath } = route
     return (
@@ -15,7 +15,11 @@ export function buildRoutesSSRParams(serverRoutes: ServerRoute[]) {
       "}"
     )
   })
+  const redirectRoutes = Object.keys(redirect).map(from => {
+    return `{from:"${from}", to:"${redirect[from]}"}`
+  })
   return {
-    serverRoutesCode: serverRoutesArray.join(",\n")
+    serverRoutes: serverRoutesArray.join(",\n"),
+    redirectRoutes: redirectRoutes.join(",\n")
   }
 }

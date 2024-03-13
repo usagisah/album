@@ -1,9 +1,9 @@
 import { AppRouterFunComponent } from "album"
-import { SSRProps } from "album.server"
+import { SSRProps, MainSSRApp } from "album.server"
 import { App } from "./App"
 import { Head } from "./Head"
 
-export default function mainSSR(AppRouter: AppRouterFunComponent, props: SSRProps) {
+export default function mainSSR(AppRouter: AppRouterFunComponent, props: SSRProps): MainSSRApp {
   return {
     Head: <Head />,
     App: (

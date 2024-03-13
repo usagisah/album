@@ -19,7 +19,7 @@ export async function pluginPatchFile(clientRoutes: ClientRoute[], serverRoutes:
     configs.push({
       type: "file",
       file: "plugin-react/router/routes.ssr.tsx",
-      params: buildRoutesSSRParams(serverRoutes)
+      params: buildRoutesSSRParams(serverRoutes, appManager.router.redirect)
     })
   }
 

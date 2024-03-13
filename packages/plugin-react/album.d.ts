@@ -1,16 +1,10 @@
 import "@albumjs/album/types/album"
-import { Context, PropsWithChildren, ReactNode, ValidationMap, WeakValidationMap } from "react"
+import { Context, FunctionComponent, PropsWithChildren, ReactNode } from "react"
 import { Location, NavigateFunction } from "react-router-dom"
 
 declare module "album" {
   /* -------------- utils -------------- */
-  export type FC<P = {}> = {
-    (props: PropsWithChildren<P>, context?: any): ReactNode | null
-    propTypes?: WeakValidationMap<P> | undefined
-    contextTypes?: ValidationMap<any> | undefined
-    defaultProps?: Partial<P> | undefined
-    displayName?: string | undefined
-  }
+  export type FC<P = {}> = FunctionComponent<PropsWithChildren<P>>
   /* -------------- utils-end -------------- */
 
   /* -------------- router -------------- */
@@ -53,6 +47,7 @@ declare module "album" {
   /* -------------- hooks-end -------------- */
 }
 
+import { AppRouterFunComponent } from "album"
 declare module "album.server" {
   /* -------------- hooks -------------- */
   export function useServer(fn: (context: SSRProps) => any): Promise<void>
@@ -60,6 +55,11 @@ declare module "album.server" {
 
   export function useServerRouteData(): Record<string, any>
   /* -------------- hooks-end -------------- */
+
+  /* -------------- type -------------- */
+  export type MainSSRApp = string | { data?: Record<string, any>; App?: ReactNode; Head?: ReactNode }
+  export type MainSSRFactory = (AppRouter: AppRouterFunComponent, props: SSRProps) => MainSSRApp
+  /* -------------- type-end -------------- */
 }
 
 declare module "album.dependency" {
