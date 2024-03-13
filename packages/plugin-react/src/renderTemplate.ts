@@ -14,8 +14,7 @@ export async function renderTemplate(filePath: string, params: Record<string, an
     templates.set(filePath, file)
   }
   for (const key in params) {
-    const reg = new RegExp(`(['"])\\$` + key + `\\$\\1`)
-    file = file.replace(reg, params[key]).replaceAll("// @ts-expect-error", "")
+    file = file.replace(new RegExp(`(let __var__${key})|(__var__${key})|("__ref__${key}")`, "g"), params[key])
   }
 
   return format ? formatCode(file) : file

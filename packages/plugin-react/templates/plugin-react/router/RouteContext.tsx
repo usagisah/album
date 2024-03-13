@@ -1,4 +1,4 @@
-import type { LocalData } from "album"
+import type { RouterLocation } from "album"
 import React from "react"
 
 export type RouteLoaderStage = "loading" | "success" | "fail"
@@ -6,7 +6,7 @@ export type RouteLoaderValue = { value: any; pending: ((stage: RouteLoaderStage,
 
 export type RouteContextValue = {
   loader: Map<string, RouteLoaderValue>
-  localData: LocalData
+  routerLocation: RouterLocation
   parentContext?: RouteContextValue
 }
 

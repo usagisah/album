@@ -1,5 +1,5 @@
 import "@albumjs/album/types/album"
-import { PropsWithChildren, ReactNode, ValidationMap, WeakValidationMap } from "react"
+import { Context, PropsWithChildren, ReactNode, ValidationMap, WeakValidationMap } from "react"
 import { Location, NavigateFunction } from "react-router-dom"
 
 declare module "album" {
@@ -60,4 +60,22 @@ declare module "album.server" {
 
   export function useServerRouteData(): Record<string, any>
   /* -------------- hooks-end -------------- */
+}
+
+declare module "album.dependency" {
+  export const RouteContext: Context<any>
+  export const SSRContext: Context<{ context: any; getSSRProps: () => any }>
+  export type RouteLoaderStage = "loading" | "success" | "fail"
+  export type RouteLoaderValue = {
+    id: string
+    value: any
+    pending: ((stage: RouteLoaderStage, value: any) => any)[]
+    stage: RouteLoaderStage
+  }
+  export type RouteContextValue = {
+    loader: Map<string, RouteLoaderValue>
+    routerLocation: any
+    parentContext?: RouteContextValue | null
+  }
+  export const createRemoteAppLoader: any
 }

@@ -32,14 +32,14 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
           RemoteAppLoader: ssrCompose ? `import { createRemoteAppLoader } from "../ssr-compose/RemoteAppLoader"\nregistryHook("createRemoteAppLoader", createRemoteAppLoader)` : ""
         }
       },
-      { type: "file", template: "plugin-react/router/routes.ssr.tsx", params: buildRoutesSSRParams(serverRoutes, dumpInput) },
+      { type: "file", template: "plugin-react/router/routes.ssr.tsx", params: buildRoutesSSRParams(serverRoutes) },
       { type: "file", template: "plugin-react/ssr/resolveActionRouteData.ts", params: {} },
       { type: "file", template: "plugin-react/ssr/SSRContext.ts", params: {} },
       {
         type: "file",
         template: "plugin-react/ssr/ssrRender.tsx",
         params: {
-          mainServerPath: relative(resolve(dumpInput, "plugin-react/ssr"), mainSSRInput)
+          mainSSR: `import mainSSR from "${relative(resolve(dumpInput, "plugin-react/ssr"), mainSSRInput)}"`
         }
       },
       { type: "file", template: "plugin-react/ssr/SSRServerShared.tsx", params: {} },

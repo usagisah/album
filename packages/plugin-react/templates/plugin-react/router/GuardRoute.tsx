@@ -61,7 +61,7 @@ export function GuardRoute(props: GuardRouteProps) {
     const routesList = [...useRoutesMap()].find(item => matchPath(item[0], curPath))!
 
     eachRouteLoader(routesList[1], async route => {
-      const { fullPath, loader } = route
+      const { fullPath, meta } = route
       const record = context.loader.get(fullPath)!
       if (record?.stage === "loading") {
         return
@@ -70,7 +70,7 @@ export function GuardRoute(props: GuardRouteProps) {
       const loaderRecord: RouteLoaderValue = { id, stage: "loading", value: null, pending: [] }
       context.loader.set(fullPath, loaderRecord)
       try {
-        loaderRecord.value = await loader({ ...routerLocation })
+        loaderRecord.value = await meta.loader({ ...routerLocation })
         loaderRecord.stage = "success"
       } catch (e) {
         loaderRecord.value = e

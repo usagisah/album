@@ -1,6 +1,6 @@
 export async function buildRoutesParams(routes: any[], redirect: Record<string, string>) {
   let str_defines = ""
-  let str_imports = ""
+  let str_imports = `import{lazyLoad, GuardRoute}from"album";import {Navigate} from "react-router-dom";`
   let str_useRoutes = `[${mapRedirectToRoute()}${nextRoute(routes, 0)}]`
   function nextRoute(routes: any[], deep: number) {
     let _useRoute_code = ""
@@ -50,7 +50,7 @@ export async function buildRoutesParams(routes: any[], redirect: Record<string, 
             `name: "${"redirect_" + counter++}"`,
             `path: "${from}"`,
             `fullPath: "${from}"`,
-            `component: <Navigate to="${to}" replace={true} />`,
+            `component: () => <Navigate to="${to}" replace={true} />`,
             `meta: {}`,
             `children: []`
           ].join(", ") +

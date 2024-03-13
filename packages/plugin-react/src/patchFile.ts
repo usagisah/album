@@ -6,8 +6,7 @@ import { renderTemplate } from "./renderTemplate.js"
 
 export async function pluginPatchFile(clientRoutes: ClientRoute[], serverRoutes: ServerRoute[], params: PluginPatchClientParam) {
   const { info, appManager, dumpFileManager } = params
-  const { ssr, inputs } = info
-  const { dumpInput } = inputs
+  const { ssr } = info
   const configs: any[] = [
     {
       type: "file",
@@ -20,7 +19,7 @@ export async function pluginPatchFile(clientRoutes: ClientRoute[], serverRoutes:
     configs.push({
       type: "file",
       file: "plugin-react/router/routes.ssr.tsx",
-      params: buildRoutesSSRParams(serverRoutes, dumpInput)
+      params: buildRoutesSSRParams(serverRoutes)
     })
   }
 

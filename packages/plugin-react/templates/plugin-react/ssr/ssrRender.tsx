@@ -2,13 +2,12 @@ import { AlbumSSRRenderOptions } from "@albumjs/album/server"
 import { isPlainObject } from "@albumjs/album/tools"
 import { SSRContext } from "album.dependency"
 import { renderToPipeableStream } from "react-dom/server"
+import { Writable } from "stream"
 import { createSSRRouter } from "../router/createSSRRouter"
 import { SSRComposeContext } from "../ssr-compose/SSRComposeContext"
 import { SSRServerShared } from "./SSRServerShared"
 import { resolveActionRouteData } from "./resolveActionRouteData"
-// @ts-expect-error
-import userSSREntry from "'$mainServerPath$'"
-import { Writable } from "stream"
+let __var__mainSSR
 
 export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   const { ssrContext, getSSRProps, ssrComposeContext } = renderOptions
@@ -18,7 +17,7 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   const { PreRender, mainEntryPath, browserScript } = await SSRServerShared.resolveContext(renderOptions)
 
   const actionData = await resolveActionRouteData(ssrContext, getSSRProps)
-  const { App = null, Head = null, data } = await (userSSREntry as any)(createSSRRouter(req.albumOptions?.originalUrl ?? req.url), getSSRProps())
+  const { App = null, Head = null, data } = await (mainSSR as any)(createSSRRouter(req.albumOptions?.originalUrl ?? req.url), getSSRProps())
   Object.assign(serverRouteData, actionData, isPlainObject(data) ? data : {})
 
   let app = (

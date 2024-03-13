@@ -85,7 +85,7 @@ export async function createAppManager(config: AppManagerConfig) {
     moduleConfig.ignore.push(...ignores)
   }
 
-  const ssrRender: AppManagerSSRRender = { sendMode: c.ssrRender?.sendMode ?? "pipe" }
+  const ssrRender: AppManagerSSRRender = { sendMode: c.ssrRender?.sendMode ?? "string" }
   const manager: AppManager = {
     mainInput,
     mainSSRInput,

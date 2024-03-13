@@ -1,13 +1,14 @@
-import { GuardOnEnter, FC, RouterRoute, lazyLoad, GuardRoute } from "album"
-import { Routes, Route, Navigate } from "react-router-dom"
-"$str_imports$"
+import { FC, GuardOnEnter, RouterRoute } from "album"
+import { Route, Routes } from "react-router-dom"
+let __var__str_imports
+
 type Props = {
   onEnter?: GuardOnEnter
 }
 
-"$str_defines$"
+let __var__str_defines
 
-export const routes = "$str_useRoutes$"
+export const routes = "__ref__str_useRoutes"
 export const routesMap = new Map<string, RouterRoute>()
 
 const nextRoute = (parent: any, routes: any[], props: any) => {
@@ -22,6 +23,6 @@ const nextRoute = (parent: any, routes: any[], props: any) => {
   })
 }
 
-export const AppRoutes: FC<Props> = props => {// @ts-ignore
+export const AppRoutes: FC<Props> = props => {
   return <Routes>{nextRoute(null, routes, props)}</Routes>
 }

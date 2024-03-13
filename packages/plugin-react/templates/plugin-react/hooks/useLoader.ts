@@ -6,8 +6,8 @@ export function useLoader<T = any>(): ["loading", null]
 export function useLoader<T = any>(): ["fail", any]
 export function useLoader(): any {
   const [_, flush] = React.useState(0)
-  const { loader, localData } = React.useContext(RouteContext)
-  const options = loader.get(localData.route.fullPath)
+  const { loader, routerLocation } = React.useContext(RouteContext)
+  const options = loader.get(routerLocation.route.fullPath)
   if (!options) return ["success", null]
   if (options.stage !== "loading") return [options.stage, options.value]
   options.pending.push(() => {

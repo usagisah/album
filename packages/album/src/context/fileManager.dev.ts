@@ -18,8 +18,12 @@ export async function createFileManager(ssr: boolean, ssrCompose: boolean, { cwd
     appFileManager.add("file", "album-env.d.ts", {
       force: true,
       value:
-        [`/// <reference types="@albumjs/album/types/node" />`, `/// <reference types="@albumjs/album/types/vite-client" />`, `/// <reference types=".album/album" />`].join("\n") +
-        "\n"
+        [
+          `/// <reference types="@albumjs/album/types/node" />`,
+          `/// <reference types="@albumjs/album/types/vite-client" />`,
+          `/// <reference types="@albumjs/album/types/express" />`,
+          `/// <reference types=".album/album" />`
+        ].join("\n") + "\n"
     }),
     dumpFileManager.add("file", "album.dependency.ts")
   ]
