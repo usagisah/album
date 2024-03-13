@@ -5,14 +5,14 @@ import { ClientRoute, ServerRoute } from "./plugin.type.js"
 import { renderTemplate } from "./renderTemplate.js"
 
 export async function pluginPatchFile(clientRoutes: ClientRoute[], serverRoutes: ServerRoute[], params: PluginPatchClientParam) {
-  const { info, dumpFileManager } = params
+  const { info, appManager, dumpFileManager } = params
   const { ssr, inputs } = info
   const { dumpInput } = inputs
   const configs: any[] = [
     {
       type: "file",
       file: "plugin-react/router/routes.tsx",
-      params: buildRoutesParams(clientRoutes)
+      params: await buildRoutesParams(clientRoutes, appManager.router.redirect)
     }
   ]
 

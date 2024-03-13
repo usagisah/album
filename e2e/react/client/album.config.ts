@@ -8,6 +8,11 @@ export default defineAlbumConfig({
     port: 5211
   },
   app: {
+    router: {
+      redirect: {
+        redirect: "/"
+      }
+    },
     module: {
       ignore: ["ignore", /iIgnore/]
     }

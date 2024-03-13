@@ -55,9 +55,21 @@ export async function createAppManager(config: AppManagerConfig) {
     routerConfig.basename = basename
   }
   if (result.router?.redirect) {
-    const redirect = result.router.redirect
-    if (!record(string()).safeParse(redirect).success) {
-      throw "app.router.redirect 配置不合法, " + commonError + "(" + format(redirect) + ")"
+    const _redirect = result.router.redirect
+    if (!record(string()).safeParse(_redirect).success) {
+      throw "app.router.redirect 配置不合法, " + commonError + "(" + format(_redirect) + ")"
+    }
+    const redirect = {}
+    for (let from in _redirect) {
+      let to = _redirect[from]
+
+      if (!from.startsWith("/")) {
+        from = "/" + from
+      }
+      if (!to.startsWith("/")) {
+        to = "/" + to
+      }
+      redirect[from] = to
     }
     routerConfig.redirect = redirect
   }

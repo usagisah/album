@@ -17,7 +17,7 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
   const { dumpInput } = inputs
   const { mainSSRInput, router } = appManager
 
-  pendingPromises.push(...mountEntry(param), ...common(clientRoutes, param))
+  pendingPromises.push(...mountEntry(param), ...(await common(clientRoutes, param)))
 
   if (ssr) {
     const ssrConfigs = [
@@ -65,7 +65,7 @@ export async function pluginInitFile(clientRoutes: ClientRoute[], serverRoutes: 
   await Promise.all(pendingPromises)
 }
 
-function mountEntry({ info, appFileManager, dumpFileManager }: PluginInitClientParam) {
+function mountEntry({ info, appManager, appFileManager, dumpFileManager }: PluginInitClientParam) {
   const { ssr, ssrCompose } = info
   /* -------------- common -------------- */
   const pendingSetFiles: Promise<any>[] = [
@@ -120,8 +120,8 @@ function remoteBlock(code: string, title: string) {
   return code.replace(new RegExp(`/\\* -+ ${title} -+ \\*/[\\s\\S]+/\\* -+ ${title}-end -+ \\*/\\n`), "")
 }
 
-function common(clientRoutes: any[], param: PluginInitClientParam) {
-  const { dumpFileManager } = param
+async function common(clientRoutes: any[], param: PluginInitClientParam) {
+  const { appManager, dumpFileManager } = param
   const clientConfigs = [
     { type: "file", template: "plugin-react/hooks/useLoader.ts", params: {} },
     { type: "file", template: "plugin-react/hooks/useRouter.ts", params: {} },
@@ -129,12 +129,12 @@ function common(clientRoutes: any[], param: PluginInitClientParam) {
     { type: "file", template: "plugin-react/router/GuardRoute.tsx", params: {} },
     { type: "file", template: "plugin-react/router/lazyLoad.tsx", params: {} },
     { type: "file", template: "plugin-react/router/RouteContext.tsx", params: {} },
-    { type: "file", template: "plugin-react/router/routes.tsx", params: buildRoutesParams(clientRoutes) },
+    { type: "file", template: "plugin-react/router/routes.tsx", params: await buildRoutesParams(clientRoutes, appManager.router.redirect), format: true },
     { type: "file", template: "main.tsx", params: buildMainParams(param) }
   ]
   return clientConfigs.map(async f => {
     return dumpFileManager.add(f.type as any, f.template, {
-      value: await renderTemplate(f.template, f.params)
+      value: await renderTemplate(f.template, f.params, f.format)
     })
   })
 }

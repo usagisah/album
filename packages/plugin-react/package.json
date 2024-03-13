@@ -39,6 +39,7 @@
     "@albumjs/tools": "workspace:^",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "path-to-regexp": "^6.2.1",
+    "prettier": "^3.2.5",
     "vite": "^5.0.4"
   },
   "devDependencies": {
