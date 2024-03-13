@@ -48,6 +48,7 @@ declare module "album" {
 }
 
 import { AppRouterFunComponent } from "album"
+import { Request, Response } from "express"
 declare module "album.server" {
   /* -------------- hooks -------------- */
   export function useServer(fn: (context: SSRProps) => any): Promise<void>
@@ -57,8 +58,30 @@ declare module "album.server" {
   /* -------------- hooks-end -------------- */
 
   /* -------------- type -------------- */
-  export type MainSSRApp = string | { data?: Record<string, any>; App?: ReactNode; Head?: ReactNode }
-  export type MainSSRFactory = (AppRouter: AppRouterFunComponent, props: SSRProps) => MainSSRApp
+  export type MainSSRAppOnError = ((e: any) => void | { code?: number; error?: any; redirect?: string }) | ((e: any) => Promise<void | { code?: number; redirect?: string }>)
+
+  export type MainSSRAppOnAfterSend = () => { html?: string } | Promise<{ html?: string }>
+
+  export type MainSSRAppRenderOptions = {
+    req: Request
+    res: Response
+    resolveRouteActions: () => Promise<Record<string, string>>
+    resolveServerDateScript: () => string
+    resolveHead: () => ReactNode
+    resolveProvide: (children?: ReactNode) => ReactNode
+  }
+  export type MainSSRAppRender = (options: MainSSRAppRenderOptions) => any
+
+  export type MainSSRAppOptions = {
+    redirect?: string
+    data?: Record<string, any>
+    App?: ReactNode
+    Head?: ReactNode
+    onAfterSend?: MainSSRAppOnAfterSend
+    render?: MainSSRAppRender
+    onError?: MainSSRAppOnError
+  }
+  export type MainSSRFactory = (AppRouter: AppRouterFunComponent, props: SSRProps) => MainSSRAppOptions
   /* -------------- type-end -------------- */
 }
 

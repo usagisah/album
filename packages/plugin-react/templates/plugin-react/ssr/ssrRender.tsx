@@ -1,7 +1,8 @@
 import { AlbumSSRRenderOptions } from "@albumjs/album/server"
 import { isPlainObject } from "@albumjs/album/tools"
 import { SSRContext } from "album.dependency"
-import { MainSSRApp } from "album.server"
+import { MainSSRAppOptions } from "album.server"
+import { ReactNode } from "react"
 import { renderToPipeableStream } from "react-dom/server"
 import { matchPath } from "react-router-dom"
 import { Writable } from "stream"
@@ -20,7 +21,25 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   const { PreRender, mainEntryPath, browserScript } = await SSRServerShared.resolveContext(renderOptions)
 
   const requestUrlOptions = req.albumOptions ?? { originalUrl: req.url, pathname: req.path }
-  const { App, Head, data, redirect } = normalizeFactoryResult(requestUrlOptions.pathname, await (mainSSR as any)(createSSRRouter(requestUrlOptions.originalUrl), getSSRProps()))
+  const { App, Head, data, redirect, onAfterSend, onError, render } = normalizeFactoryResult(
+    requestUrlOptions.pathname,
+    await (mainSSR as any)(createSSRRouter(requestUrlOptions.originalUrl), getSSRProps())
+  )
+  if (isPlainObject(data)) {
+    Object.assign(serverRouteData, data)
+  }
+
+  if (render) {
+    return render({
+      req,
+      res,
+      resolveRouteActions,
+      resolveServerDateScript,
+      resolveHead,
+      resolveProvide
+    })
+  }
+
   if (redirect) {
     const url = new URL("http://usagisah.cc" + redirect)
     for (const key in req.query) {
@@ -29,11 +48,51 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
     return res.redirect(302, url.pathname + url.search)
   }
 
-  const actionData = await resolveActionRouteData(ssrContext, getSSRProps)
-  Object.assign(serverRouteData, actionData, isPlainObject(data) ? data : {})
+  async function resolveRouteActions() {
+    return resolveActionRouteData(ssrContext, getSSRProps)
+  }
+  function resolveServerDateScript() {
+    let clientJsonData = ""
+    for (const id of Object.getOwnPropertyNames(serverDynamicData)) {
+      const value = serverDynamicData[id]
+      try {
+        clientJsonData += `<script type="text/json" id="server-data-${id}">${JSON.stringify(value)}</script>`
+      } catch {
+        logger.error("server-data 必须能够被 JSON.stringify 序列化", "失败信息", { id: value }, "ssrRender")
+      }
+    }
+    if (Object.keys(serverRouteData).length > 0) {
+      try {
+        clientJsonData += `<script type="text/json" id="server-router-data">${JSON.stringify(serverRouteData)}</script>`
+      } catch {
+        logger.error("server-router-data 必须能够被 JSON.stringify 序列化", "失败信息", serverRouteData, "ssrRender")
+      }
+    }
+    return clientJsonData
+  }
+  function resolveHead() {
+    return <PreRender />
+  }
+  function resolveProvide(children: ReactNode) {
+    let app = <SSRContext.Provider value={{ context: ssrContext, getSSRProps }}>{children}</SSRContext.Provider>
+    if (ssrCompose) {
+      app = <SSRComposeContext.Provider value={ssrComposeContext!}>{app}</SSRComposeContext.Provider>
+    }
+    return app
+  }
 
-  let app = (
-    <SSRContext.Provider value={{ context: ssrContext, getSSRProps }}>
+  try {
+    Object.assign(serverRouteData, resolveRouteActions())
+    const complete = () => {
+      setTimeout(async () => {
+        const _res = await onAfterSend?.()
+        if (_res?.html) {
+          res.write(_res.html)
+        }
+        res.send()
+      })
+    }
+    const app = resolveProvide(
       <html lang="en">
         <head>
           <PreRender />
@@ -41,74 +100,67 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
         </head>
         <body>{App}</body>
       </html>
-    </SSRContext.Provider>
-  )
-  if (ssrCompose) {
-    app = <SSRComposeContext.Provider value={ssrComposeContext!}>{app}</SSRComposeContext.Provider>
-  }
-
-  const complete = () => setTimeout(() => res.send())
-  const { pipe } = renderToPipeableStream(app, {
-    onShellReady() {
-      res.header("content-type", "text/html")
-      if (sendMode === "pipe") pipe(res)
-    },
-    onAllReady() {
-      let clientJsonData = ""
-      for (const id of Object.getOwnPropertyNames(serverDynamicData)) {
-        const value = serverDynamicData[id]
-        try {
-          clientJsonData += `<script type="text/json" id="server-data-${id}">${JSON.stringify(value)}</script>`
-        } catch {
-          logger.error("server-data 必须能够被 JSON.stringify 序列化", "失败信息", { id: value }, "ssrRender")
+    )
+    const { pipe } = renderToPipeableStream(app, {
+      onShellReady() {
+        res.header("content-type", "text/html")
+        if (sendMode === "pipe") {
+          pipe(res)
         }
-      }
-      if (Object.keys(serverRouteData).length > 0) {
-        try {
-          clientJsonData += `<script type="text/json" id="server-router-data">${JSON.stringify(serverRouteData)}</script>`
-        } catch {
-          logger.error("server-router-data 必须能够被 JSON.stringify 序列化", "失败信息", serverRouteData, "ssrRender")
+      },
+      onAllReady() {
+        res.write(resolveServerDateScript())
+        if (ssrCompose) {
+          const code = sendMode === "string" ? readPipeStreamCode(pipe) : ""
+          res.write(code)
+
+          let cssCode = ""
+          let jsCode = ""
+          for (const sourcePath of Object.getOwnPropertyNames(sources)) {
+            const source = sources![sourcePath]
+            if (source === false) continue
+            source.css.forEach(css => (cssCode += `{type:2,paths:["${css}"]},`))
+
+            let importers = ""
+            source.importPaths.forEach(p => (importers += `"${p}",`))
+            jsCode += `{sid:"${sourcePath}",type:1,paths:[${importers}]},`
+          }
+          const clientScript = [
+            `<script type="module">`,
+            `await import("${browserScript}");`,
+            `const {loadModules}=window.__$_album_ssr_compose;const m=await loadModules([${cssCode + jsCode}]);`,
+            `import("${mainEntryPath}");`,
+            "</script>"
+          ]
+          res.write(clientScript.join(""))
+          return complete()
         }
-      }
-      res.write(clientJsonData)
-
-      if (ssrCompose) {
-        const code = sendMode === "string" ? readPipeStreamCode(pipe) : ""
-        res.write(code)
-
-        let cssCode = ""
-        let jsCode = ""
-        for (const sourcePath of Object.getOwnPropertyNames(sources)) {
-          const source = sources![sourcePath]
-          if (source === false) continue
-          source.css.forEach(css => (cssCode += `{type:2,paths:["${css}"]},`))
-
-          let importers = ""
-          source.importPaths.forEach(p => (importers += `"${p}",`))
-          jsCode += `{sid:"${sourcePath}",type:1,paths:[${importers}]},`
+        if (sendMode === "string") {
+          res.write(readPipeStreamCode(pipe))
+          return complete()
         }
-        const clientScript = [
-          `<script type="module">`,
-          `await import("${browserScript}");`,
-          `const {loadModules}=window.__$_album_ssr_compose;const m=await loadModules([${cssCode + jsCode}]);`,
-          `import("${mainEntryPath}");`,
-          "</script>"
-        ]
-        res.write(clientScript.join(""))
-        return complete()
+        if (sendMode === "pipe") {
+          res.write(`<script type="module" src="${mainEntryPath}"><\/script>`)
+          return complete()
+        }
+        return res.status(500), complete()
       }
-
-      if (sendMode === "string") {
-        res.write(readPipeStreamCode(pipe))
-        return complete()
-      }
-      if (sendMode === "pipe") {
-        res.write(`<script type="module" src="${mainEntryPath}"><\/script>`)
-        return complete()
-      }
-      return res.status(500), complete()
+    })
+  } catch (e) {
+    if (!onError) {
+      throw e
     }
-  })
+
+    const onErrorRes = await onError(e)
+    if (!onErrorRes) {
+      return
+    }
+
+    const { code, redirect } = onErrorRes
+    if (redirect) {
+      return code ? res.redirect(code, redirect) : res.redirect(redirect)
+    }
+  }
 }
 
 function readPipeStreamCode(pipe: (destination: Writable) => Writable) {
@@ -124,10 +176,20 @@ function readPipeStreamCode(pipe: (destination: Writable) => Writable) {
   return code
 }
 
-function normalizeFactoryResult(url: string, app: MainSSRApp) {
-  const _app: Record<any, any> = { App: null, Head: null, data: {}, redirect: null }
-  if (typeof app === "string") {
-    _app.redirect = app
+function normalizeFactoryResult(url: string, app: MainSSRAppOptions) {
+  const _app: MainSSRAppOptions = { ...app }
+  if (app.render) {
+    if (typeof app.render === "function") {
+      return app
+    } else {
+      app.render = undefined
+    }
+  }
+
+  if (_app.redirect) {
+    if (!_app.redirect.startsWith("/")) {
+      _app.redirect = "/" + app.redirect
+    }
     return _app
   }
 
@@ -137,8 +199,13 @@ function normalizeFactoryResult(url: string, app: MainSSRApp) {
     return _app
   }
 
-  if (app.App) _app.App = app.App
-  if (app.Head) _app.Head = app.Head
-  if (app.data) _app.data = app.data
+  if (typeof app.onAfterSend !== "function") {
+    _app.onAfterSend = undefined
+  }
+
+  if (typeof app.onError !== "function") {
+    _app.onError = undefined
+  }
+
   return _app
 }

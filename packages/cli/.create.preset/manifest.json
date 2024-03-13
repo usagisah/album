@@ -1,5 +1,4 @@
 {
   "react": {},
-  "react-ssr": {},
-  "react-ssr-compose": {}
+  "react-ssr": {}
 }

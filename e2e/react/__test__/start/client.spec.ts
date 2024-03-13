@@ -3,7 +3,7 @@ import { setupPuppeteer, timeout } from "../../../helpers/puppeteer"
 
 const pId = "react/client"
 await setupProject(pId, "start", ["dist"])
-const { page, html, text } = await setupPuppeteer(pId)
+const { page, html, text, count } = await setupPuppeteer(pId)
 
 it("env", async () => {
   const p = page()
@@ -62,4 +62,12 @@ it("client-hook  useLoader, useRouter, useRoutes, useRoutesMap", async () => {
   expect(JSON.parse(await html("#useRouter"))).toEqual({ query: { a: 1 }, meta: { message: "routerHook page router" } })
   expect(Number(await html("#useRoutes"))).toBeGreaterThanOrEqual(4)
   expect(Number(await html("#useRoutesMap"))).toBeGreaterThanOrEqual(4)
+})
+
+it("redirect", async () => {
+  const p = page()
+  await p.goto("http://localhost:5211/redirect?a=1")
+  await p.waitForSelector("div")
+  await timeout(10)
+  expect(p.url()).toBe("http://localhost:5211")
 })

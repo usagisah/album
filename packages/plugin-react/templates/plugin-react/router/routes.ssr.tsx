@@ -6,10 +6,10 @@ export type ServerRoute = {
   actionFactory: (() => Promise<unknown>) | null
 }
 
-export const serverRoutes: ServerRoute[] = ["__ref__serverRoutes" as any]
+export const serverRoutes: ServerRoute[] = ["__ref__serverRoutes"]
 
 export type RedirectRoute = {
   from: string
   to: string
 }
-export const redirectRoutes: RedirectRoute[] = ["__ref__redirectRoutes" as any]
+export const redirectRoutes: RedirectRoute[] = ["__ref__redirectRoutes"]
