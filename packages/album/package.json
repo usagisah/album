@@ -1,6 +1,6 @@
 {
   "name": "@albumjs/album",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "一个组合 vite+nestjs 的集成式框架",
   "keywords": [
     "@albumjs/album",
