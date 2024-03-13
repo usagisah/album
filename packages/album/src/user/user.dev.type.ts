@@ -9,6 +9,7 @@ export type UserConfigEnv = UserConfigEnvValue | string
 
 export interface UserConfigAppRouter {
   basename?: string
+  redirect?: Record<string, string>
 }
 
 export interface UserConfigAppModule {

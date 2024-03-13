@@ -14,18 +14,15 @@ declare module "album" {
   /* -------------- utils-end -------------- */
 
   /* -------------- router -------------- */
-  export type GuardOnEnter = (params: LocalData, navigate: NavigateFunction) => any
-  export type GuardLoader = (local: LocalData) => any
+  export type GuardOnEnter = (local: RouterLocation, navigate: NavigateFunction) => any
+  export type GuardLoader = (local: RouterLocation) => any
   export type GuardRouteProps = {
     children?: any
     onEnter?: GuardOnEnter
     route: RouterRoute
   }
-  export type LocalData = Location & {
-    params: Record<string, any>
-    query: Record<string, any>
+  export interface RouterLocation extends Location {
     route: RouterRoute
-    [key: string]: any
   }
   export type AppRouterFunComponent = FC<{ Layout: FC<any>; onEnter?: GuardOnEnter }>
 

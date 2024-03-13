@@ -1,3 +1,5 @@
+import { Obj } from "@albumjs/tools/node"
+
 export type AppManagerModule = {
   moduleName: string
   modulePath: string
@@ -6,6 +8,7 @@ export type AppManagerModule = {
 
 export type AppManagerRouter = {
   basename: string
+  redirect: Obj<string>
 }
 
 export type AppManagerSSRRender = {

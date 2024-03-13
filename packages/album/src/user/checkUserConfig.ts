@@ -37,7 +37,10 @@ const appValidator = object({
   ).optional(),
   router: object(
     {
-      basename: string({ invalid_type_error: "config.app.router.basename 必须是一个字符串" }).optional()
+      basename: string({ invalid_type_error: "config.app.router.basename 必须是一个字符串" }).optional(),
+      redirect: record(string({ invalid_type_error: "config.app.router.redirect[item] 子项必须是字符串" }), {
+        invalid_type_error: "config.app.router.redirect 必须是一个字符串对象"
+      }).optional()
     },
     { invalid_type_error: "config.app.router 必须是一个对象" }
   ).optional()

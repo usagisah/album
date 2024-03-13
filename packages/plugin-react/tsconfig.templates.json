@@ -10,6 +10,8 @@
   },
   "include": [
     "templates/**/*.ts",
-    "templates/**/*.tsx"
+    "templates/**/*.tsx",
+    "templates/album.type.d.ts",
+    "album.d.ts",
   ]
 }

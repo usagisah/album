@@ -1,4 +1,5 @@
 import { format } from "@albumjs/tools/lib/pretty-format"
+import { record, string } from "@albumjs/tools/lib/zod"
 import { isArray, isBlank, isRegExp } from "@albumjs/tools/node"
 import { Inputs } from "../context/context.dev.type.js"
 import { PluginManager } from "../plugins/plugin.dev.type.js"
@@ -42,10 +43,24 @@ export async function createAppManager(config: AppManagerConfig) {
     if (isBlank(mainSSRInput)) throw "app.mainSSR SSR入口路径不合法, " + commonError + "(" + mainSSRInput + ")"
   }
 
-  const routerConfig: AppManagerRouter = (result.router as any) ?? { basename: "/" }
-  if (isBlank(routerConfig.basename)) throw "app.router.basename 配置不合法, " + commonError + "(" + format(routerConfig) + ")"
-  if (!routerConfig.basename) routerConfig.basename = "/"
-  else if (!routerConfig.basename.startsWith("/")) routerConfig.basename = "/" + routerConfig.basename
+  const routerConfig: AppManagerRouter = { basename: "/", redirect: {} }
+  if (result.router?.basename) {
+    let basename = result.router.basename
+    if (isBlank(basename)) {
+      throw "app.router.basename 配置不合法, " + commonError + "(" + basename + ")"
+    }
+    if (!basename.startsWith("/")) {
+      basename = "/" + basename
+    }
+    routerConfig.basename = basename
+  }
+  if (result.router?.redirect) {
+    const redirect = result.router.redirect
+    if (!record(string()).safeParse(redirect).success) {
+      throw "app.router.redirect 配置不合法, " + commonError + "(" + format(redirect) + ")"
+    }
+    routerConfig.redirect = redirect
+  }
 
   const moduleConfig: AppManagerModule = {
     moduleName: result.module!.name!,

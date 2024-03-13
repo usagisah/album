@@ -1,34 +1,29 @@
 import { queryString } from "@albumjs/album/tools"
-import { GuardLoader, GuardRouteProps, LocalData, RouterRoute, useRoutesMap } from "album"
+import { GuardRouteProps, RouterLocation, RouterRoute, useRoutesMap } from "album"
 import { RouteContext, RouteContextValue, RouteLoaderValue } from "album.dependency"
 import React from "react"
-import { NavigateFunction, matchPath, useLocation, useNavigate, useParams } from "react-router-dom"
+import { matchPath, useLocation, useNavigate, useParams } from "react-router-dom"
 import { callPromiseWithCatch } from "../utils/callWithCatch"
 
+let counter = (Math.random() * 100) >>> 0
 export function GuardRoute(props: GuardRouteProps) {
   const { children, onEnter, route } = props
 
   const location = useLocation()
   const navigate = useNavigate()
 
+  const routerLocation = React.useRef<RouterLocation>({} as any).current
   const parentContext = React.useContext(RouteContext)
-  const local: LocalData = React.useRef<any>({}).current
-  const context = React.useRef<RouteContextValue>({
-    localData: local,
-    parentContext: null,
-    loader: null
-  } as any).current
+  const context = React.useRef<RouteContextValue>({ routerLocation, parentContext, loader: parentContext?.loader }).current
 
-  const [Component, setComponent] = React.useState(!parentContext && onEnter ? null : children)
+  const needGuard = !parentContext && onEnter
+  const [Component, setComponent] = React.useState(needGuard ? null : children)
 
   if (parentContext) {
-    Object.assign(local, parentContext.localData)
-    local.route = route
-
-    context.parentContext = parentContext
-    context.loader = parentContext.loader
+    Object.assign(routerLocation, parentContext)
+    routerLocation.route = route
   } else {
-    Object.assign(local, {
+    Object.assign(routerLocation, {
       ...location,
       params: useParams(),
       query: queryString.parse(location.search),
@@ -37,82 +32,79 @@ export function GuardRoute(props: GuardRouteProps) {
     context.loader = new Map()
   }
 
+  async function doEach() {
+    if (needGuard) {
+      const { pathname } = routerLocation
+      const res = await callPromiseWithCatch(props.onEnter, [routerLocation, navigate], "GuardRoute-onEnter has a error")
+      if (res !== true || pathname !== location.pathname) {
+        return
+      }
+      doLoader()
+      setComponent(children)
+      return
+    }
+
+    if (!needGuard && Component !== children) {
+      doLoader()
+      setComponent(children)
+      return
+    }
+
+    doLoader()
+  }
+
+  async function doLoader() {
+    if (parentContext) return
+
+    const id = Date.now() + "" + counter++
+    const curPath = routerLocation.pathname
+    const routesList = [...useRoutesMap()].find(item => matchPath(item[0], curPath))!
+
+    eachRouteLoader(routesList[1], async route => {
+      const { fullPath, loader } = route
+      const record = context.loader.get(fullPath)!
+      if (record?.stage === "loading") {
+        return
+      }
+
+      const loaderRecord: RouteLoaderValue = { id, stage: "loading", value: null, pending: [] }
+      context.loader.set(fullPath, loaderRecord)
+      try {
+        loaderRecord.value = await loader({ ...routerLocation })
+        loaderRecord.stage = "success"
+      } catch (e) {
+        loaderRecord.value = e
+        loaderRecord.stage = "fail"
+      }
+
+      const curLoaderRecord = context.loader.get(fullPath)
+      if (!curLoaderRecord || curLoaderRecord.id !== id) {
+        return
+      }
+      for (const set of loaderRecord.pending) {
+        set(loaderRecord.stage, loaderRecord.value)
+      }
+      loaderRecord.pending.length = 0
+    })
+  }
+
   React.useEffect(() => {
-    _doEach()
+    doEach()
   }, [location.pathname])
 
   if (import.meta.env.SSR) {
-    _doEach()
-  }
-
-  function _doEach() {
-    doEach({
-      useComponent: { Component, setComponent },
-      local,
-      context,
-      props,
-      navigate
-    })
+    doEach()
   }
 
   return <RouteContext.Provider value={context}>{Component}</RouteContext.Provider>
 }
 
-type InnerRouteContext = {
-  useComponent: { Component: any; setComponent: any }
-  local: LocalData
-  context: RouteContextValue
-  props: GuardRouteProps
-  navigate: NavigateFunction
-}
-
-async function doEach(ctx: InnerRouteContext) {
-  const { useComponent, context, local, props, navigate } = ctx
-  const { Component, setComponent } = useComponent
-  if (!context.parentContext && props.onEnter) {
-    const curPath = local.pathname
-    const res = await callPromiseWithCatch(props.onEnter, [local, navigate], "GuardRoute-onEnter has a error")
-    if (res !== true || curPath !== context.localData.pathname) return
-  } else if (Component !== props.children) {
-    setComponent(props.children)
+function eachRouteLoader(route: RouterRoute, fn: (route: RouterRoute) => any) {
+  const { parent, meta } = route
+  if (parent) {
+    eachRouteLoader(parent, fn)
   }
-
-  doLoader(ctx)
-}
-
-async function doLoader(ctx: InnerRouteContext) {
-  const { context, local } = ctx
-  if (context.parentContext) return
-
-  const curPath = local.pathname
-  const routesList = [...useRoutesMap()].find(([path]) => matchPath(path, curPath))!
-  const loaderList = collectLoaders(routesList[1])
-  await Promise.all([
-    loaderList.map(async ([loaderFn, route]) => {
-      const _options = context.loader.get(route.fullPath)
-      if (_options && _options.stage === "loading") return
-
-      let options: RouteLoaderValue
-      context.loader.set(route.fullPath, (options = { stage: "loading", value: null, pending: [] }))
-      try {
-        options.value = await loaderFn(local)
-        options.stage = "success"
-      } catch (e) {
-        options.value = e
-        options.stage = "fail"
-      }
-      if (curPath !== context.localData.pathname) return
-      for (const set of options.pending) {
-        set(options.stage, options.value)
-        options.pending.length = 0
-      }
-    })
-  ])
-}
-
-function collectLoaders(route: any, loaders: any = []): [GuardLoader, RouterRoute][] {
-  const { meta, parent } = route
-  if (meta && meta.loader) loaders.push([meta.loader, route])
-  if (parent) return collectLoaders(parent, loaders)
-  return loaders
+  if (meta?.loader) {
+    fn(route)
+  }
 }
