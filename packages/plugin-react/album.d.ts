@@ -11,9 +11,9 @@ declare module "album" {
   export type GuardOnEnter = (local: RouterLocation, navigate: NavigateFunction) => any
   export type GuardLoader = (local: RouterLocation) => any
   export type GuardRouteProps = {
-    children?: any
     onEnter?: GuardOnEnter
     route: RouterRoute
+    children?: any
   }
   export interface RouterLocation extends Location {
     route: RouterRoute
@@ -90,7 +90,6 @@ declare module "album.dependency" {
   export const SSRContext: Context<{ context: any; getSSRProps: () => any }>
   export type RouteLoaderStage = "loading" | "success" | "fail"
   export type RouteLoaderValue = {
-    id: string
     value: any
     pending: ((stage: RouteLoaderStage, value: any) => any)[]
     stage: RouteLoaderStage

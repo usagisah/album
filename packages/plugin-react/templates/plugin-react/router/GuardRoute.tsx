@@ -5,9 +5,8 @@ import React from "react"
 import { matchPath, useLocation, useNavigate, useParams } from "react-router-dom"
 import { callPromiseWithCatch } from "../utils/callWithCatch"
 
-let counter = (Math.random() * 100) >>> 0
 export function GuardRoute(props: GuardRouteProps) {
-  const { children, onEnter, route } = props
+  const { route, children, onEnter } = props
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -30,6 +29,18 @@ export function GuardRoute(props: GuardRouteProps) {
       route
     })
     context.loader = new Map()
+  }
+
+  let unMounted = false
+  React.useEffect(() => {
+    doEach()
+    return () => {
+      unMounted = true
+    }
+  }, [location.pathname])
+
+  if (import.meta.env.SSR) {
+    doEach()
   }
 
   async function doEach() {
@@ -56,18 +67,21 @@ export function GuardRoute(props: GuardRouteProps) {
   async function doLoader() {
     if (parentContext) return
 
-    const id = Date.now() + "" + counter++
     const curPath = routerLocation.pathname
     const routesList = [...useRoutesMap()].find(item => matchPath(item[0], curPath))!
 
     eachRouteLoader(routesList[1], async route => {
+      if (unMounted) {
+        return
+      }
+
       const { fullPath, meta } = route
       const record = context.loader.get(fullPath)!
       if (record?.stage === "loading") {
         return
       }
 
-      const loaderRecord: RouteLoaderValue = { id, stage: "loading", value: null, pending: [] }
+      const loaderRecord: RouteLoaderValue = { stage: "loading", value: null, pending: [] }
       context.loader.set(fullPath, loaderRecord)
       try {
         loaderRecord.value = await meta.loader({ ...routerLocation })
@@ -77,23 +91,13 @@ export function GuardRoute(props: GuardRouteProps) {
         loaderRecord.stage = "fail"
       }
 
-      const curLoaderRecord = context.loader.get(fullPath)
-      if (!curLoaderRecord || curLoaderRecord.id !== id) {
-        return
-      }
-      for (const set of loaderRecord.pending) {
-        set(loaderRecord.stage, loaderRecord.value)
+      if (!unMounted) {
+        for (const set of loaderRecord.pending) {
+          set(loaderRecord.stage, loaderRecord.value)
+        }
       }
       loaderRecord.pending.length = 0
     })
-  }
-
-  React.useEffect(() => {
-    doEach()
-  }, [location.pathname])
-
-  if (import.meta.env.SSR) {
-    doEach()
   }
 
   return <RouteContext.Provider value={context}>{Component}</RouteContext.Provider>

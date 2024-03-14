@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { cac } from "@albumjs/tools/lib/cac"
 import { resolveNodeArgs } from "@albumjs/tools/node"
 import { readFileSync } from "fs"

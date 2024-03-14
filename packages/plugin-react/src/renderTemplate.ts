@@ -1,6 +1,5 @@
 import { readFile } from "fs/promises"
 import { dirname, resolve } from "path"
-import { format } from "prettier"
 import { fileURLToPath } from "url"
 
 const __filename = fileURLToPath(import.meta.url)
@@ -17,25 +16,5 @@ export async function renderTemplate(filePath: string, params: Record<string, an
     file = file.replace(new RegExp(`(let __var__${key})|(__var__${key})|("__ref__${key}")`, "g"), params[key])
   }
 
-  return format ? formatCode(file) : file
-}
-
-function formatCode(code: string) {
-  return format(code, {
-    printWidth: 180,
-    tabWidth: 2,
-    useTabs: false,
-    semi: false,
-    singleQuote: false,
-    quoteProps: "as-needed",
-    jsxSingleQuote: false,
-    trailingComma: "none",
-    bracketSpacing: true,
-    bracketSameLine: false,
-    arrowParens: "avoid",
-    vueIndentScriptAndStyle: false,
-    endOfLine: "lf",
-    singleAttributePerLine: false,
-    parser: "typescript"
-  })
+  return file
 }
