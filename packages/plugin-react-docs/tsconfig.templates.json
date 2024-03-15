@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2018",
+    "moduleResolution": "Bundler",
+    "composite": true,
+    "strictNullChecks": true,
+    "strict": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "templates/**/*.ts",
+    "templates/**/*.tsx",
+    "templates/album.type.d.ts",
+    "album.d.ts",
+  ]
+}

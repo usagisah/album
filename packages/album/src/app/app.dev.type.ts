@@ -4,6 +4,10 @@ export type AppManagerModule = {
   moduleName: string
   modulePath: string
   ignore: RegExp[]
+  pageFilter: RegExp
+  routerFilter: RegExp
+  actionFilter: RegExp
+  pageExtensions: RegExp[]
 }
 
 export type AppManagerRouter = {

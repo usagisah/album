@@ -27,13 +27,11 @@ export type PluginConfig = (param: PluginConfigParams) => any
 export type PluginFindEntriesParam = {
   inputs: Inputs
   appId: string
-  result: {
-    main?: string
-    mainSSR?: string
-    module?: UserConfigAppModule
-    router?: UserConfigAppRouter
-    appConfig: UserConfigApp
-  }
+  main?: string
+  mainSSR?: string
+  module?: UserConfigAppModule
+  router?: UserConfigAppRouter
+  appConfig: UserConfigApp
 } & PluginGlobalMessage
 export type PluginFindEntries = (param: PluginFindEntriesParam) => any
 
@@ -56,10 +54,8 @@ export type PluginInitClientParam = {
   }
   appFileManager: FileManager
   dumpFileManager: FileManager
-  result: {
-    realClientInput: string | null
-    realSSRInput: string | null
-  }
+  realClientInput: string | null
+  realSSRInput: string | null
 } & PluginGlobalMessage
 export type PluginInitClient = (param: PluginInitClientParam) => any
 

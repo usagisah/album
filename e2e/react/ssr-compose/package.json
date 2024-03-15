@@ -10,17 +10,17 @@
     "start": "album start"
   },
   "dependencies": {
-    "@albumjs/cli": "workspace:^",
     "@albumjs/album": "workspace:^",
+    "@albumjs/cli": "workspace:^",
     "@albumjs/plugin-react": "workspace:^",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
-    "sass": "^1.69.5"
+    "react-router-dom": "^6.22.3",
+    "sass": "^1.72.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.41",
-    "@types/react-dom": "^18.2.17",
-    "typescript": "^5.3.2"
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "typescript": "^5.4.2"
   }
 }

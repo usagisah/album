@@ -1,5 +1,5 @@
 import { AlbumContext, AlbumUserPlugin, mergeConfig } from "@albumjs/album/server"
-import { cjsImporterToEsm, resolveDirPath, resolveFilePath } from "@albumjs/tools/node"
+import { cjsImporterToEsm, resolveFilePath } from "@albumjs/tools/node"
 import viteReactPlugin from "@vitejs/plugin-react-swc"
 import { readFile, writeFile } from "fs/promises"
 import { resolve, sep } from "path"
@@ -14,8 +14,8 @@ export type PluginReact = {
   pluginReact?: PluginProps<typeof viteReactPlugin>
 }
 
-export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
-  const { pluginReact } = props ?? {}
+export default function pluginReact(config?: PluginReact): AlbumUserPlugin {
+  const { pluginReact } = config ?? {}
   let albumContext: AlbumContext
 
   return {
@@ -28,11 +28,10 @@ export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
         }
       })
     },
-    async findEntries(param) {
-      const { result, inputs } = param
+    async findEntries(config) {
+      const { main, mainSSR, inputs } = config
       const { cwd } = inputs
-      const { main, mainSSR, module = {} } = result
-      const [_main, _mainSSR, _modulePath] = await Promise.all([
+      const [_main, _mainSSR] = await Promise.all([
         resolveFilePath({
           root: cwd,
           name: main ?? "main",
@@ -42,33 +41,22 @@ export default function pluginReact(props?: PluginReact): AlbumUserPlugin {
           root: cwd,
           name: mainSSR ?? "main.ssr",
           exts: [".tsx", ".ts"]
-        }),
-        module.path
-          ? resolve(cwd, module.path)
-          : resolveDirPath({
-              root: cwd,
-              name: module.name ?? "modules"
-            })
+        })
       ])
-      result.main = _main
-      result.mainSSR = _mainSSR
-      result.module = {
-        path: _modulePath,
-        name: module.name ?? "modules",
-        ignore: module.ignore
-      }
+      config.main = _main
+      config.mainSSR = _mainSSR
     },
     context(param) {
       albumContext = param.albumContext
     },
-    async initClient(param) {
-      const { result, info, appManager } = param
+    async initClient(config) {
+      const { info, appManager } = config
       const { ssr, inputs } = info
       const { specialModules } = appManager
       const { clientRoutes, serverRoutes } = await buildReactRoutes(inputs.dumpInput, specialModules)
-      await pluginInitFile(clientRoutes, serverRoutes, param)
-      result.realClientInput = resolve(inputs.dumpInput, "main.tsx")
-      if (ssr) result.realSSRInput = resolve(inputs.dumpInput, "main.ssr.tsx")
+      await pluginInitFile(clientRoutes, serverRoutes, config)
+      config.realClientInput = resolve(inputs.dumpInput, "main.tsx")
+      if (ssr) config.realSSRInput = resolve(inputs.dumpInput, "main.ssr.tsx")
     },
     async patchClient(param) {
       const { info, appManager } = param

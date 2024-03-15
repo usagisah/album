@@ -6,17 +6,14 @@ export async function initClient(context: AlbumContext) {
   const { ssr, appManager, fileManager, pluginManager, getStaticInfo } = context
   const { mainInput, mainSSRInput, module, router, ssrRender } = appManager
   const specialModules = await buildSpecialModules(context)
-  const { result } = await pluginManager.execute("initClient", {
+
+  let { realClientInput, realSSRInput } = await pluginManager.execute("initClient", {
+    ...(await fileManager),
     info: getStaticInfo(),
     appManager: { mainInput, mainSSRInput, module, router, ssrRender, specialModules },
-    ...(await fileManager),
-    result: {
-      realClientInput: null,
-      realSSRInput: null
-    }
+    realClientInput: null,
+    realSSRInput: null
   })
-
-  let { realClientInput, realSSRInput } = result
   if (isBlank(realClientInput)) throw `client 客户端真实指向入口(client)不存在(${realClientInput})`
   if (ssr && isBlank(realSSRInput)) throw `client 客户端真实指向入口(SSR)不存在(${realSSRInput})`
 
