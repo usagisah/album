@@ -10,10 +10,10 @@ import { DevServerParams } from "../service.type.js"
 
 export async function albumDevServer(params: DevServerParams) {
   const markStart = performance.now()
-  let { appId = "default", args, SYSTEM_RESTART = DEFAULT_SYSTEM_RESTART } = params
+  let { appId = "default", args, SYSTEM_RESTART = DEFAULT_SYSTEM_RESTART, config } = params
   let _logger: ILogger = console
 
-  const context = await createContext({ appId, args, serverMode: "dev", SYSTEM_RESTART })
+  const context = await createContext({ appId, args, serverMode: "dev", SYSTEM_RESTART, config })
   try {
     const { inputs, env, serverManager, pluginManager, logger } = context
     context.ssrComposeManager = await createSSRComposeManager(context)

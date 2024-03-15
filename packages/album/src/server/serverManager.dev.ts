@@ -7,7 +7,7 @@ import { UserConfigServer } from "../user/user.dev.type.js"
 import { ServerManager } from "./server.dev.type.js"
 
 export async function createServerManager(input: Inputs, userConfigServer?: UserConfigServer) {
-  const { port, appModule, tsconfig } = userConfigServer ?? {}
+  const { port, appModule, builtinModules, tsconfig } = userConfigServer ?? {}
   const { cwd, dumpInput } = input
 
   let _appModule: string | null = null
@@ -55,6 +55,7 @@ export async function createServerManager(input: Inputs, userConfigServer?: User
       input: _appModule,
       output: resolve(dumpInput, "__server")
     },
+    builtinModules: !!builtinModules,
     tsconfig: _tsconfig
   }
   return manager

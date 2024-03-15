@@ -11,9 +11,10 @@ export default function command(cli: CAC, args: ParsedArgs) {
   cli
     .command("dev [id]", "启动开发服务器")
     .option("--cwd [cwd]", "设置默认的，查找根目录路径")
+    .option("-c, --config <config>", "使用指定路径的配置文件")
     .example("album dev [config.app.id]")
     .action(async (appId, options) => {
-      const { cwd } = options
+      const { cwd, config } = options
       if (cwd) {
         process.chdir(resolve(process.cwd(), cwd))
       }
@@ -24,7 +25,7 @@ export default function command(cli: CAC, args: ParsedArgs) {
           cProcess.kill()
           cProcess = null
         }
-        cProcess = execa("node", [resolve(__dirname, "./dev.server.setup.js"), "--color", JSON.stringify({ appId: appId ?? "default", args, SYSTEM_RESTART })], {
+        cProcess = execa("node", [resolve(__dirname, "./dev.server.setup.js"), "--color", JSON.stringify({ appId: appId ?? "default", args, SYSTEM_RESTART, config })], {
           cwd: process.cwd(),
           stdout: process.stdout
         })

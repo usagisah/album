@@ -15,16 +15,17 @@ export type ContextParams = {
   appId: string
   serverMode: ServerMode
   args: NodeArgs
+  config?: string
 }
 
 export async function createContext(params: ContextParams): Promise<AlbumContext> {
   let _logger: ILogger = console
   try {
-    const { appId, serverMode, args, SYSTEM_RESTART } = params
+    const { appId, serverMode, args, SYSTEM_RESTART, config } = params
 
     const cwd = process.cwd()
     const dumpInput = `${cwd}${sep}.album`
-    const albumConfigInput = `${cwd}${sep}album.config.ts`
+    const albumConfigInput = config ?? `${cwd}${sep}album.config.ts`
     const inputs: Inputs = { cwd, root: cwd, dumpInput, albumConfigInput }
 
     const { userConfig, pluginManager, logger } = await loadConfig({ args, inputs, serverMode })

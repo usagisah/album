@@ -38,6 +38,6 @@ export async function loadConfig({ serverMode, inputs, args }: LoadConfigParams)
 
   const logger = await createAlbumLogger(config.logger)
   const pluginManager = createPluginManager({ userPlugin: config.plugins, logger })
-  const { config: userConfig } = await pluginManager.execute("config", { serverMode, config })
+  const { config: userConfig } = await pluginManager.execute("config", { serverMode, args, config })
   return { userConfig, pluginManager, logger }
 }

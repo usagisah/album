@@ -16,6 +16,10 @@ export interface UserConfigAppModule {
   path?: string
   name?: string
   ignore?: (string | RegExp)[]
+  pageFilter?: string | RegExp
+  routerFilter?: string | RegExp
+  actionFilter?: string | RegExp
+  pageExtensions?: (string | RegExp)[]
 }
 
 export interface UserConfigAppSSRRender {
@@ -41,6 +45,7 @@ export interface UserSSRCompose {
 export interface UserConfigServer {
   port?: number
   appModule?: string
+  builtinModules?: boolean
   tsconfig?: string | Record<string, any>
 }
 

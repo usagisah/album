@@ -13,8 +13,8 @@ import { applySSRComposeDevMiddleware } from "../ssrCompose/applySSRComposeMiddl
 export async function processServer(context: AlbumContext) {
   const { ssr, ssrCompose, serverManager, pluginManager, logger, getStaticInfo } = context
   const { midConfigs, viteConfigs } = await resolveMiddlewareConfig(context)
-  const m = serverManager.appModule
-  const apiAppModuleInput = m.input ? resolve(m.output!, m.filename) : null
+  const { appModule, builtinModules } = serverManager
+  const apiAppModuleInput = appModule.input ? resolve(appModule.output!, appModule.filename) : null
   const serverApp = await NestFactory.create(await loadRsModule(apiAppModuleInput), { logger, cors: true })
   const moduleLoader = serverApp.get(LazyModuleLoader)
   await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
@@ -37,8 +37,10 @@ export async function processServer(context: AlbumContext) {
   const viteDevServer = await createServer(viteConfigs)
   serverApp.use((context.viteDevServer = viteDevServer).middlewares)
 
-  if (ssrCompose) await applySSRComposeDevMiddleware(serverApp, context)
-  if (ssr) await moduleLoader.load(() => SSRModule)
-  else await moduleLoader.load(() => SpaModule)
+  if (builtinModules) {
+    if (ssrCompose) await applySSRComposeDevMiddleware(serverApp, context)
+    if (ssr) await moduleLoader.load(() => SSRModule)
+    else await moduleLoader.load(() => SpaModule)
+  }
   return { serverApp, viteDevServer }
 }

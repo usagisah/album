@@ -1,4 +1,4 @@
-import { FileManager } from "@albumjs/tools/node"
+import { FileManager, NodeArgs } from "@albumjs/tools/node"
 import { INestApplication } from "@nestjs/common"
 import EventEmitter from "events"
 import { AppManagerModule, AppManagerRouter, AppManagerSSRRender, AppSpecialModule } from "../app/app.dev.type.js"
@@ -18,6 +18,7 @@ export type PluginManager = ReturnType<typeof createPluginManager>
 // 修改引用配置文件
 export type PluginConfigParams = {
   serverMode: ServerMode
+  args: NodeArgs
   config: AlbumUserConfig
 } & PluginGlobalMessage
 export type PluginConfig = (param: PluginConfigParams) => any

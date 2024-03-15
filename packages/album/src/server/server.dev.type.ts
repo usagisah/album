@@ -11,5 +11,6 @@ export type ServerManagerTsconfig = Obj | null
 export type ServerManager = {
   port: number
   appModule: ServerManagerAppModule
+  builtinModules: boolean
   tsconfig: ServerManagerTsconfig
 }
