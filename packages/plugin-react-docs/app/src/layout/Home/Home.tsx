@@ -1,4 +1,7 @@
 import styled from "@emotion/styled"
+import { Footer } from "./Footer"
+import { Header } from "./Header"
+import { MainHome } from "./MainHome"
 
 const HomeContainer = styled.div(() => ({
   display: "flex",
@@ -7,5 +10,11 @@ const HomeContainer = styled.div(() => ({
 }))
 
 export function HomeLayout() {
-  return <HomeContainer></HomeContainer>
+  return (
+    <HomeContainer>
+      <Header />
+      <MainHome />
+      <Footer />
+    </HomeContainer>
+  )
 }
