@@ -22,7 +22,13 @@ const NavSearchContainer = styled.button`
     border-radius: 4px;
   }
 `
-export function NavSearch() {
+
+export interface NavSearchProps {
+  mobile?: boolean
+}
+
+export function NavSearch(props: NavSearchProps) {
+  const { mobile } = props
   return (
     <NavSearchContainer className="navSearch">
       <svg width="16" height="16" className="icon" viewBox="0 0 20 20" aria-hidden="true">
@@ -35,8 +41,8 @@ export function NavSearch() {
           strokeLinejoin="round"
         />
       </svg>
-      <span className="placeholder">搜索文档</span>
-      <span className="pointKeys">⌘ K</span>
+      {!mobile && <span className="placeholder">搜索文档</span>}
+      {!mobile && <span className="pointKeys">⌘ K</span>}
     </NavSearchContainer>
   )
 }

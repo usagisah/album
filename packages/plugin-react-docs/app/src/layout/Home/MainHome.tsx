@@ -2,6 +2,7 @@ import { css } from "@emotion/react"
 import styled from "@emotion/styled"
 import { ReactNode } from "react"
 import bg from "../../assets/home.bg.png"
+import { Features } from "./Features"
 
 const MainHomeContainer = styled.main`
   flex: 1;
@@ -22,6 +23,7 @@ const MainHomeContainer = styled.main`
     position: relative;
     margin: 0 auto;
     display: flex;
+    flex-wrap: wrap;
     max-width: 1050px;
   }
 
@@ -34,6 +36,7 @@ const MainHomeContainer = styled.main`
       background: -webkit-linear-gradient(120deg, #bd34fe 30%, #41d1ff);
       background-clip: text;
       color: transparent;
+      text-align: justify;
       -webkit-text-fill-color: transparent;
     }
 
@@ -41,12 +44,14 @@ const MainHomeContainer = styled.main`
       font-weight: 700;
       padding-top: 12px;
       font-size: 56px;
+      text-align: justify;
     }
 
     .tagline {
       padding-top: 12px;
       font-size: 24px;
       color: #3c3c43c6;
+      text-align: justify;
     }
 
     .fastActions {
@@ -76,7 +81,7 @@ const MainHomeContainer = styled.main`
       background: linear-gradient(-45deg, #00bfff 50%, #f2f1ef 50%);
       filter: blur(68px);
     }
-    
+
     img {
       display: block;
       width: 320px;
@@ -84,46 +89,39 @@ const MainHomeContainer = styled.main`
     }
   }
 
-  .features {
-    margin: 40px auto 0 auto;
-    width: 1050px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-
-    .item {
-      margin-top: 2rem;
-      width: 320px;
-      display: flex;
+  @media (max-width: 1024px) {
+    .wrapper {
       flex-direction: column;
-      padding: 24px;
-      background-color: #f6f6f7;
-      border-radius: 12px;
-    }
-
-    .icon {
-      display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 24px;
-      width: 48px;
-      height: 48px;
-      background-color: #8e96aa23;
-      border-radius: 8px;
+      padding-left: 48px;
+      padding-right: 48px;
     }
 
-    .title {
-      padding-top: 8px;
-      font-weight: 600;
-      text-align: justify;
+    .hero {
+      transform: translateY(86%);
+
+      .title,
+      .description,
+      .tagline {
+        text-align: center;
+      }
+
+      .fastActions {
+        justify-content: center;
+      }
     }
 
-    .detail {
-      flex: 1;
-      padding-top: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #3c3c43c6;
+    .image {
+      transform: translateY(-120%);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      transform: translateY(60%);
+    }
+    .image {
+      transform: translateY(-150%);
     }
   }
 `
@@ -138,7 +136,7 @@ export function MainHome() {
           <p className="description">由 Vite 和 Vue 驱动的静态站点生成器</p>
           <p className="tagline">将 Markdown 变成优雅的文档，只需几分钟</p>
           <div className="fastActions">
-            <CircleButton type="primary">什么是 VitePress</CircleButton>
+            <CircleButton primary>什么是 VitePress</CircleButton>
             <CircleButton>快速开始</CircleButton>
             <CircleButton>Github</CircleButton>
           </div>
@@ -149,33 +147,12 @@ export function MainHome() {
         </div>
       </div>
 
-      <div className="features">
-        <div className="item">
-          <div className="icon">🚀</div>
-          <h2 className="title">专注内容</h2>
-          <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-        </div>
-        <div className="item">
-          <div className="icon">🚀</div>
-          <h2 className="title">专注内容</h2>
-          <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-        </div>
-        <div className="item">
-          <div className="icon">🚀</div>
-          <h2 className="title">专注内容</h2>
-          <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-        </div>
-        <div className="item">
-          <div className="icon">🚀</div>
-          <h2 className="title">专注内容</h2>
-          <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-        </div>
-      </div>
+      <Features />
     </MainHomeContainer>
   )
 }
 
-function CircleButton({ href, children }: { href: string; children: ReactNode }) {
+function CircleButton({ primary, href, children }: { primary?: boolean; href?: string; children: ReactNode }) {
   return (
     <a
       href={href}
@@ -185,8 +162,8 @@ function CircleButton({ href, children }: { href: string; children: ReactNode })
         font-weight: 600;
         text-align: center;
         white-space: nowrap;
-        color: #3c3c43;
-        background-color: #ebebef;
+        color: ${primary ? "white" : "#3c3c43"};
+        background-color: ${primary ? "#5672cd" : "#ebebef"};
         border-radius: 20px;
       `}
     >
