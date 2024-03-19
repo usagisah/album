@@ -2,7 +2,7 @@ import { css } from "@emotion/react"
 import styled from "@emotion/styled"
 import { ReactNode } from "react"
 import bg from "../../assets/home.bg.png"
-import { Features } from "./Features"
+import { usePage } from "album.docs"
 
 const MainHomeContainer = styled.main`
   flex: 1;
@@ -56,6 +56,7 @@ const MainHomeContainer = styled.main`
 
     .fastActions {
       display: flex;
+      flex-wrap: wrap;
       gap: 12px;
       padding-top: 32px;
     }
@@ -118,15 +119,37 @@ const MainHomeContainer = styled.main`
 
   @media (max-width: 768px) {
     .hero {
-      transform: translateY(60%);
+      transform: translateY(65%);
     }
     .image {
       transform: translateY(-150%);
     }
   }
+
+  @media (max-width: 575px) {
+    .hero {
+      transform: translateY(30%);
+    }
+
+    .image {
+      transform: translateY(-270%);
+
+      .bg {
+        width: 270px;
+        height: 270px;
+      }
+
+      img {
+        width: 270px;
+        height: 270px;
+      }
+    }
+  }
 `
 
 export function MainHome() {
+  const { components } = usePage()
+  const Features = components["Features"]
   return (
     <MainHomeContainer className="mainHome">
       <img className="bgImg" src={bg} alt="" />

@@ -1,13 +1,24 @@
 import siteConfig from "@docs/site-config"
 import themeConfigs, { ThemeConfig } from "@docs/site-theme"
 import { PageContext } from "album.docs"
+import { Switch } from "antd"
 import { createRoot, hydrateRoot } from "react-dom/client"
+import { Category } from "./components/Category/Category.tsx"
+import { EditInfo } from "./components/EditInfo/EditInfo"
+import { Features } from "./components/Features/Features.tsx"
+import { Footer } from "./components/Footer/Footer.tsx"
+import { Github } from "./components/Github/Github.tsx"
+import { Header } from "./components/Header/Header.tsx"
+import { Lang } from "./components/Lang/Lang.tsx"
 import { NavBar } from "./components/NavBar/NavBar.tsx"
 import { NavSearch } from "./components/NavSearch/NavSearch.tsx"
 import { NavTitle } from "./components/NavTitle/NavTitle.tsx"
+import { PrevNext } from "./components/PrevNext/PrevNext.tsx"
 import { SelectMenu } from "./components/SelectMenu/SelectMenu.tsx"
+import { Sidebar } from "./components/Sidebar/Sidebar.tsx"
 import { AppProvide } from "./hooks/useAppContext.tsx"
 import { useThemeMode } from "./hooks/useThemeMode.ts"
+import { DocsLayout } from "./layout/Docs/Docs.tsx"
 import { HomeLayout } from "./layout/Home/Home.tsx"
 import "./normalize.css"
 
@@ -24,12 +35,22 @@ async function createStaticApp() {
 
   const themeConfig = await mergeThemeConfig({
     meta: {},
-    layouts: { Home: HomeLayout },
+    layouts: { default: DocsLayout, Home: HomeLayout, Docs: DocsLayout },
     components: {
       NavBar,
       NavSearch,
       NavTitle,
-      SelectMenu
+      SelectMenu,
+      Features,
+      Header,
+      Footer,
+      Github,
+      Lang,
+      EditInfo,
+      Sidebar,
+      PrevNext,
+      Switch,
+      Category
     }
   })
 
@@ -49,12 +70,13 @@ async function createStaticApp() {
       path: siteConfig.path
     },
     navList: siteConfig.navList,
+    sidebar: siteConfig.sidebar,
     lang: siteConfig.lang
   }
 
   return () => {
     appContext.themeMode = useThemeMode()
-    const Layout = themeConfig.layouts[siteConfig.layout]
+    const Layout = themeConfig.layouts[siteConfig.layout ?? "default"]
     return (
       <AppProvide context={appContext}>
         <Layout />

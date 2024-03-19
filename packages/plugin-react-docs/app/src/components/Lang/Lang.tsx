@@ -1,8 +1,8 @@
 import { usePage } from "album.docs"
-import { SelectMenu } from "../SelectMenu/SelectMenu"
 
 export function Lang() {
-  const { lang } = usePage()
+  const { lang, components } = usePage()
+  const SelectMenu = components["SelectMenu"]
   return (
     <SelectMenu navItems={lang}>
       <svg

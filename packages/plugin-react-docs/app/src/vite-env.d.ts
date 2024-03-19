@@ -18,6 +18,8 @@ declare module "@docs/site-config" {
     navList: NavItem[]
     lang: { text: string; link: string; icon?: string }[]
 
+    sidebar: NavItem[]
+
     footer: {
       message: string
       copyright: string
@@ -67,6 +69,7 @@ declare module "album.docs" {
       path: string
     }
     navList: NavItem[]
+    sidebar: NavItem[]
     lang: { text: string; link: string; icon?: string }[]
   }
   export function usePage(): PageContext

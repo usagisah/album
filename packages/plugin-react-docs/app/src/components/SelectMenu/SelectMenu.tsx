@@ -1,27 +1,29 @@
 import { DownOutlined } from "@ant-design/icons"
 import { NavItem } from "@docs/site-config"
-import { Menu, Popover } from "antd"
+import { Dropdown, DropdownProps } from "antd"
 import { ReactNode, useRef } from "react"
 
-export interface SelectMenuProps {
+export interface SelectMenuProps extends React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
+  arrow?: boolean
   navItems: NavItem[]
   children: ReactNode
+  dropdownProps?: DropdownProps
 }
 
 export function SelectMenu(props: SelectMenuProps) {
-  const { navItems, children } = props
+  const { arrow = true, navItems, children, dropdownProps, ..._props } = props
   if (navItems.length === 0) {
     return children
   }
 
   const items = useRef(transformItems(navItems))
   return (
-    <Popover placement="bottom" content={<Menu style={{ border: "none" }} items={items.current} />}>
-      <div style={{ display: "flex", gap: "4px", alignItems: "center", cursor: "pointer" }}>
+    <Dropdown placement="bottom" menu={{ items: items.current, style: { border: "none" } }} {...dropdownProps}>
+      <div style={{ display: "flex", gap: "4px", alignItems: "center", cursor: "pointer" }} {..._props}>
         {children}
-        <DownOutlined style={{ width: "8px", height: "8px" }} />
+        {arrow && <DownOutlined style={{ width: "8px", height: "8px" }} />}
       </div>
-    </Popover>
+    </Dropdown>
   )
 }
 
