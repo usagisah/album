@@ -53,7 +53,7 @@ export function IpadActions() {
         key: item.link,
         label: (
           <a href={item.link}>
-            {item.text} {item.icon}
+            {item.label} {item.icon}
           </a>
         )
       }))

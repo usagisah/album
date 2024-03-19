@@ -1,11 +1,11 @@
 /// <reference types="vite/client" />
 
 declare module "@docs/site-config" {
-  export interface NavItem {
-    text?: string
+  export interface LinkItem {
+    label?: string
     link?: string
     icon?: string
-    items?: NavItem[]
+    children?: LinkItem[]
   }
 
   export interface SiteConfig {
@@ -15,10 +15,10 @@ declare module "@docs/site-config" {
     description: string
     path: string
 
-    navList: NavItem[]
-    lang: { text: string; link: string; icon?: string }[]
+    navList: LinkItem[]
+    lang: LinkItem[]
 
-    sidebar: NavItem[]
+    sidebar: LinkItem[]
 
     footer: {
       message: string
@@ -49,7 +49,7 @@ declare module "@docs/site-theme" {
 }
 
 declare module "album.docs" {
-  import { NavItem } from "@docs/site-config"
+  import { LinkItem } from "@docs/site-config"
   import React from "react"
   export interface PageContext {
     store: Map<any, any>
@@ -68,9 +68,9 @@ declare module "album.docs" {
       icon: string
       path: string
     }
-    navList: NavItem[]
-    sidebar: NavItem[]
-    lang: { text: string; link: string; icon?: string }[]
+    navList: LinkItem[]
+    sidebar: LinkItem[]
+    lang: LinkItem[]
   }
   export function usePage(): PageContext
 }

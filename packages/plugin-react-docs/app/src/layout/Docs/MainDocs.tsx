@@ -4,9 +4,9 @@ import { usePage } from "album.docs"
 const MainDocsContainer = styled.main`
   display: flex;
   gap: 4rem;
-  margin: 80px auto 0 auto;
+  margin: 100px auto 0 auto;
   padding: 0 24px;
-  max-width: 1200px;
+  max-width: 1400px;
 
   .content {
     flex: 1;

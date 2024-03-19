@@ -7,8 +7,7 @@ const NavSearchContainer = styled.button`
   padding: 0 10px 0 12px;
   height: 40px;
   font-size: 14px;
-  background-color: #f6f6f7;
-  border: 1px solid transparent;
+  border: 1px solid #e2e2e3;
   border-radius: 8px;
 
   .placeholder {

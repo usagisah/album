@@ -1,7 +1,7 @@
 import siteConfig from "@docs/site-config"
 import themeConfigs, { ThemeConfig } from "@docs/site-theme"
 import { PageContext } from "album.docs"
-import { Switch } from "antd"
+import { Collapse, Switch } from "antd"
 import { createRoot, hydrateRoot } from "react-dom/client"
 import { Category } from "./components/Category/Category.tsx"
 import { EditInfo } from "./components/EditInfo/EditInfo"
@@ -50,7 +50,8 @@ async function createStaticApp() {
       Sidebar,
       PrevNext,
       Switch,
-      Category
+      Category,
+      Collapse
     }
   })
 

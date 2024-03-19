@@ -1,5 +1,5 @@
 import { MenuOutlined } from "@ant-design/icons"
-import { NavItem } from "@docs/site-config"
+import { LinkItem } from "@docs/site-config"
 import styled from "@emotion/styled"
 
 const NavBarContainer = styled.ul`
@@ -31,7 +31,7 @@ const NavBarContainer = styled.ul`
 `
 
 export interface NavBarProps {
-  list: NavItem[]
+  list: LinkItem[]
   SelectMenu: any
 }
 
@@ -41,15 +41,15 @@ export function NavBar(props: NavBarProps) {
     <NavBarContainer className="navBar">
       <div className="pc-nav">
         {list.map((item, index) => (
-          <SelectMenu key={index} navItems={item.items ?? []}>
+          <SelectMenu key={index} linkItems={item.children ?? []}>
             <li className="item">
-              <a href={item.link}>{item.text}</a>
+              <a href={item.link}>{item.label}</a>
             </li>
           </SelectMenu>
         ))}
       </div>
 
-      <SelectMenu navItems={list} arrow={false} dropdownProps={{ className: "ipad-nav" }}>
+      <SelectMenu linkItems={list} arrow={false} dropdownProps={{ className: "ipad-nav" }}>
         <MenuOutlined width={16} height={16} style={{ cursor: "pointer" }} />
       </SelectMenu>
     </NavBarContainer>

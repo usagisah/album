@@ -23,13 +23,13 @@ export default defineConfig({
             logo: "https://vitepress.dev/vitepress-logo-mini.svg",
             path: "/",
             navList: [
-              { text: "指南", link: "/" },
-              { text: "扭矩", link: "/" },
-              { text: "你他丫的", link: "/" },
+              { label: "指南", link: "/" },
+              { label: "扭矩", link: "/" },
+              { label: "你他丫的", link: "/" },
               { 
-                text: "下拉列表", link: "/", items: [
-                  { text: "1", link: "/1" },
-                  { text: "2", link: "/2", items: [{text:"#", link:"/#"}] },
+                label: "下拉列表", link: "/", children: [
+                  { label: "1", link: "/1" },
+                  { label: "2", link: "/2", children: [{label:"#", link:"/#"}] },
                 ] 
               },
             ],
@@ -41,46 +41,42 @@ export default defineConfig({
             ],
             sidebar: [
               {
-                text: '简介',
-                collapsed: false,
-                items: [
-                  { text: '什么是 VitePress？', link: 'what-is-vitepress' },
-                  { text: '快速开始', link: 'getting-started' },
-                  { text: '路由', link: 'routing' },
-                  { text: '部署', link: 'deploy' }
+                label: '简介',
+                children: [
+                  { label: '什么是 VitePress？', link: 'what-is-vitepress' },
+                  { label: '快速开始', link: 'getting-started' },
+                  { label: '路由', link: 'routing' },
+                  { label: '部署', link: 'deploy', children: [{ label: '部署', link: 'deploy' }] }
                 ]
               },
               {
-                text: '写作',
-                collapsed: false,
-                items: [
-                  { text: 'Markdown 扩展', link: 'markdown' },
-                  { text: '资源处理', link: 'asset-handling' },
-                  { text: 'frontmatter', link: 'frontmatter' },
-                  { text: '在 Markdown 使用 Vue', link: 'using-vue' },
-                  { text: '国际化', link: 'i18n' }
+                label: '写作',
+                children: [
+                  { label: 'Markdown 扩展', link: 'markdown' },
+                  { label: '资源处理', link: 'asset-handling' },
+                  { label: 'frontmatter', link: 'frontmatter' },
+                  { label: '在 Markdown 使用 Vue', link: 'using-vue' },
+                  { label: '国际化', link: 'i18n' }
                 ]
               },
               {
-                text: '自定义',
-                collapsed: false,
-                items: [
-                  { text: '自定义主题', link: 'custom-theme' },
-                  { text: '扩展默认主题', link: 'extending-default-theme' },
-                  { text: '构建时数据加载', link: 'data-loading' },
-                  { text: 'SSR 兼容性', link: 'ssr-compat' },
-                  { text: '连接 CMS', link: 'cms' }
+                label: '自定义',
+                children: [
+                  { label: '自定义主题', link: 'custom-theme' },
+                  { label: '扩展默认主题', link: 'extending-default-theme' },
+                  { label: '构建时数据加载', link: 'data-loading' },
+                  { label: 'SSR 兼容性', link: 'ssr-compat' },
+                  { label: '连接 CMS', link: 'cms' }
                 ]
               },
               {
-                text: '实验性功能',
-                collapsed: false,
-                items: [
-                  { text: 'MPA 模式', link: 'mpa-mode' },
-                  { text: 'sitemap 生成', link: 'sitemap-generation' }
+                label: '实验性功能',
+                children: [
+                  { label: 'MPA 模式', link: 'mpa-mode' },
+                  { label: 'sitemap 生成', link: 'sitemap-generation' }
                 ]
               },
-              { text: '配置和 API 参考', base: '/zh/reference/', link: 'site-config' }
+              { label: '配置和 API 参考', base: '/zh/reference/', link: 'site-config' }
             ],
             footer: {
               message: "基于 MIT 许可发布",
@@ -88,8 +84,8 @@ export default defineConfig({
             },
             layout: "default",
             lang: [
-              { text: "English", link: "/e" },
-              { text: "中文", link: "/c" },
+              { label: "English", link: "/e" },
+              { label: "中文", link: "/c" },
             ]
           }`
         } else if (id === "@docs/site-theme") {
