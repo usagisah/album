@@ -74,3 +74,8 @@ declare module "album.docs" {
   }
   export function usePage(): PageContext
 }
+
+declare module "*.md" {
+  import { FC } from "react"
+  export default FC<any>
+}

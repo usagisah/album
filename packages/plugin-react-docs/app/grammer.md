@@ -127,6 +127,6 @@ export default {
 }
 ```
 
-作为一个组件进行渲染
-```type{render}
-```
+
+渲染同时能看源码
+tab切换

@@ -1,5 +1,7 @@
 import styled from "@emotion/styled"
 import { usePage } from "album.docs"
+import Test from "../../test.md"
+import siteConfig from "@docs/site-config"
 
 const MainDocsContainer = styled.main`
   display: flex;
@@ -18,6 +20,10 @@ const MainDocsContainer = styled.main`
     background-color: white;
     border-radius: 12px;
   }
+
+  .doc-footer {
+    margin-top: 64px;
+  }
 `
 
 export function MainDocs() {
@@ -26,11 +32,14 @@ export function MainDocs() {
   const EditInfo = components["EditInfo"]
   const PrevNext = components["PrevNext"]
   const Category = components["Category"]
+  console.log( siteConfig )
   return (
     <MainDocsContainer className="mainDocs">
       <Sidebar />
       <section className="content">
-        <article className="article"></article>
+        <article className="article">
+          <Test />
+        </article>
         <section className="doc-footer">
           <EditInfo />
           <PrevNext />
