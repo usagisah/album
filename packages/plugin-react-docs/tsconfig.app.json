@@ -9,9 +9,9 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "templates/**/*.ts",
-    "templates/**/*.tsx",
-    "templates/album.type.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "app/album.type.d.ts",
     "album.d.ts",
   ]
 }

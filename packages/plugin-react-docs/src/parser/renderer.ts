@@ -1,7 +1,7 @@
 import { RendererObject } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
-import { PARSE_SKIP, numReg, scopeNumReg } from "../constants"
-import { parseArgs } from "./parseArgs"
+import { PARSE_SKIP, numReg, scopeNumReg } from "../constants.js"
+import { parseArgs } from "./parseArgs.js"
 
 export interface RendererOptions {
   highlighter: HighlighterGeneric<BundledLanguage, BundledTheme>

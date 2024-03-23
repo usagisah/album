@@ -1,16 +1,14 @@
 import react from "@vitejs/plugin-react-swc"
 import { resolve } from "path"
 import { Plugin, ViteDevServer, mergeConfig } from "vite"
-import { SITE_CONFIG, SITE_THEME } from "./constants"
-import { ParseConfig, parseMdToReact } from "./parser/parseMdToReact"
-
-export { ParseConfig } from "./parser/parseMdToReact"
+import { SITE_CONFIG, SITE_THEME } from "./constants.js"
+import { ParseConfig, parseMdToReact } from "./parser/parseMdToReact.js"
+export { ParseConfig } from "./parser/parseMdToReact.js"
 
 export interface ReactDocsConfig {
   react?: Parameters<typeof react>[0]
   parse?: ParseConfig
 }
-
 
 export default function AlbumReactDocsVitePlugin(config: ReactDocsConfig = {}) {
   const markdownRecord: Record<string, any> = {}
@@ -40,16 +38,6 @@ export default function AlbumReactDocsVitePlugin(config: ReactDocsConfig = {}) {
 
   const plugin: Plugin = {
     name: "album:react-docs",
-
-    config(config) {
-      return mergeConfig(config, {
-        resolve: {
-          alias: {
-            "album.docs": resolve(process.cwd(), "src/hooks/useAppContext.tsx")
-          }
-        }
-      })
-    },
 
     resolveId(id) {
       switch (id) {

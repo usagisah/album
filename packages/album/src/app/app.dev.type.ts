@@ -7,7 +7,7 @@ export type AppManagerModule = {
   pageFilter: RegExp
   routerFilter: RegExp
   actionFilter: RegExp
-  pageExtensions: RegExp[]
+  fileExtensions: RegExp[]
 }
 
 export type AppManagerRouter = {

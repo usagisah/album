@@ -19,7 +19,7 @@ export interface UserConfigAppModule {
   pageFilter?: string | RegExp
   routerFilter?: string | RegExp
   actionFilter?: string | RegExp
-  pageExtensions?: (string | RegExp)[]
+  fileExtensions?: (string | RegExp)[]
 }
 
 export interface UserConfigAppSSRRender {

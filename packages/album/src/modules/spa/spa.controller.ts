@@ -1,3 +1,4 @@
+import { isBlank } from "@albumjs/tools/node"
 import { Controller, Get, Req, Res } from "@nestjs/common"
 import { Request, Response } from "express"
 import { readFile } from "fs/promises"
@@ -29,6 +30,10 @@ export class SpaController {
     const { url, originalUrl } = req
     const { inputs, appManager, viteDevServer } = this.context.getContext() as DevContext
     try {
+      if (isBlank(appManager.realClientInput)) {
+        return res.status(500).send("spa-controller 发现入口 js 为空")
+      }
+
       let html = await readFile(resolve(inputs.cwd, "index.html"), "utf-8")
       html = html.replace("</body>", `<script type="module" src="/${relative(inputs.cwd, appManager.realClientInput)}"></script></body>`)
       html = await viteDevServer!.transformIndexHtml(url, html, originalUrl)

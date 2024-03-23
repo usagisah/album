@@ -38,6 +38,7 @@
     "@albumjs/album": "workspace:^",
     "@albumjs/tools": "workspace:^",
     "@vitejs/plugin-react-swc": "^3.6.0",
+    "front-matter": "^4.0.2",
     "marked": "^12.0.1",
     "path-to-regexp": "^6.2.1",
     "shiki": "^1.1.7",

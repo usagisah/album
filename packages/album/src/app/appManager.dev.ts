@@ -84,10 +84,10 @@ export async function createAppManager(config: AppManagerConfig) {
         name: moduleName
       })),
     ignore: [/^(\.)|(_)|(common)/],
-    pageFilter: isRegExp(_moduleConfig.pageFilter) ? _moduleConfig.pageFilter : /[a-zA-Z]*\.?page\.\w+/,
-    routerFilter: isRegExp(_moduleConfig.routerFilter) ? _moduleConfig.routerFilter : /[a-zA-Z]*\.?router\.\w+/,
-    actionFilter: isRegExp(_moduleConfig.actionFilter) ? _moduleConfig.actionFilter : /[a-zA-Z]*\.?action\.\w+/,
-    pageExtensions: [/\.ts$/, /\.tsx$/].concat(isArray(_moduleConfig.pageExtensions) ? (_moduleConfig.pageExtensions as RegExp[]) : [])
+    pageFilter: isRegExp(_moduleConfig.pageFilter) ? _moduleConfig.pageFilter : /^[a-zA-Z]+\.page$|^page$/,
+    routerFilter: isRegExp(_moduleConfig.routerFilter) ? _moduleConfig.routerFilter : /^[a-zA-Z]+\.router$|^router$/,
+    actionFilter: isRegExp(_moduleConfig.actionFilter) ? _moduleConfig.actionFilter : /^[a-zA-Z]+\.action$|^action$/,
+    fileExtensions: [/\.ts$/, /\.tsx$/].concat(isArray(_moduleConfig.fileExtensions) ? (_moduleConfig.fileExtensions as RegExp[]) : [])
   }
   if (!moduleConfig.modulePath) {
     throw `找不到${c.module?.path ? "指定的" : "默认的"} app.module.path 入口`

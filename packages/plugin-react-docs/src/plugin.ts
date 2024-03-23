@@ -1,21 +1,13 @@
 import { AlbumContext, AlbumUserPlugin, mergeConfig } from "@albumjs/album/server"
 import { red } from "@albumjs/tools/lib/colorette"
-import viteReactPlugin from "@vitejs/plugin-react-swc"
+import { createCommonJS } from "@albumjs/tools/lib/mlly"
+import { resolve } from "path"
+import AlbumReactDocsVitePlugin, { ReactDocsConfig } from "./vite.js"
 
-type PluginProps<T> = T extends (props: infer P) => any ? P : never
+export interface PluginReactDocsConfig extends ReactDocsConfig {}
 
-export type PluginReactDocs = {
-  pluginReact?: PluginProps<typeof viteReactPlugin>
-}
-
-/* 
-express mid
-vite mid
-
-hot 更新，非 md 部分
-*/
-export default function pluginReactDocs(config: PluginReactDocs = {}): AlbumUserPlugin {
-  const { pluginReact } = config
+const { __dirname } = createCommonJS(import.meta.url)
+export default function pluginReactDocs(config: PluginReactDocsConfig = {}): AlbumUserPlugin {
   let albumContext: AlbumContext
 
   return {
@@ -34,14 +26,19 @@ export default function pluginReactDocs(config: PluginReactDocs = {}): AlbumUser
       const ctx = (albumContext = param.albumContext)
       ctx.watcher
     },
-    async serverConfig(params) {
-      params.viteConfigs.push({
+    async serverConfig(c) {
+      c.viteConfigs.push({
         name: "plugin-react",
         config: {
           build: {
             emptyOutDir: false
           },
-          plugins: [viteReactPlugin(pluginReact) as any]
+          resolve: {
+            alias: {
+              "album.docs": resolve(__dirname, "../app/hooks/useAppContext.tsx")
+            }
+          },
+          plugins: [AlbumReactDocsVitePlugin(config)]
         }
       })
     }

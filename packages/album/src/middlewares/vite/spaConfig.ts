@@ -2,6 +2,7 @@ import { readFile } from "fs/promises"
 import { relative, resolve } from "path"
 import { InlineConfig, PluginOption } from "vite"
 import { AlbumContext } from "../../context/context.dev.type.js"
+import { isBlank } from "@albumjs/tools/node"
 
 const configName = "album:spa"
 export function createSPACoreConfig(context: AlbumContext): [InlineConfig, PluginOption] {
@@ -17,6 +18,9 @@ export function createSPACoreConfig(context: AlbumContext): [InlineConfig, Plugi
         input: ssr ? appManager.realClientInput : undefined
       }
     }
+  }
+  if (ssr && isBlank(appManager.realClientInput)) {
+    throw "build-ssr 发现入口为空"
   }
   
   const indexHtmlPath = resolve(cwd, "index.html")
