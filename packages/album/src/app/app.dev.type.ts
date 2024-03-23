@@ -39,11 +39,20 @@ export type AppSpecialModuleFile = {
   ext: string
 }
 
+export type AppSpecialModuleDir = {
+  type: "dir"
+  filepath: string
+  filename: string
+  files: AppSpecialModuleFile[]
+  dirs: AppSpecialModuleDir[]
+}
+
 export type AppSpecialModule = {
   type: "module"
   filepath: string
   filename: string
   files: AppSpecialModuleFile[]
+  dirs: AppSpecialModuleDir[]
   children: AppSpecialModule[]
 
   pageFile: AppSpecialModuleFile

@@ -4,7 +4,7 @@ import { readdir } from "fs/promises"
 import { basename, parse as pathParse, resolve } from "path"
 import { AlbumContext } from "../context/context.dev.type.js"
 import { ILogger } from "../logger/logger.type.js"
-import { AppManagerModule, AppSpecialModule, AppSpecialModuleFile } from "./app.dev.type.js"
+import { AppManagerModule, AppSpecialModule, AppSpecialModuleDir, AppSpecialModuleFile } from "./app.dev.type.js"
 
 export async function buildSpecialModules(context: AlbumContext): Promise<AppSpecialModule[]> {
   const { ssrCompose, appManager, logger } = context
@@ -39,24 +39,23 @@ export async function walkModules(params: ParseRouterParams) {
   return modules
 }
 
-export async function resolveModules(params: ParseRouterParams) {
-  const { moduleName, modulePath, fileExtensions, ignore, logger, ...ps } = params
-
-  const filename = basename(modulePath)
-  if (ignore.some(r => r.test(filename))) {
-    return false
-  }
-
+export async function resolveDirFiles(params: { findChildModule: boolean; moduleName: string; modulePath: string; fileExtensions: RegExp[] }) {
+  const { findChildModule, moduleName, modulePath, fileExtensions } = params
   const files: AppSpecialModuleFile[] = []
-  const dirFiles = await readdir(modulePath, { encoding: "utf-8", withFileTypes: true })
+  const dirs: AppSpecialModuleDir[] = []
   let childModuleDir: Dirent | null = null
+
+  const dirFiles = await readdir(modulePath, { encoding: "utf-8", withFileTypes: true })
   for (const file of dirFiles) {
     const filename = file.name
     const filepath = resolve(modulePath, file.name)
 
     if (file.isDirectory()) {
-      if (filename === moduleName) {
+      if (findChildModule && filename === moduleName) {
         childModuleDir = file
+      } else {
+        const dir = await resolveDirFiles({ findChildModule: false, moduleName, modulePath: resolve(modulePath, childModuleDir.name), fileExtensions })
+        dirs.push({ type: "dir", filename, filepath, files: dir.files, dirs: dir.dirs })
       }
       continue
     }
@@ -73,21 +72,31 @@ export async function resolveModules(params: ParseRouterParams) {
       })
     }
   }
+  return { files, dirs, childModuleDir }
+}
 
+export async function resolveModules(params: ParseRouterParams) {
+  const { moduleName, modulePath, fileExtensions, ignore, logger, ...ps } = params
+
+  const filename = basename(modulePath)
+  if (ignore.some(r => r.test(filename))) {
+    return false
+  }
+
+  const { files, dirs, childModuleDir } = await resolveDirFiles({ findChildModule: true, moduleName, modulePath, fileExtensions })
   const res = buildRoute({ filename, files }, params)
-  if (!res) return
+  if (!res) {
+    return
+  }
 
   const specialModule: AppSpecialModule = {
     type: "module",
     filename,
     filepath: modulePath,
     files,
+    dirs,
     children: [],
-
-    pageFile: res.pageFile,
-    routerFile: res.routerFile,
-    actionFile: res.actionFile,
-    routePath: res.routePath
+    ...res
   }
 
   if (childModuleDir) {
@@ -111,12 +120,12 @@ type BuildRouteParams = {
 }
 
 function buildRoute({ filename, files }: BuildRouteParams, { parentModule, pageFilter, actionFilter, routerFilter }: ParseRouterParams) {
-  const pageFile = files.find(f => pageFilter.test(f.filename))
+  const pageFile = files.find(f => pageFilter.test(f.appName))
   if (!pageFile) {
     return false
   }
 
-  const routerFile = files.find(f => routerFilter.test(f.filename))
+  const routerFile = files.find(f => routerFilter.test(f.appName))
   let routePath = ""
   if (!parentModule && filename.toLocaleLowerCase() === "home") {
     routePath = "/"
@@ -127,6 +136,6 @@ function buildRoute({ filename, files }: BuildRouteParams, { parentModule, pageF
     routePath = "/" + pageFile.filename.slice(0, index)
   }
 
-  const actionFile = files.find(f => actionFilter.test(f.filename))
+  const actionFile = files.find(f => actionFilter.test(f.appName))
   return { pageFile, routerFile, actionFile, routePath }
 }

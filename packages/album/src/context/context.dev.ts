@@ -22,7 +22,6 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
   let _logger: ILogger = console
   try {
     const { appId, serverMode, args, SYSTEM_RESTART, config } = params
-
     const cwd = process.cwd()
     const dumpInput = `${cwd}${sep}.album`
     const albumConfigInput = config ?? `${cwd}${sep}album.config.ts`

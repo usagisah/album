@@ -2,7 +2,7 @@ import { isPlainObject, resolveFilePath } from "@albumjs/tools/node"
 import { parse } from "@ungap/structured-clone/json"
 import { existsSync, statSync } from "fs"
 import { readFile } from "fs/promises"
-import { dirname, resolve, sep } from "path"
+import { dirname, resolve } from "path"
 import { createAlbumLogger } from "../logger/logger.js"
 import { ILogger } from "../logger/logger.type.js"
 import { StartServerParams } from "../service/service.type.js"
@@ -13,9 +13,9 @@ export async function createContext({ args }: StartServerParams): Promise<AlbumC
   let logger: ILogger
   try {
     const cwd = process.cwd()
-    let root = args._[1]
+    let root = args._[1] ?? args.root
     if (root) {
-      root = `${cwd}${sep}${root}`
+      root = resolve(cwd, root)
       if (!existsSync(root) && !statSync(root).isDirectory()) throw `指定的启动根目录路径不存在(${root})`
     } else {
       root = cwd

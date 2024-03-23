@@ -28,7 +28,7 @@
   ],
   "references": [
     {
-      "path": "./tsconfig.templates.json"
+      "path": "./tsconfig.app.json"
     }
   ]
 }

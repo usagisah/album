@@ -1,5 +1,5 @@
 import { readJson } from "@albumjs/tools/lib/fs-extra"
-import { Obj, isNumber, isPlainObject, isString, resolveFilePath } from "@albumjs/tools/node"
+import { Obj, isBoolean, isNumber, isPlainObject, isString, resolveFilePath } from "@albumjs/tools/node"
 import { resolve } from "path"
 import portfinder from "portfinder"
 import { Inputs } from "../context/context.dev.type.js"
@@ -55,7 +55,7 @@ export async function createServerManager(input: Inputs, userConfigServer?: User
       input: _appModule,
       output: resolve(dumpInput, "__server")
     },
-    builtinModules: !!builtinModules,
+    builtinModules: isBoolean(builtinModules) ? !!builtinModules : true,
     tsconfig: _tsconfig
   }
   return manager
