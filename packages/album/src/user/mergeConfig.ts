@@ -22,6 +22,18 @@ export function mergeConfigRecursively(conf1: AlbumUserConfig, conf2: AlbumUserC
       continue
     }
 
+    if (key === "app") {
+      if (isArray(value)) {
+        throw "合并配置时，新的 config.app 不能是一个数组"
+      }
+      if (isArray(mValue)) {
+        merged.app = mValue.map(item => mergeConfigRecursively(item, value)) as any
+      } else {
+        merged.app = mergeConfigRecursively(mValue, value) as any
+      }
+      continue
+    }
+
     if (key === "vite") {
       merged.vite = viteMergeConfig(mValue, value)
       continue

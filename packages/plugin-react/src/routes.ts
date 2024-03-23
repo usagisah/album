@@ -3,7 +3,7 @@ import { relative, resolve } from "path"
 import { pathToRegexp } from "path-to-regexp"
 import { ClientRoute, ParseRouteContext, ServerRoute } from "./plugin.type.js"
 
-export async function buildReactRoutes(dumpInput: string, specialModule: AppSpecialModule[]) {debugger
+export async function buildReactRoutes(dumpInput: string, specialModule: AppSpecialModule[]) {
   const { clientRoutes, serverRoutes } = await walkModule(specialModule, {
     dumpInput,
     parentClientPath: "",

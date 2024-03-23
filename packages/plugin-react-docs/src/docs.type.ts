@@ -32,13 +32,17 @@ export interface AlbumDocsConfig {
   }
 }
 
+export interface PluginContext {
+  outDir: string
+  records: MDRecord[]
+  recordMap: Map<string, MDRecord>
+}
 
-/* 
-api:
-components: {}
-layouts: {}
-hooks: {}
-store: {}
-config: {}
-lang: {}
-*/
+export interface MDRecord {
+  filename: string
+  filepath: string
+  outPath: string
+  hash: number
+  routePath: RegExp
+  frontmatter: Record<string, string>
+}
