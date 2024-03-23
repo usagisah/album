@@ -1,22 +1,22 @@
+import { isBlank } from "@albumjs/tools/node"
 import { AlbumContext } from "../context/context.dev.type.js"
 import { initClient } from "./initClient.js"
 import { patchClient } from "./patchClient.js"
 
-const specialModuleReg = /\.?(page|router|action)\.[a-z]+$/
-
 export function processClient(context: AlbumContext) {
-  const { watcher } = context
+  const { appManager, watcher } = context
+  const { pageFilter, routerFilter, actionFilter } = appManager.module
   const ready = initClient(context)
 
   if (watcher) {
     const filter = (type: string) => {
       const { modulePath } = context.appManager.module
       return (p: string) => {
-        if (!p.startsWith(modulePath)) {
+        if (isBlank(modulePath) || !p.startsWith(modulePath)) {
           return
         }
-        if (type === "unlinkDir" || specialModuleReg.test(p)) {
-          patchClient(context)
+        if (type === "unlinkDir" || pageFilter.test(p) || routerFilter.test(p) || actionFilter.test(p)) {
+          patchClient(context, { type, path: p })
         }
       }
     }

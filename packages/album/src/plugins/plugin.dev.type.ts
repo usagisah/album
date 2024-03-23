@@ -62,6 +62,7 @@ export type PluginInitClient = (param: PluginInitClientParam) => any
 // 模块发生改变，热更新客户端文件
 export type PluginPatchClientParam = {
   info: ContextStaticInfo
+  updateInfo: { type: string; path: string }
   appManager: {
     mainInput: string
     mainSSRInput: string | null

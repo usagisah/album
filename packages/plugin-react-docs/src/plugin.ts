@@ -1,15 +1,14 @@
-import { AlbumContext, AlbumUserPlugin, mergeConfig } from "@albumjs/album/server"
+import { AlbumUserPlugin, mergeConfig } from "@albumjs/album/server"
 import { red } from "@albumjs/tools/lib/colorette"
 import { createCommonJS } from "@albumjs/tools/lib/mlly"
 import { resolve } from "path"
 import AlbumReactDocsVitePlugin, { ReactDocsConfig } from "./vite.js"
+import { copy } from "@albumjs/tools/lib/fs-extra"
 
 export interface PluginReactDocsConfig extends ReactDocsConfig {}
 
 const { __dirname } = createCommonJS(import.meta.url)
 export default function pluginReactDocs(config: PluginReactDocsConfig = {}): AlbumUserPlugin {
-  let albumContext: AlbumContext
-
   return {
     name: "album:plugin-react-docs",
     config(config) {
@@ -19,12 +18,18 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       config.config = mergeConfig(config.config, { ssrCompose: undefined, server: { builtinModules: false } })
     },
     async findEntries(config) {
-      config.main = config.mainSSR = " "
-      config.module = {}
+      const { inputs } = config
+      const { dumpInput } = inputs
+      config.main = resolve(dumpInput, "plugin-react-docs/main.tsx")
+      config.mainSSR = resolve(dumpInput, "plugin-react-docs/main.ssr.tsx")
     },
-    context(param) {
-      const ctx = (albumContext = param.albumContext)
-      ctx.watcher
+    context({ albumContext }) {
+      albumContext.watcher.on("add", p => {}).on("change", p => {}).on("unlink", p => {}).on("unlinkDir", p => {})
+    },
+    async initClient({ info, dumpFileManager }) {
+      const name = "plugin-react-docs"
+      await dumpFileManager.add("dir", name, { create: false })
+      await copy(resolve(__dirname, "../app"), resolve(info.inputs.dumpInput, name))
     },
     async serverConfig(c) {
       c.viteConfigs.push({

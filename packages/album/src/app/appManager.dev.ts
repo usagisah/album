@@ -83,7 +83,7 @@ export async function createAppManager(config: AppManagerConfig) {
         root: inputs.cwd,
         name: moduleName
       })),
-    ignore: [/^(\.)|(_)|(common)/],
+    ignore: [/(^\.)|(^_)|(^common)|(^components)|(^node_modules)/],
     pageFilter: isRegExp(_moduleConfig.pageFilter) ? _moduleConfig.pageFilter : /^[a-zA-Z]+\.page$|^page$/,
     routerFilter: isRegExp(_moduleConfig.routerFilter) ? _moduleConfig.routerFilter : /^[a-zA-Z]+\.router$|^router$/,
     actionFilter: isRegExp(_moduleConfig.actionFilter) ? _moduleConfig.actionFilter : /^[a-zA-Z]+\.action$|^action$/,

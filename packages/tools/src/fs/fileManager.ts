@@ -20,12 +20,21 @@ export interface FileTreeNode extends FileDescription {
   children: FileTreeNode[]
 }
 
+interface WriteFileOptions {
+  fileKey: string
+  type: FileType
+  path: string
+  create?: boolean
+  check?: boolean
+  value?: string | ((value: string) => any | Promise<any>)
+}
+
 export async function createFileManager(options: FileManagerOptions) {
   const { root, create = true } = options
   const files = new Map<string, FileDescription>()
 
-  async function add(type: "dir", path: string, options?: { force?: boolean }): Promise<void>
-  async function add(type: "file", path: string, options?: { value?: string | ((value: string) => any | Promise<any>); force?: boolean }): Promise<void>
+  async function add(type: "dir", path: string, options?: { force?: boolean; create?: boolean }): Promise<void>
+  async function add(type: "file", path: string, options?: { value?: string | ((value: string) => any | Promise<any>); force?: boolean; create?: boolean }): Promise<void>
   async function add(type: FileType, path: string, options?: any) {
     if (type !== "dir" && type !== "file") {
       throw `FileManager.add type is must be FileType("dir" | "file")`
@@ -34,29 +43,31 @@ export async function createFileManager(options: FileManagerOptions) {
       path = path.slice(1)
     }
 
-    const { value, force = true } = options ?? {}
+    const { value, force = true, create = true } = options ?? {}
     const fileKey = buildFileKey(type, path)
     const exist = files.has(fileKey)
 
     if (force && exist) {
       await del(type, path)
-      await write({ fileKey, type, path, value: value ?? "" })
+      await write({ fileKey, type, path, value: value ?? "", create })
       return
     }
     if (!exist) {
-      await write({ fileKey, type, path, value: value ?? "" })
+      await write({ fileKey, type, path, value: value ?? "", create })
       return
     }
   }
 
-  async function write(options: { fileKey: string; type: FileType; path: string; check?: boolean; value?: string | ((value: string) => any | Promise<any>) }) {
-    const { fileKey, path, type, check, value } = options
+  async function write(options: WriteFileOptions) {
+    const { fileKey, path, type, check, value, create } = options
     if (check && !files.has(fileKey)) {
       throw `FileManager path-file is not exist. (${path})`
     }
 
     if (type === "dir") {
-      await mkdir(path, { recursive: true })
+      if (create) {
+        await mkdir(path, { recursive: true })
+      }
       files.set(fileKey, { type: "dir", name: basename(path), path })
       return
     }
@@ -64,15 +75,17 @@ export async function createFileManager(options: FileManagerOptions) {
     const filepath = join(root, path)
     let fileContent = value + ""
     try {
-      if (isFunction(value)) {
-        const file = await readFile(filepath, "utf-8").catch(() => "")
-        const res = await value(file)
-        if (res === false || isEmpty(res)) {
-          return
+      if (create) {
+        if (isFunction(value)) {
+          const file = await readFile(filepath, "utf-8").catch(() => "")
+          const res = await value(file)
+          if (res === false || isEmpty(res)) {
+            return
+          }
+          fileContent = res + ""
         }
-        fileContent = res + ""
+        await outputFile(filepath, fileContent, "utf-8")
       }
-      await outputFile(filepath, fileContent, "utf-8")
       files.set(fileKey, { type: "file", name: basename(path), path })
     } catch (e) {
       console.error(e)
