@@ -1,16 +1,12 @@
 import react from "@vitejs/plugin-react-swc"
-import { resolve } from "path"
-import { Plugin, ViteDevServer, mergeConfig } from "vite"
+import { Plugin, ViteDevServer } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
-import { ParseConfig, parseMdToReact } from "./parser/parseMdToReact.js"
-export { ParseConfig } from "./parser/parseMdToReact.js"
+import { PluginContext } from "./docs.type.js"
+import { parseMdToReact } from "./parser/parseMdToReact.js"
+export { ParseMDConfig } from "./parser/parseMdToReact.js"
 
-export interface ReactDocsConfig {
-  react?: Parameters<typeof react>[0]
-  parse?: ParseConfig
-}
-
-export default function AlbumReactDocsVitePlugin(config: ReactDocsConfig = {}) {
+export default function AlbumReactDocsVitePlugin(context: PluginContext) {
+  const { reactConfig, parseMDConfig } = context
   const markdownRecord: Record<string, any> = {}
   const usedId = new Set<string>()
 
@@ -134,7 +130,7 @@ export default function AlbumReactDocsVitePlugin(config: ReactDocsConfig = {}) {
         usedId.add(id)
       }
       if (id.endsWith(".md")) {
-        const res = await parseMdToReact(code, config.parse ?? {})
+        const res = await parseMdToReact(code, parseMDConfig)
         markdownRecord[id] = { frontmatter: res.frontmatter }
         debugger
         hotUpdate()
@@ -144,13 +140,16 @@ export default function AlbumReactDocsVitePlugin(config: ReactDocsConfig = {}) {
 
     configureServer(_server) {
       server = _server
+      server.middlewares.use((req, res, next) => {
+        debugger
+      })
     }
   }
 
   return [
     plugin,
     ...react({
-      ...config.react,
+      ...reactConfig,
       parserConfig: id => {
         if (id.endsWith(".md") || id.endsWith(".tsx")) {
           return {
@@ -163,7 +162,7 @@ export default function AlbumReactDocsVitePlugin(config: ReactDocsConfig = {}) {
             syntax: "typescript"
           }
         }
-        return config.react?.parserConfig?.(id)
+        return reactConfig?.parserConfig?.(id)
       },
       jsxImportSource: "@emotion/react"
     })

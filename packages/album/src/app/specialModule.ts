@@ -68,7 +68,7 @@ export async function resolveDirFiles(params: { findChildModule: boolean; module
         filename,
         // xxx.page. 这是不合法的
         appName: ext.length <= 1 ? filename : name,
-        ext
+        ext: ext.slice(1)
       })
     }
   }

@@ -1,3 +1,9 @@
+import { MDFrontmatter } from "./parser/parseFrontmatter.js"
+import { ParseMDConfig } from "./parser/parseMdToReact.js"
+import react from "@vitejs/plugin-react-swc"
+
+
+
 export interface AlbumDocsConfig {
   /* 标题 */
   title?: string
@@ -32,7 +38,12 @@ export interface AlbumDocsConfig {
   }
 }
 
+
+type ReactPlugin = Parameters<typeof react>[0]
+
 export interface PluginContext {
+  parseMDConfig: ParseMDConfig
+  reactConfig: ReactPlugin
   outDir: string
   records: MDRecord[]
   recordMap: Map<string, MDRecord>
@@ -41,8 +52,8 @@ export interface PluginContext {
 export interface MDRecord {
   filename: string
   filepath: string
-  outPath: string
   hash: number
-  routePath: RegExp
-  frontmatter: Record<string, string>
+  frontmatter: MDFrontmatter
+  outPath?: string
+  routePath?: RegExp
 }

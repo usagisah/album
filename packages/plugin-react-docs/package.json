@@ -37,8 +37,10 @@
   "dependencies": {
     "@albumjs/album": "workspace:^",
     "@albumjs/tools": "workspace:^",
+    "@types/js-yaml": "^4.0.9",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "front-matter": "^4.0.2",
+    "js-yaml": "^4.1.0",
     "marked": "^12.0.1",
     "path-to-regexp": "^6.2.1",
     "shiki": "^1.1.7",

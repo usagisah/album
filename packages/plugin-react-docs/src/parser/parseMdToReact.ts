@@ -5,12 +5,12 @@ import { DEFAULT_COPY_TEXT } from "../constants.js"
 import { blockExtension } from "./extension.js"
 import { renderer } from "./renderer.js"
 
-export interface ParseConfig {
+export interface ParseMDConfig {
   copyText?: string
   className?: string
 }
 
-export async function parseMdToReact(mdContent: string, config: ParseConfig) {
+export async function parseMdToReact(mdContent: string, config: ParseMDConfig) {
   const { className = "className", copyText = DEFAULT_COPY_TEXT } = config
   const highlighter = await getHighlighter({
     themes: Object.keys(bundledThemes),

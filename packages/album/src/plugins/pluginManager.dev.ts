@@ -34,5 +34,9 @@ export function createPluginManager(config: PluginManagerConfig) {
     return r as Props<T>
   }
 
-  return { execute }
+  function getSize<T extends Keys>(key: T): number {
+    return userPlugin.filter(p => p[key]).length
+  }
+
+  return { execute, getSize }
 }

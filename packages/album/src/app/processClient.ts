@@ -4,7 +4,7 @@ import { initClient } from "./initClient.js"
 import { patchClient } from "./patchClient.js"
 
 export function processClient(context: AlbumContext) {
-  const { appManager, watcher } = context
+  const { appManager, pluginManager, watcher } = context
   const { pageFilter, routerFilter, actionFilter } = appManager.module
   const ready = initClient(context)
 
@@ -12,7 +12,7 @@ export function processClient(context: AlbumContext) {
     const filter = (type: string) => {
       const { modulePath } = context.appManager.module
       return (p: string) => {
-        if (isBlank(modulePath) || !p.startsWith(modulePath)) {
+        if (pluginManager.getSize("patchClient") === 0 || isBlank(modulePath) || !p.startsWith(modulePath)) {
           return
         }
         if (type === "unlinkDir" || pageFilter.test(p) || routerFilter.test(p) || actionFilter.test(p)) {
