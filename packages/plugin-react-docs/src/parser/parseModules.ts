@@ -51,6 +51,10 @@ function nextFiles(files: (AppSpecialModuleDir | AppSpecialModuleFile)[], option
 
     promises.push(
       (async () => {
+        if (context.recordMap.has(item.filepath)) {
+          return
+        }
+
         const res = await parseFile(item.filepath)
         const record = { ...res, filename: item.filename, filepath: item.filepath }
         context.recordMap.set(item.filepath, record)
@@ -61,16 +65,16 @@ function nextFiles(files: (AppSpecialModuleDir | AppSpecialModuleFile)[], option
 }
 
 function nextModules(specialModules: AppSpecialModule[], options: ParseOptions) {
-  const { parentPath, context, promises } = options
+  const { context, promises } = options
   const { outDir, records, recordMap } = context
   for (const module of specialModules) {
     promises.push(
       (async () => {
-        const { files, filename, filepath, dirs, children } = module
+        const { pageFile, routePath, files, dirs, children } = module
+        const { filename, filepath } = pageFile
         const mdInfo = await parseFile(filepath)
-        const routePath = parentPath + filename
-        const routePathReg = pathToRegexp(parentPath + filename, null, { sensitive: false })
-        const outPath = resolve(outDir, "." + filename)
+        const routePathReg = pathToRegexp(routePath, null, { sensitive: false })
+        const outPath = resolve(outDir, normalizeOutName(routePath))
         const record: MDRecord = {
           ...mdInfo,
           filename,
@@ -87,4 +91,16 @@ function nextModules(specialModules: AppSpecialModule[], options: ParseOptions) 
       })()
     )
   }
+}
+
+function normalizeOutName(name: string) {
+  if (name === "/") {
+    name = "index"
+  } else if (name === "/*") {
+    name = "404"
+  }
+  if (!name.startsWith("/")) {
+    name = "/" + name
+  }
+  return "." + name + ".html"
 }

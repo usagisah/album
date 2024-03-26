@@ -6,7 +6,7 @@ export interface MDFrontmatter {
   bodyBegin: number
 }
 
-export function parseFrontmatter(fileContent: string) {
+export function parseFrontmatter(fileContent: string, bodyOnly?: boolean) {
   const res: MDFrontmatter = { value: {}, bodyBegin: 0 }
   if (!fileContent.startsWith("---")) {
     return res
@@ -17,7 +17,11 @@ export function parseFrontmatter(fileContent: string) {
     return res
   }
 
-  res.value = yml.load(fileContent.slice(3, e))
   res.bodyBegin = e + 3
+  if (bodyOnly) {
+    return res
+  }
+
+  res.value = yml.load(fileContent.slice(3, e))
   return res
 }

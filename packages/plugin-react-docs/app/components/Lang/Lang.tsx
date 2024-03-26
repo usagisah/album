@@ -4,7 +4,7 @@ export function Lang() {
   const { lang, components } = usePage()
   const SelectMenu = components["SelectMenu"]
   return (
-    <SelectMenu linkItems={lang}>
+    <SelectMenu linkItems={lang.select}>
       <svg
         className="lang"
         style={{ cursor: "pointer" }}

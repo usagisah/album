@@ -1,5 +1,3 @@
-import { FC } from "album"
-import { ReactNode, createContext, useContext, useRef } from "react"
 import { create } from "zustand"
 
 interface BearState {

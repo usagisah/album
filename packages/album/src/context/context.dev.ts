@@ -23,8 +23,8 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
   try {
     const { appId, serverMode, args, SYSTEM_RESTART, config } = params
     const cwd = process.cwd()
-    const dumpInput = `${cwd}${sep}.album`
-    const albumConfigInput = config ?? `${cwd}${sep}album.config.ts`
+    const dumpInput = resolve(cwd, ".album")
+    const albumConfigInput = config ?? resolve(cwd, "album.config.ts")
     const inputs: Inputs = { cwd, root: cwd, dumpInput, albumConfigInput }
 
     const { userConfig, pluginManager, logger } = await loadConfig({ args, inputs, serverMode })

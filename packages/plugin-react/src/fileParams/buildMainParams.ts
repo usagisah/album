@@ -1,7 +1,7 @@
-import { PluginPatchClientParam } from "@albumjs/album/server"
+import { PluginInitClientParam, PluginPatchClientParam } from "@albumjs/album/server"
 import { relative } from "path"
 
-export function buildMainParams(param: PluginPatchClientParam) {
+export function buildMainParams(param: PluginInitClientParam | PluginPatchClientParam) {
   const { appManager, info } = param
   const { appId, ssr, ssrCompose, inputs } = info
   const { dumpInput } = inputs

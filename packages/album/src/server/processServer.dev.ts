@@ -42,5 +42,8 @@ export async function processServer(context: AlbumContext) {
     if (ssr) await moduleLoader.load(() => SSRModule)
     else await moduleLoader.load(() => SpaModule)
   }
+
+  serverManager.nestServer = serverApp
+  serverManager.viteServer = viteDevServer
   return { serverApp, viteDevServer }
 }

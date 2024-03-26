@@ -30,9 +30,7 @@ export function renderer({ highlighter, copyText, className }: RendererOptions):
         const themeCode = highlighter.codeToHtml(code, {
           lang: _lang,
           theme: "vitesse-light",
-          transformers: [{
-            
-          }]
+          transformers: [{}]
         })
         code = `<div ${className}="u-code-lang">${_lang}</div><div ${className}="u-code-copy">${copyText}</div>\n<div dangerouslySetInnerHTML={{__html: \`${themeCode}\`}}></div>`
       }

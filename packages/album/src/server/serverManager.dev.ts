@@ -56,7 +56,9 @@ export async function createServerManager(input: Inputs, userConfigServer?: User
       output: resolve(dumpInput, "__server")
     },
     builtinModules: isBoolean(builtinModules) ? !!builtinModules : true,
-    tsconfig: _tsconfig
+    tsconfig: _tsconfig,
+    nestServer: null,
+    viteServer: null
   }
   return manager
 }

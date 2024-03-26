@@ -1,1 +1,5 @@
-/// <reference types="@white/plugin-react/album" />
+预解析
+写入html
+请求解析
+热更新变化
+打包

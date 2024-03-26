@@ -5,30 +5,35 @@ import { createCommonJS } from "@albumjs/tools/lib/mlly"
 import react from "@vitejs/plugin-react-swc"
 import { resolve } from "path"
 import { DEFAULT_COPY_TEXT } from "./constants.js"
-import { PluginContext } from "./docs.type.js"
+import { DocsConfig, PluginContext } from "./docs.type.js"
+import { normalizeDocsConfig } from "./normalizeDocsConfig.js"
 import { parseModules } from "./parser/parseModules.js"
 import AlbumReactDocsVitePlugin, { ParseMDConfig } from "./vite.js"
 
 export interface PluginReactDocsConfig {
   md?: ParseMDConfig
   react?: Parameters<typeof react>[0]
+  docs?: DocsConfig
 }
 
 const { __dirname } = createCommonJS(import.meta.url)
 export default function pluginReactDocs(config: PluginReactDocsConfig = {}): AlbumUserPlugin {
-  const { md = {}, react } = config
+  const { md = {}, docs = {} as any, react = {} } = config
   const context: PluginContext = {
     parseMDConfig: {
       className: md.className ?? "className",
       copyText: md.copyText ?? DEFAULT_COPY_TEXT
     },
-    reactConfig: react ?? {},
-    outDir: "",
+    docsConfig: normalizeDocsConfig(docs),
+    reactConfig: react,
+    outDir: null,
     records: [],
-    recordMap: new Map()
+    recordMap: new Map(),
+    albumContext: null
   }
   return {
     name: "album:plugin-react-docs",
+
     config(config) {
       if (config.config.ssrCompose) {
         console.error(red("使用 plugin-react-docs 插件时，禁止开启 ssr-compose 功能"))
@@ -36,7 +41,6 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       config.config = mergeConfig(config.config, {
         app: {
           module: {
-            pageFilter: /\w+/,
             fileExtensions: [/\.md/]
           }
         },
@@ -44,27 +48,39 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
         server: { builtinModules: false }
       })
     },
-    async findEntries(config) {
-      const { inputs } = config
-      const { dumpInput } = inputs
-      config.main = resolve(dumpInput, "plugin-react-docs/main.tsx")
-      config.mainSSR = resolve(dumpInput, "plugin-react-docs/main.ssr.tsx")
-    },
+
+    // async findEntries(config) {
+    //   const { inputs } = config
+    //   const { dumpInput } = inputs
+    //   config.main = resolve(dumpInput, "plugin-react-docs/main.tsx")
+    // },
+
     context({ albumContext }) {
-      albumContext.watcher
-        .on("add", p => {})
-        .on("change", p => {})
-        .on("unlink", p => {})
-        .on("unlinkDir", p => {})
+      context.albumContext = albumContext
+      // albumContext.watcher
+      //   .on("add", p => {})
+      //   .on("change", p => {})
+      //   .on("unlink", p => {})
+      //   .on("unlinkDir", p => {})
     },
-    async initClient({ info, dumpFileManager, appManager }) {
+
+    async initClient({ info, dumpFileManager, appFileManager, appManager }) {
       const name = "plugin-react-docs"
       await dumpFileManager.add("dir", name, { create: false })
 
-      const outDir = resolve(info.inputs.dumpInput, name)
-      await Promise.all([copy(resolve(__dirname, "../app"), outDir), parseModules(appManager.specialModules, context)])
+      const outDir = (context.outDir = resolve(info.inputs.dumpInput, name))
+      await Promise.all([
+        copy(resolve(__dirname, "../app"), outDir, { overwrite: true }),
+        appFileManager.setFile("album-env.d.ts", f => {
+          const typePlugin = `/// <reference types=".album/plugin-react-docs/plugin-react-docs" />`
+          return f.includes(typePlugin) ? f : `${f}${typePlugin}\n`
+        }),
+        parseModules(appManager.specialModules, context)
+      ])
     },
+
     async serverConfig(c) {
+      const { dumpInput } = context.albumContext.inputs
       c.viteConfigs.push({
         name: "plugin-react",
         config: {
@@ -73,7 +89,7 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
           },
           resolve: {
             alias: {
-              "album.docs": resolve(__dirname, "../app/hooks/useAppContext.tsx")
+              "album.docs": resolve(dumpInput, "plugin-react-docs/hooks/useAppContext.tsx")
             }
           },
           plugins: [AlbumReactDocsVitePlugin(context)]
@@ -81,4 +97,8 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       })
     }
   }
+}
+
+export interface AlbumDocsConfig {
+  docs?: DocsConfig
 }

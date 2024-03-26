@@ -1,35 +1,46 @@
+import { AlbumContext } from "@albumjs/album/server"
+import react from "@vitejs/plugin-react-swc"
 import { MDFrontmatter } from "./parser/parseFrontmatter.js"
 import { ParseMDConfig } from "./parser/parseMdToReact.js"
-import react from "@vitejs/plugin-react-swc"
 
-
-
-export interface AlbumDocsConfig {
+export interface LinkItem {
+  label?: string
+  link?: string
+  icon?: string
+  children?: LinkItem[]
+}
+export interface DocsConfig {
   /* 标题 */
   title?: string
+  /* 站点图标 */
+  icon?: string
   /* 描述 */
   description?: string
-  /* 
-    主题 ./开头视为本地主题，否则视为外部主题 
-    主题文件需要导出一个默认函数，函数里会接收到 配置参数&api 参数，使用 api 来动态注册布局等一些事
-  */
+  /* logo */
+  logo?: string
+
+  /* 主题文件路径 */
   theme?: string[]
-  /* 默认语言 */
-  lang?: string
-  /* 全局头 {meta: { name: "xx" }} */
+
+  /* 多语言 */
+  lang?: {
+    use?: string
+    select?: { label?: string; link?: string; icon?: string }[]
+    locales?: Record<string, any>
+  }
+
+  /* html.head {meta: { name: "xx" }} */
   head?: Record<string, Record<string, string>>
-  /* 注入全局元数据 */
-  inject?: {
-    /* 
-      注入脚本函数文件 <script type="module" src="" /> 
-      ./ 开头视为本地文件，其他视为外部文件
-    */
-    scripts?: string[]
-    /* 注入全局变量 window.xxx */
-    data?: string[]
-    /* 注入约定式路由意外的文章映射 */
-    documents: any
-  } & Record<string, string>
+  /* <script /> 自定义脚本相关的 */
+  scripts?: { attrs?: Record<string, string | number>; content?: string }[]
+  /* html.footer */
+  footer: { message: string; copyright: string }
+
+  /* 导航链接选项 */
+  navList: LinkItem[]
+  /* 侧边栏选项 */
+  sidebar: LinkItem[]
+
   /* 静态资源服务器配置 */
   server?: {
     /* 路径重写规则 'packages/:pkg/src/(.*)': ':pkg/index.md' */
@@ -38,15 +49,21 @@ export interface AlbumDocsConfig {
   }
 }
 
-
 type ReactPlugin = Parameters<typeof react>[0]
 
 export interface PluginContext {
   parseMDConfig: ParseMDConfig
   reactConfig: ReactPlugin
+  docsConfig: {
+    scripts: DocsConfig["scripts"]
+    siteConfig: any
+    server: DocsConfig["server"]
+    resolveThemeFile: (cwd: string) => string
+  }
   outDir: string
   records: MDRecord[]
   recordMap: Map<string, MDRecord>
+  albumContext: AlbumContext
 }
 
 export interface MDRecord {
@@ -56,4 +73,5 @@ export interface MDRecord {
   frontmatter: MDFrontmatter
   outPath?: string
   routePath?: RegExp
+  ready?: Promise<void>
 }

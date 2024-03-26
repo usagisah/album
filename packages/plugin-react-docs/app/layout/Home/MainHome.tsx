@@ -24,7 +24,7 @@ const MainHomeContainer = styled.main`
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
-    max-width: 1050px;
+    max-width: 1100px;
   }
 
   .hero {

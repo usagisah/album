@@ -1,4 +1,3 @@
-import { MenuOutlined } from "@ant-design/icons"
 import { LinkItem } from "@docs/site-config"
 import styled from "@emotion/styled"
 
@@ -50,7 +49,7 @@ export function NavBar(props: NavBarProps) {
       </div>
 
       <SelectMenu linkItems={list} arrow={false} dropdownProps={{ className: "ipad-nav" }}>
-        <MenuOutlined width={16} height={16} style={{ cursor: "pointer" }} />
+        {/* <MenuOutlined width={16} height={16} style={{ cursor: "pointer" }} /> */}
       </SelectMenu>
     </NavBarContainer>
   )

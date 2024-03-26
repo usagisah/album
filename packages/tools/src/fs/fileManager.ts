@@ -118,7 +118,7 @@ export async function createFileManager(options: FileManagerOptions) {
     if (path.startsWith("/")) {
       path = path.slice(1)
     }
-    return write({ fileKey: buildFileKey("file", path), type: "file", path, check: true, value: value ?? "" })
+    return write({ fileKey: buildFileKey("file", path), type: "file", path, check: true, value: value ?? "", create: true })
   }
 
   function buildFileKey(type: FileType, path: string) {

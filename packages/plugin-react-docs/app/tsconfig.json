@@ -12,9 +12,8 @@
     "noEmit": true
   },
   "include": [
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "app/album.type.d.ts",
-    "album.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "album.type.d.ts"
   ]
 }

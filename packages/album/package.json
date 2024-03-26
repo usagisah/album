@@ -45,6 +45,7 @@
     }
   },
   "scripts": {
+    "tsc": "tsc",
     "watch": "tsc -w"
   },
   "dependencies": {

@@ -1,4 +1,6 @@
 import { Obj } from "@albumjs/tools/node"
+import { INestApplication } from "@nestjs/common"
+import { ViteDevServer } from "vite"
 
 export type ServerManagerAppModule = {
   filename: string
@@ -13,4 +15,6 @@ export type ServerManager = {
   appModule: ServerManagerAppModule
   builtinModules: boolean
   tsconfig: ServerManagerTsconfig
+  nestServer: INestApplication<any> | null
+  viteServer: ViteDevServer | null
 }

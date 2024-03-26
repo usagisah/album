@@ -23,11 +23,7 @@ export const SSRStoreProvide: FC<{
       ssrState.current = state
     }
   }
-  return (
-    <SSRStoreContext.Provider value={ssrState.current}>
-      {children}
-    </SSRStoreContext.Provider>
-  )
+  return <SSRStoreContext.Provider value={ssrState.current}>{children}</SSRStoreContext.Provider>
 }
 
 export function useSSRStore<T = any>(): T {

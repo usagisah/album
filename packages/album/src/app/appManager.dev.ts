@@ -38,10 +38,6 @@ export async function createAppManager(config: AppManagerConfig) {
     module: c.module,
     appConfig: c
   })
-  if (isBlank(mainInput)) throw "app.main 客户端入口路径不合法, " + commonError + "(" + mainInput + ")"
-  if (c.mainSSR || ssrCompose) {
-    if (isBlank(mainSSRInput)) throw "app.mainSSR SSR入口路径不合法, " + commonError + "(" + mainSSRInput + ")"
-  }
 
   const routerConfig: AppManagerRouter = { basename: "/", redirect: {} }
   if (_routerConfig?.basename) {
@@ -81,7 +77,8 @@ export async function createAppManager(config: AppManagerConfig) {
       _moduleConfig.path ??
       (await resolveDirPath({
         root: inputs.cwd,
-        name: moduleName
+        name: moduleName,
+        prefixes: ["./", "src"]
       })),
     ignore: [/(^\.)|(^_)|(^common)|(^components)|(^node_modules)/],
     pageFilter: isRegExp(_moduleConfig.pageFilter) ? _moduleConfig.pageFilter : /^[a-zA-Z]+\.page$|^page$/,

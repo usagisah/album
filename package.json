@@ -8,6 +8,7 @@
   "scripts": {
     "watch:react": "concurrently 'cd packages/tools && npm run watch' 'cd packages/album && npm run watch' 'cd packages/plugin-react && npm run watch' 'cd packages/cli && npm run watch'",
     "watch:cli": "concurrently 'cd packages/tools && npm run watch' 'cd packages/cli && npm run watch'",
+    "watch:react-docs": "concurrently 'cd packages/tools && npm run watch' 'cd packages/album && npm run watch' 'cd packages/plugin-react-docs && npm run watch'",
     "build": "node scripts/build.mjs",
     "format": "prettier --write \"packages/**/*.ts\" \"e2e/**/*.{ts,tsx}\"",
     "test:e2e": "node scripts/e2e.mjs",

@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 declare module "@docs/site-config" {
   export interface LinkItem {
     label?: string
@@ -9,21 +7,36 @@ declare module "@docs/site-config" {
   }
 
   export interface SiteConfig {
-    title: string
-    icon: string
-    logo: string
-    description: string
+    /* 标题 */
+    title?: string
+    /* 站点图标 */
+    icon?: string
+    /* 描述 */
+    description?: string
+    /* logo */
+    logo?: string
+    /* 当前路径 */
     path: string
 
-    navList: LinkItem[]
-    lang: LinkItem[]
+    /* 路由文档元信息 */
+    frontmatter: Record<string, number | string>
 
-    sidebar: LinkItem[]
-
-    footer: {
-      message: string
-      copyright: string
+    /* 多语言 */
+    lang?: {
+      use?: string
+      select?: { label?: string; link?: string; icon?: string }[]
+      locales?: Record<string, any>
     }
+
+    /* html.head {meta: { name: "xx" }} */
+    head?: Record<string, Record<string, string>>
+    /* html.footer */
+    footer: { message: string; copyright: string }
+
+    /* 导航链接选项 */
+    navList: LinkItem[]
+    /* 侧边栏选项 */
+    sidebar: LinkItem[]
 
     layout: string
   }
@@ -59,6 +72,7 @@ declare module "album.docs" {
       themeMode: string
       setThemeMode: (mode: string) => void
     }
+    frontmatter: Record<string, number | string>
     layout: any
     footer: any
     site: {
@@ -70,12 +84,17 @@ declare module "album.docs" {
     }
     navList: LinkItem[]
     sidebar: LinkItem[]
-    lang: LinkItem[]
+    lang: {
+      use?: string
+      select?: { label?: string; link?: string; icon?: string }[]
+      locales?: Record<string, any>
+    }
   }
   export function usePage(): PageContext
 }
 
 declare module "*.md" {
   import { FC } from "react"
-  export default FC<any>
+  const MDComponent: FC<any>
+  export default MDComponent
 }

@@ -1,5 +1,5 @@
 import { AppRouterFunComponent } from "album"
-import { SSRProps, MainSSRApp } from "album.server"
+import { MainSSRApp, SSRProps } from "album.server"
 import { App } from "./App"
 import { Head } from "./Head"
 
