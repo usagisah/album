@@ -1,6 +1,7 @@
 import { FileManager, NodeArgs } from "@albumjs/tools/node"
 import { INestApplication } from "@nestjs/common"
 import EventEmitter from "events"
+import { InlineConfig } from "vite"
 import { AppManagerModule, AppManagerRouter, AppManagerSSRRender, AppSpecialModule } from "../app/app.dev.type.js"
 import { AlbumContext, ContextStaticInfo, Inputs } from "../context/context.dev.type.js"
 import { AlbumServerExpressConfig, AlbumServerViteConfig } from "../middlewares/middlewares.type.js"
@@ -92,7 +93,25 @@ export type PluginServerParam = {
 } & PluginGlobalMessage
 export type PluginServer = (param: PluginServerParam) => any
 
-export type PluginBuildEndParam = {} & PluginGlobalMessage
+// 打包开始
+// 用于自定义打包逻辑，可手动结束
+export type PluginBuildStartParam = {
+  info: ContextStaticInfo
+  resolveMiddlewareConfig: (forceClient?: boolean) => Promise<{
+    midConfigs: AlbumServerExpressConfig[]
+    viteConfigs: InlineConfig
+  }>
+  forceQuit: boolean
+} & PluginGlobalMessage
+export type PluginBuildStart = (param: PluginBuildStartParam) => any
+
+export type PluginBuildEndParam = {
+  info: ContextStaticInfo
+  resolveMiddlewareConfig: (forceClient?: boolean) => Promise<{
+    midConfigs: AlbumServerExpressConfig[]
+    viteConfigs: InlineConfig
+  }>
+} & PluginGlobalMessage
 export type PluginBuildEnd = (param: PluginBuildEndParam) => any
 
 export type AlbumUserPlugin = {
@@ -104,5 +123,6 @@ export type AlbumUserPlugin = {
   patchClient?: PluginPatchClient
   serverConfig?: PluginServerConfig
   server?: PluginServer
+  buildStart?: PluginBuildStart
   buildEnd?: PluginBuildEnd
 }
