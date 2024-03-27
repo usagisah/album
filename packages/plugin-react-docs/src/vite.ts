@@ -1,5 +1,4 @@
 import react from "@vitejs/plugin-react-swc"
-import { readFile, writeFile } from "fs/promises"
 import { resolve } from "path"
 import { Plugin, ViteDevServer, mergeConfig } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
@@ -10,6 +9,17 @@ export { ParseMDConfig } from "./parser/parseMdToReact.js"
 export default function AlbumReactDocsVitePlugin(context: PluginContext) {
   const { docsConfig, reactConfig, parseMDConfig, albumContext } = context
   const { inputs } = albumContext
+  const transform = async (code: string, id: string) => {
+    if (id.endsWith(".md")) {
+      const { importers, frontmatter, content } = await parseMdToReact(code, parseMDConfig)
+      return [
+        ...importers,
+        `export default function MarkdownComp(){ return <div className="md">${content}</div> }`,
+        `const frontmatter=${JSON.stringify(frontmatter)}`,
+        `MarkdownComp.frontmatter = frontmatter`
+      ].join("\n")
+    }
+  }
 
   let server: ViteDevServer
 
@@ -42,54 +52,48 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
     },
 
     async transform(code, id) {
-      if (id.endsWith(".md")) {
-        const content = await parseMdToReact(code, parseMDConfig)
-        return `export default function MarkdownComp(){ return <div className="md">${content}</div> }`
-      }
+      return transform(code, id)
     },
 
     configureServer(_server) {
       server = _server
       server.middlewares.use(async (req, res, next) => {
+        let path: string = (req as any).path
         if (req.method !== "GET") {
           return next()
         }
 
-        const { records } = context
-        let path = (req as any).path
-        if (path.endsWith(".html")) {
-          path = path.slice(0, -5)
-        }
-        const record = records.find(r => {
-          if (!r.routePath) {
+        const { routes } = context
+        const route = routes.find(r => {
+          if (!r.match) {
             return false
           }
-          return r.routePath.test(path)
+          return r.match.test(path)
         })
 
-        if (!record) {
+        if (!route) {
           return next()
         }
 
-        const { frontmatter, outPath } = record
+        const { filepath } = route
         const { scripts, siteConfig } = context.docsConfig
         const { dumpInput } = context.albumContext.inputs
         const { viteServer } = context.albumContext.serverManager
-
-        if (!record.ready) {
-          record.ready = new Promise<void>(async success => {
-            const { renderSSG } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
-            const html = await renderSSG({ ...siteConfig, frontmatter: frontmatter.value }, scripts)
-            await writeFile(outPath, "<!doctype html>" + html, "utf-8")
-            success()
-          })
-        }
-
-        await record.ready
-        const html = await readFile(record.outPath, "utf-8")
-        const useHtml = await viteServer.transformIndexHtml(req.originalUrl, html)
-        return res.end(useHtml)
+        const { renderSSG } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
+        let html = await renderSSG({ siteConfig, scripts, contentPath: filepath, clientPath: resolve(dumpInput, "plugin-react-docs/main.tsx") })
+        html = await viteServer.transformIndexHtml(req.originalUrl, html)
+        return res.end(html)
       })
+    },
+
+    handleHotUpdate(ctx) {
+      const { file, server } = ctx
+      if (ctx.file.endsWith(".md")) {
+        const { modulePath } = context.albumContext.appManager.module
+        if (file.startsWith(modulePath)) {
+          server.hot.send({ type: "full-reload" })
+        }
+      }
     }
   }
 

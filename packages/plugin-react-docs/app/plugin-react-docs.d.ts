@@ -97,4 +97,6 @@ declare module "*.md" {
   import { FC } from "react"
   const MDComponent: FC<any>
   export default MDComponent
+
+  export const $frontmatter: Record<string, string | number>
 }

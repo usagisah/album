@@ -150,6 +150,7 @@ const MainHomeContainer = styled.main`
 export function MainHome() {
   const { components } = usePage()
   const Features = components["Features"]
+  const Content = components["Content"]
   return (
     <MainHomeContainer className="mainHome">
       <img className="bgImg" src={bg} alt="" />
@@ -169,8 +170,8 @@ export function MainHome() {
           <img src="https://vitepress.dev/vitepress-logo-large.webp" alt="" />
         </div>
       </div>
-
       <Features />
+      <Content />
     </MainHomeContainer>
   )
 }

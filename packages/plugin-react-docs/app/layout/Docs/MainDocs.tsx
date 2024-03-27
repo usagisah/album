@@ -1,6 +1,5 @@
 import styled from "@emotion/styled"
 import { usePage } from "album.docs"
-import Test from "../../test.md"
 import siteConfig from "@docs/site-config"
 
 const MainDocsContainer = styled.main`
@@ -32,13 +31,13 @@ export function MainDocs() {
   const EditInfo = components["EditInfo"]
   const PrevNext = components["PrevNext"]
   const Category = components["Category"]
-  console.log( siteConfig )
+  const Content = components["Content"]
   return (
     <MainDocsContainer className="mainDocs">
       <Sidebar />
       <section className="content">
-        <article className="article">
-          <Test />
+        <article className="article" suppressHydrationWarning={true}>
+          <Content />
         </article>
         <section className="doc-footer">
           <EditInfo />

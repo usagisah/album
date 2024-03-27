@@ -27,8 +27,8 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
     docsConfig: normalizeDocsConfig(docs),
     reactConfig: react,
     outDir: null,
-    records: [],
-    recordMap: new Map(),
+    routes: [],
+    routeMap: new Map(),
     albumContext: null
   }
   return {
@@ -49,19 +49,8 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       })
     },
 
-    // async findEntries(config) {
-    //   const { inputs } = config
-    //   const { dumpInput } = inputs
-    //   config.main = resolve(dumpInput, "plugin-react-docs/main.tsx")
-    // },
-
     context({ albumContext }) {
       context.albumContext = albumContext
-      // albumContext.watcher
-      //   .on("add", p => {})
-      //   .on("change", p => {})
-      //   .on("unlink", p => {})
-      //   .on("unlinkDir", p => {})
     },
 
     async initClient({ info, dumpFileManager, appFileManager, appManager }) {

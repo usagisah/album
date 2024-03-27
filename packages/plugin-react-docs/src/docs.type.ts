@@ -1,6 +1,5 @@
 import { AlbumContext } from "@albumjs/album/server"
 import react from "@vitejs/plugin-react-swc"
-import { MDFrontmatter } from "./parser/parseFrontmatter.js"
 import { ParseMDConfig } from "./parser/parseMdToReact.js"
 
 export interface LinkItem {
@@ -61,17 +60,14 @@ export interface PluginContext {
     resolveThemeFile: (cwd: string) => string
   }
   outDir: string
-  records: MDRecord[]
-  recordMap: Map<string, MDRecord>
+  routes: MDRoute[]
+  routeMap: Map<string, MDRoute>
   albumContext: AlbumContext
 }
 
-export interface MDRecord {
-  filename: string
+export interface MDRoute {
   filepath: string
-  hash: number
-  frontmatter: MDFrontmatter
   outPath?: string
-  routePath?: RegExp
-  ready?: Promise<void>
+  match: RegExp
+  ext: string
 }

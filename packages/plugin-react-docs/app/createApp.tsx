@@ -19,6 +19,7 @@ import { AppProvide } from "./hooks/useAppContext.tsx"
 import { useThemeMode } from "./hooks/useThemeMode.ts"
 import { DocsLayout } from "./layout/Docs/Docs"
 import { HomeLayout } from "./layout/Home/Home"
+import { FC } from "react"
 
 async function mergeThemeConfig(defaultConfig: ThemeConfig) {
   let c = defaultConfig
@@ -28,7 +29,7 @@ async function mergeThemeConfig(defaultConfig: ThemeConfig) {
   return c
 }
 
-export async function createApp(siteConfig: SiteConfig) {
+export async function createApp(siteConfig: SiteConfig, Content: FC<any>) {
   const themeConfig = await mergeThemeConfig({
     meta: {},
     layouts: { default: DocsLayout, Home: HomeLayout, Docs: DocsLayout },
@@ -47,7 +48,8 @@ export async function createApp(siteConfig: SiteConfig) {
       PrevNext,
       Switch,
       Category,
-      Collapse
+      Collapse,
+      Content
     }
   })
   const store = new Map()
