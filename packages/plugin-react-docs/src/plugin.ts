@@ -30,7 +30,6 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
     },
     docsConfig: normalizeDocsConfig(docs),
     reactConfig: react,
-    outDir: null,
     routes: [],
     routeMap: new Map(),
     albumContext: null
@@ -60,10 +59,8 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
     async initClient({ info, dumpFileManager, appFileManager, appManager }) {
       const name = "plugin-react-docs"
       await dumpFileManager.add("dir", name, { create: false })
-
-      const outDir = (context.outDir = resolve(info.inputs.dumpInput, name))
       await Promise.all([
-        copy(resolve(__dirname, "../app"), outDir, { overwrite: true }),
+        copy(resolve(__dirname, "../app"), resolve(info.inputs.dumpInput, name), { overwrite: true }),
         appFileManager.setFile("album-env.d.ts", f => {
           const typePlugin = `/// <reference types=".album/plugin-react-docs/plugin-react-docs" />`
           return f.includes(typePlugin) ? f : `${f}${typePlugin}\n`

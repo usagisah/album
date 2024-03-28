@@ -49,7 +49,8 @@ export function viteCoreOptions(context: AlbumContext, forceClient = false): Alb
     define: {
       __app_id__: `"${appId}"`,
       __app_id_path__: `"/${appId}"`,
-      __ssr_compose__: ssrCompose
+      __ssr_compose__: ssrCompose,
+      "process.env.NODE_ENV": serverMode === "dev" ? `"development"` : `"production"`
     },
     resolve: {
       alias: {

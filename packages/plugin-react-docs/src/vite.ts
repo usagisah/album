@@ -1,6 +1,7 @@
 import react from "@vitejs/plugin-react-swc"
+import gm from "gray-matter"
 import { resolve } from "path"
-import { Plugin, ViteDevServer, mergeConfig, splitVendorChunkPlugin } from "vite"
+import { Plugin, ViteDevServer, mergeConfig } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
 import { PluginContext } from "./docs.type.js"
 import { parseMdToReact } from "./parser/parseMdToReact.js"
@@ -9,17 +10,6 @@ export { ParseMDConfig } from "./parser/parseMdToReact.js"
 export default function AlbumReactDocsVitePlugin(context: PluginContext) {
   const { docsConfig, reactConfig, parseMDConfig, albumContext } = context
   const { inputs } = albumContext
-  const transform = async (code: string, id: string) => {
-    if (id.endsWith(".md")) {
-      const { importers, frontmatter, content } = await parseMdToReact(code, parseMDConfig)
-      return [
-        ...importers,
-        `export default function MarkdownComp(){ return <div className="md">${content}</div> }`,
-        `const frontmatter=${JSON.stringify(frontmatter)}`,
-        `MarkdownComp.frontmatter = frontmatter`
-      ].join("\n")
-    }
-  }
 
   let server: ViteDevServer
 
@@ -57,8 +47,19 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
       }
     },
 
-    transform(code, id) {
-      return transform(code, id)
+    async transform(code: string, id: string) {
+      if (id.endsWith(".md")) {
+        const { data, content } = gm(code)
+        const { import: importers = [], export: exporters } = data
+        const res = await parseMdToReact(content, parseMDConfig)
+        let mdContent = [
+          ...importers,
+          `export default function MarkdownComp(){ return <div className="md">${res}</div> }`,
+          `const frontmatter=${JSON.stringify(data)}`,
+          `MarkdownComp.frontmatter = frontmatter`
+        ].join("\n")
+        return mdContent
+      }
     },
 
     configureServer(_server) {
@@ -86,7 +87,13 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
         const { dumpInput } = context.albumContext.inputs
         const { viteServer } = context.albumContext.serverManager
         const { ssgRender } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
-        let html = await ssgRender({ siteConfig, scripts, contentPath: filepath, clientPath: resolve(dumpInput, "plugin-react-docs/main.tsx") })
+        let html = await ssgRender({
+          entryPath: resolve(dumpInput, "plugin-react-docs/main.tsx"),
+          importPath: filepath,
+          contentPath: filepath,
+          siteConfig,
+          scripts
+        })
         html = await viteServer.transformIndexHtml(req.originalUrl, html)
         return res.end(html)
       })

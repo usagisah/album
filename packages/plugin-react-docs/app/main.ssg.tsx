@@ -9,17 +9,18 @@ import { createApp } from "./createApp"
 interface SSGRenderOption {
   siteConfig: SiteConfig
   scripts: any[]
+  importPath: string
   contentPath: string
-  clientPath: string
+  entryPath: string
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-export function ssgRender({ siteConfig, clientPath, contentPath, scripts }: SSGRenderOption) {
+export function ssgRender({ siteConfig, entryPath, importPath, contentPath, scripts }: SSGRenderOption) {
   return new Promise(async send => {
     const [css1, css2, { default: MDContent }] = await Promise.all([
       readFile(join(__dirname, "./normalize.css")),
       readFile(join(__dirname, "./docs.css")),
-      import(/*@vite-ignore*/ contentPath)
+      import(/*@vite-ignore*/ importPath)
     ])
     siteConfig.frontmatter = MDContent.frontmatter
     const App = await createApp(siteConfig, MDContent)
@@ -39,7 +40,7 @@ export function ssgRender({ siteConfig, clientPath, contentPath, scripts }: SSGR
               <App />
             </div>
             <script type="text/json" id="_docs-meta" dangerouslySetInnerHTML={{ __html: JSON.stringify({ contentPath }) }}></script>
-            <script type="module" src={clientPath}></script>
+            <script type="module" src={entryPath}></script>
           </body>
         </html>
       )

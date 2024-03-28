@@ -4,7 +4,7 @@ import { basename, resolve } from "path"
 import { InlineConfig, Rollup, build, mergeConfig } from "vite"
 import { PluginContext } from "../docs.type.js"
 
-export type TempModule = { app: boolean; clientOutPath: string; serverOutPath: string; client: Rollup.OutputChunk; server: Rollup.OutputChunk }
+export type TempModule = { app: boolean; routePath: string; clientOutPath: string; serverOutPath: string; client: Rollup.OutputChunk; server: Rollup.OutputChunk }
 export type TempModuleMap = Map<string, TempModule>
 
 export async function buildPages(p: PluginBuildStartParam, context: PluginContext) {
@@ -27,8 +27,8 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
       ssrEmitAssets: false,
       manifest: false,
       ssrManifest: false,
-      minify: false,
-      cssMinify: false,
+      minify: true,
+      cssMinify: true,
       sourcemap: false,
       rollupOptions: {
         output: {
@@ -46,6 +46,7 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
     }
   } as InlineConfig)
   const serverBuildConfig = mergeConfig(viteConfigs, {
+    mode: "production",
     build: {
       cssCodeSplit: false,
       emptyOutDir: true,
@@ -65,19 +66,22 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
   if (index > -1) {
     serverBuildConfig.plugins.splice(index, 1)
   }
-
   const [clientResult, serverResult] = await Promise.all<any>([build(clientBuildConfig), build(serverBuildConfig)])
   await Promise.all([
     copy(resolve(inputs.dumpInput, "plugin-react-docs/docs.css"), resolve(inputs.cwd, ".temp/server/docs.css")),
     copy(resolve(inputs.dumpInput, "plugin-react-docs/normalize.css"), resolve(inputs.cwd, ".temp/server/normalize.css"))
   ])
-  return makeModuleMap(inputs.cwd, { ...moduleEntries, __app: "app" }, clientResult[0], serverResult[0])
+  return makeModuleMap(context, { ...moduleEntries, __app: "app" }, clientResult[0], serverResult[0])
 }
 
-function makeModuleMap(cwd: string, moduleEntries: Record<string, string>, clientResult: Rollup.RollupOutput, serverResult: Rollup.RollupOutput) {
+function makeModuleMap(context: PluginContext, moduleEntries: Record<string, string>, clientResult: Rollup.RollupOutput, serverResult: Rollup.RollupOutput) {
+  const { routeMap, albumContext } = context
+  const { cwd } = albumContext.inputs
   const map: TempModuleMap = new Map()
   for (const name in moduleEntries) {
-    map.set(moduleEntries[name], { app: name === "__app" } as any)
+    const isApp = name === "__app"
+    const filepath = moduleEntries[name]
+    map.set(filepath, { app: isApp, routePath: isApp ? null : routeMap.get(filepath).buildOutPath } as any)
   }
   clientResult.output.forEach(item => {
     if (item.type === "chunk") {

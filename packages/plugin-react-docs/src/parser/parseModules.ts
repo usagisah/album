@@ -1,5 +1,4 @@
 import { AppSpecialModule } from "@albumjs/album/server"
-import { resolve } from "path"
 import { pathToRegexp } from "path-to-regexp"
 import { MDRoute, PluginContext } from "../docs.type.js"
 
@@ -13,15 +12,14 @@ export async function parseModules(specialModules: AppSpecialModule[], context: 
 
 function nextModules(specialModules: AppSpecialModule[], options: ParseOptions) {
   const { context } = options
-  const { outDir, routeMap, routes } = context
+  const { routeMap, routes } = context
   for (const module of specialModules) {
     const { pageFile, routePath, children } = module
     const { filepath, ext } = pageFile
     const routePathReg = pathToRegexp(routePath, null, { sensitive: false })
-    const outPath = resolve(outDir, normalizeOutName(routePath))
     const route: MDRoute = {
       filepath,
-      outPath,
+      buildOutPath: normalizeOutName(routePath),
       match: routePathReg,
       ext
     }
@@ -40,5 +38,5 @@ function normalizeOutName(name: string) {
   if (!name.startsWith("/")) {
     name = "/" + name
   }
-  return "." + name + ".html"
+  return `${name}.html`.slice(1)
 }
