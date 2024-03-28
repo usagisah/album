@@ -1,9 +1,13 @@
 import { AlbumUserPlugin, mergeConfig } from "@albumjs/album/server"
-import { red } from "@albumjs/tools/lib/colorette"
+import { green, red } from "@albumjs/tools/lib/colorette"
 import { copy } from "@albumjs/tools/lib/fs-extra"
 import { createCommonJS } from "@albumjs/tools/lib/mlly"
+import ora from "@albumjs/tools/lib/ora"
 import react from "@vitejs/plugin-react-swc"
+import { rm } from "fs/promises"
 import { resolve } from "path"
+import { buildPages } from "./build/buildPages.js"
+import { renderPages } from "./build/renderPages.js"
 import { DEFAULT_COPY_TEXT } from "./constants.js"
 import { DocsConfig, PluginContext } from "./docs.type.js"
 import { normalizeDocsConfig } from "./normalizeDocsConfig.js"
@@ -84,6 +88,25 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
           plugins: [AlbumReactDocsVitePlugin(context)]
         }
       })
+    },
+
+    async buildStart(p) {
+      p.forceQuit = true
+
+      const { info } = p
+      const { inputs } = info
+
+      const spinner = ora(green("building docs pages...")).start()
+      const map = await buildPages(p, context)
+      spinner.succeed()
+
+      spinner.start(green("render docs pages..."))
+      await renderPages(map, p, context)
+      spinner.succeed()
+
+      spinner.start(green("clear temp cache..."))
+      await Promise.all([rm(resolve(inputs.cwd, ".swc"), { force: true, recursive: true }), rm(resolve(inputs.cwd, ".temp"), { force: true, recursive: true })])
+      spinner.succeed()
     }
   }
 }

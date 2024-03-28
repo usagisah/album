@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react-swc"
 import { resolve } from "path"
-import { Plugin, ViteDevServer, mergeConfig } from "vite"
+import { Plugin, ViteDevServer, mergeConfig, splitVendorChunkPlugin } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
 import { PluginContext } from "./docs.type.js"
 import { parseMdToReact } from "./parser/parseMdToReact.js"
@@ -26,6 +26,8 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
   const plugin: Plugin = {
     name: "album:react-docs",
 
+    enforce: "pre",
+
     config(c) {
       return mergeConfig(c, {
         optimizeDeps: {
@@ -49,9 +51,13 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
       } else if (id === SITE_THEME) {
         return docsConfig.resolveThemeFile(inputs.cwd)
       }
+
+      if (albumContext.serverMode === "build" && id.endsWith("index.html")) {
+        return ""
+      }
     },
 
-    async transform(code, id) {
+    transform(code, id) {
       return transform(code, id)
     },
 
@@ -79,8 +85,8 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
         const { scripts, siteConfig } = context.docsConfig
         const { dumpInput } = context.albumContext.inputs
         const { viteServer } = context.albumContext.serverManager
-        const { renderSSG } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
-        let html = await renderSSG({ siteConfig, scripts, contentPath: filepath, clientPath: resolve(dumpInput, "plugin-react-docs/main.tsx") })
+        const { ssgRender } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
+        let html = await ssgRender({ siteConfig, scripts, contentPath: filepath, clientPath: resolve(dumpInput, "plugin-react-docs/main.tsx") })
         html = await viteServer.transformIndexHtml(req.originalUrl, html)
         return res.end(html)
       })
@@ -101,6 +107,7 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
     plugin,
     ...react({
       ...reactConfig,
+      plugins: [],
       parserConfig: id => {
         if (id.endsWith(".md") || id.endsWith(".tsx")) {
           return {

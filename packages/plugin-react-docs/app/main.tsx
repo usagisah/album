@@ -11,8 +11,10 @@ async function createStaticApp() {
   return App
 }
 
-if (import.meta.env.PROD) {
-  createStaticApp().then(App => hydrateRoot(document.getElementById("album-docs")!, <App />))
-} else {
-  createStaticApp().then(App => createRoot(document.getElementById("album-docs")!).render(<App />))
+if (typeof window !== "undefined") {
+  if (import.meta.env.PROD) {
+    createStaticApp().then(App => hydrateRoot(document.getElementById("album-docs")!, <App />))
+  } else {
+    createStaticApp().then(App => createRoot(document.getElementById("album-docs")!).render(<App />))
+  }
 }

@@ -28,7 +28,11 @@ export function createPluginManager(config: PluginManagerConfig) {
           })
         }
       } catch (e) {
-        logger.error(`插件(${pg.name}-${key})发生错误，错误信息:`, e, "album-plugin")
+        if (key === "buildStart" || key === "buildEnd") {
+          throw e
+        } else {
+          logger.error(`插件(${pg.name}-${key})发生错误，错误信息:`, e, "album-plugin")
+        }
       }
     }
     return r as Props<T>

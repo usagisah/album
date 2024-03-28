@@ -6,7 +6,7 @@ import { Writable } from "stream"
 import { fileURLToPath } from "url"
 import { createApp } from "./createApp"
 
-interface RenderSSGOption {
+interface SSGRenderOption {
   siteConfig: SiteConfig
   scripts: any[]
   contentPath: string
@@ -14,7 +14,7 @@ interface RenderSSGOption {
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-export function renderSSG({ siteConfig, clientPath, contentPath, scripts }: RenderSSGOption) {
+export function ssgRender({ siteConfig, clientPath, contentPath, scripts }: SSGRenderOption) {
   return new Promise(async send => {
     const [css1, css2, { default: MDContent }] = await Promise.all([
       readFile(join(__dirname, "./normalize.css")),

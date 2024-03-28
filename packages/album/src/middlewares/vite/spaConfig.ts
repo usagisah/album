@@ -27,7 +27,7 @@ export function createSPACoreConfig(context: AlbumContext): [InlineConfig, Plugi
   const plugin: PluginOption = {
     name: configName,
     async load(id) {
-      if (id === indexHtmlPath) {
+      if (appManager.realClientInput && id === indexHtmlPath) {
         const html = await readFile(resolve(cwd, "index.html"), "utf-8")
         return html.replace("</body>", `<script type="module" src="/${relative(cwd, appManager.realClientInput)}"></script>\n </body>`)
       }

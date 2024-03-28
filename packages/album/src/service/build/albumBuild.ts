@@ -28,7 +28,7 @@ export async function albumBuild(params: DevServerParams) {
       return resolveMiddlewareConfig(context, forceClient)
     }
     const { forceQuit } = await pluginManager.execute("buildStart", { forceQuit: false, info: getStaticInfo(), resolveMiddlewareConfig: _resolveMiddlewareConfig })
-    if (forceQuit !== false) {
+    if (forceQuit !== true) {
       const buildInfo: [string, string][] = [["clientOutDir", clientOutDir]]
       if (ssr) {
         buildInfo.push(["ssrOutDir", ssrOutDir])

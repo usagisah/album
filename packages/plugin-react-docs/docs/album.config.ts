@@ -9,7 +9,6 @@ export default defineAlbumConfig<AlbumDocsConfig>({
         description: "",
         icon: "",
         logo: "https://vitepress.dev/vitepress-logo-mini.svg",
-        path: "/",
         navList: [
           { label: "指东", link: "/" },
           { label: "扭矩", link: "/" },
@@ -23,8 +22,6 @@ export default defineAlbumConfig<AlbumDocsConfig>({
             ]
           }
         ],
-        navSearch: {},
-        navActions: [],
         sidebar: [
           {
             label: "简介",
@@ -62,7 +59,7 @@ export default defineAlbumConfig<AlbumDocsConfig>({
               { label: "sitemap 生成", link: "sitemap-generation" }
             ]
           },
-          { label: "配置和 API 参考", base: "/zh/reference/", link: "site-config" }
+          { label: "配置和 API 参考", link: "site-config" }
         ],
         footer: {
           message: "基于 MIT 许可发布",
