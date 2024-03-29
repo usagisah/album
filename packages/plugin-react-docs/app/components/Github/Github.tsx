@@ -1,10 +1,13 @@
+import { useTheme } from "@emotion/react"
+
 export function Github() {
+  const theme = useTheme()
   return (
     <a href="/">
       <svg
         className="github"
         style={{ cursor: "pointer" }}
-        fill="#3c3c43"
+        fill={theme.text[1]}
         viewBox="0 0 1024 1024"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"

@@ -2,7 +2,7 @@ import { LinkItem } from "@docs/site-config"
 import styled from "@emotion/styled"
 
 const NavBarContainer = styled.ul`
-  color: #3c3c43;
+  color: ${({ theme }) => theme.text[1]};
   font-size: 14px;
   font-weight: 500;
 

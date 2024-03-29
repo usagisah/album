@@ -14,16 +14,16 @@ const EditInfoContainer = styled.div`
     gap: 4px;
     justify-content: center;
     align-items: center;
-    color: #3451b2;
+    color: ${({ theme }) => theme.primary.default};
     transition: all 0.25s;
 
     svg {
-      fill: #3451b2;
+      fill: ${({ theme }) => theme.primary.default};
     }
   }
 
   .last-updated {
-    color: #3c3c43c6;
+    color: ${({ theme }) => theme.text[2]};
   }
 `
 

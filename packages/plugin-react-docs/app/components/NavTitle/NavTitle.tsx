@@ -8,7 +8,7 @@ const NavTitleContainer = styled.a`
   font-size: 18px;
   font-weight: 600;
   white-space: nowrap;
-  color: #3c3c43;
+  color: ${({ theme }) => theme.text[1]};
 
   .img {
     width: 24px;

@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import { usePage } from "album.docs"
 import { CSSProperties, useState } from "react"
@@ -41,6 +42,7 @@ export function Header() {
   const NavTitle = components["NavTitle"]
   const NavBar = components["NavBar"]
   const SelectMenu = components["SelectMenu"]
+  const theme = useTheme()
 
   const [style, setStyle] = useState<CSSProperties>({})
   useScroll(() => {
@@ -56,7 +58,7 @@ export function Header() {
     }
 
     if (!style.borderBottom) {
-      setStyle({ background: "rgb(248, 249, 251)", borderBottom: "1px solid rgb(248, 249, 251)" })
+      setStyle({ background: theme.gray.bg, borderBottom: `1px solid ${theme.gray.bg}` })
     }
   })
   return (

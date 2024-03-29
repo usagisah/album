@@ -7,7 +7,7 @@ const DocsContainer = styled.div`
   flex-direction: column;
   min-width: 375px;
   min-height: 100vh;
-  background: rgb(248, 249, 251);
+  background: ${({ theme }) => theme.gray.bg};
 `
 
 export function DocsLayout() {

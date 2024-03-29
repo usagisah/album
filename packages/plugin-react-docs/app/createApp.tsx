@@ -1,25 +1,27 @@
 import { SiteConfig } from "@docs/site-config"
 import themeConfigs, { ThemeConfig } from "@docs/site-theme"
+import { ThemeProvider } from "@emotion/react"
 import { PageContext } from "album.docs"
 import { Collapse, Switch } from "antd"
-import { Category } from "./components/Category/Category.tsx"
+import { FC } from "react"
+import { Category } from "./components/Category/Category"
 import { EditInfo } from "./components/EditInfo/EditInfo"
-import { Features } from "./components/Features/Features.tsx"
-import { Footer } from "./components/Footer/Footer.tsx"
-import { Github } from "./components/Github/Github.tsx"
-import { Header } from "./components/Header/Header.tsx"
-import { Lang } from "./components/Lang/Lang.tsx"
-import { NavBar } from "./components/NavBar/NavBar.tsx"
-import { NavSearch } from "./components/NavSearch/NavSearch.tsx"
-import { NavTitle } from "./components/NavTitle/NavTitle.tsx"
-import { PrevNext } from "./components/PrevNext/PrevNext.tsx"
-import { SelectMenu } from "./components/SelectMenu/SelectMenu.tsx"
-import { Sidebar } from "./components/Sidebar/Sidebar.tsx"
-import { AppProvide } from "./hooks/useAppContext.tsx"
-import { useThemeMode } from "./hooks/useThemeMode.ts"
+import { Features } from "./components/Features/Features"
+import { Footer } from "./components/Footer/Footer"
+import { Github } from "./components/Github/Github"
+import { Header } from "./components/Header/Header"
+import { Lang } from "./components/Lang/Lang"
+import { NavBar } from "./components/NavBar/NavBar"
+import { NavSearch } from "./components/NavSearch/NavSearch"
+import { NavTitle } from "./components/NavTitle/NavTitle"
+import { PrevNext } from "./components/PrevNext/PrevNext"
+import { SelectMenu } from "./components/SelectMenu/SelectMenu"
+import { Sidebar } from "./components/Sidebar/Sidebar"
+import { AppProvide } from "./hooks/useAppContext"
+import { useThemeMode } from "./hooks/useThemeMode"
 import { DocsLayout } from "./layout/Docs/Docs"
 import { HomeLayout } from "./layout/Home/Home"
-import { FC } from "react"
+import { GlobalStyle, THEME } from "./theme"
 
 async function mergeThemeConfig(defaultConfig: ThemeConfig) {
   let c = defaultConfig
@@ -82,7 +84,10 @@ export async function createApp(siteConfig: SiteConfig, Content: FC<any>) {
     }
     return (
       <AppProvide context={appContext}>
-        <Layout />
+        <ThemeProvider theme={THEME}>
+          <GlobalStyle theme={THEME} />
+          <Layout />
+        </ThemeProvider>
       </AppProvide>
     )
   }

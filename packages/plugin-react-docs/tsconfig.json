@@ -20,10 +20,14 @@
     "resolveJsonModule": true
   },
   "include": [
-    "src/**/*.ts",
-    "album.d.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
+  ],
+  "references": [
+    {
+      "path": "./app/tsconfig.json"
+    }
   ]
 }

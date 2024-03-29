@@ -1,14 +1,16 @@
+import { useTheme } from "@emotion/react"
 import { usePage } from "album.docs"
 
 export function Lang() {
   const { lang, components } = usePage()
   const SelectMenu = components["SelectMenu"]
+  const theme = useTheme()
   return (
     <SelectMenu linkItems={lang.select}>
       <svg
         className="lang"
         style={{ cursor: "pointer" }}
-        fill="#3c3c43"
+        fill={theme.text[1]}
         viewBox="0 0 1024 1024"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"

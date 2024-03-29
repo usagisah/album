@@ -6,14 +6,14 @@ const PrevNextContainer = styled.footer`
   align-items: center;
   gap: 1rem;
   padding-top: 24px;
-  border-top: 1px solid #e2e2e3;
+  border-top: 1px solid ${({ theme }) => theme.divider.default};;
 
   .page {
     display: block;
     padding: 12px;
     min-width: 48%;
-    border: 1px solid #e2e2e3;
-    border-radius: 8px;
+    border: 1px solid ${({ theme }) => theme.divider.default};;
+    border-radius: ${({theme}) => theme.radius.default};
     font-weight: 600;
     overflow: hidden;
 
@@ -24,12 +24,12 @@ const PrevNextContainer = styled.footer`
 
   .desc {
     font-size: 12px;
-    color: #3c3c43c6;
+    color:${({ theme }) => theme.text[2]};
   }
 
   .title {
     font-size: 14px;
-    color: #3451b2;
+    color: ${({ theme }) => theme.primary.default};
   }
 `
 

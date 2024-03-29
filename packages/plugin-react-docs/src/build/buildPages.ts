@@ -71,11 +71,6 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
     serverBuildConfig.plugins.splice(index, 1)
   }
   const [clientResult, serverResult] = await Promise.all<any>([build(clientBuildConfig), build(serverBuildConfig)])
-  await Promise.all([
-    copy(resolve(inputs.dumpInput, "plugin-react-docs/docs.css"), resolve(inputs.cwd, ".temp/server/docs.css")),
-    copy(resolve(inputs.dumpInput, "plugin-react-docs/normalize.css"), resolve(inputs.cwd, ".temp/server/normalize.css"))
-  ])
-  debugger
   return makeModuleMap(context, { ...moduleEntries, __app: "app" }, clientResult[0], serverResult[0])
 }
 

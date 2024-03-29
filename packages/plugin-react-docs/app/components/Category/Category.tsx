@@ -6,7 +6,7 @@ const CategoryContainer = styled.aside`
   position: sticky;
   top: 106px;
   max-height: 80vh;
-  color: #3c3c43c6;
+  color: ${({ theme }) => theme.text[2]};
   overflow: auto;
 
   .cat-title {
@@ -16,16 +16,16 @@ const CategoryContainer = styled.aside`
   }
 
   .topic {
-    color: rgba(60, 60, 67, 0.78);
+    color: ${({ theme }) => theme.text[2]};
     padding: 0px 0px 0 1rem;
-    border-left: 1px solid #e2e2e3;
+    border-left: 1px solid ${({ theme }) => theme.divider.default};
 
     .top-group {
       padding-bottom: 0px;
     }
 
     .top-title {
-      color: rgba(60, 60, 67, 0.78);
+      color: ${({ theme }) => theme.text[2]};
     }
 
     .title {

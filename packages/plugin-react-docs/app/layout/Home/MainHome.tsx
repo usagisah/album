@@ -1,8 +1,8 @@
-import { css } from "@emotion/react"
+import { css, useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
+import { usePage } from "album.docs"
 import { ReactNode } from "react"
 import bg from "../../assets/home.bg.png"
-import { usePage } from "album.docs"
 
 const MainHomeContainer = styled.main`
   flex: 1;
@@ -33,7 +33,7 @@ const MainHomeContainer = styled.main`
     .title {
       font-size: 56px;
       font-weight: 600;
-      background: -webkit-linear-gradient(120deg, #bd34fe 30%, #41d1ff);
+      background: ${({ theme }) => `-webkit-linear-gradient(120deg, ${theme.primary.default} 30%, slateblue)`};
       background-clip: text;
       color: transparent;
       text-align: justify;
@@ -50,7 +50,7 @@ const MainHomeContainer = styled.main`
     .tagline {
       padding-top: 12px;
       font-size: 24px;
-      color: #3c3c43c6;
+      color: ${({ theme }) => theme.text[2]};
       text-align: justify;
     }
 
@@ -77,9 +77,9 @@ const MainHomeContainer = styled.main`
       z-index: -1;
       width: 320px;
       height: 320px;
-      border-radius: 50%;
+      border-radius: ${({ theme }) => theme.radius.max};
       transform: translate(-50%, -50%);
-      background: linear-gradient(-45deg, #00bfff 50%, #f2f1ef 50%);
+      background: ${({ theme }) => `linear-gradient(-45deg, ${theme.primary.default} 50%, slateblue 50%)`};
       filter: blur(68px);
     }
 
@@ -177,6 +177,7 @@ export function MainHome() {
 }
 
 function CircleButton({ primary, href, children }: { primary?: boolean; href?: string; children: ReactNode }) {
+  const theme = useTheme()
   return (
     <a
       href={href}
@@ -186,9 +187,9 @@ function CircleButton({ primary, href, children }: { primary?: boolean; href?: s
         font-weight: 600;
         text-align: center;
         white-space: nowrap;
-        color: ${primary ? "white" : "#3c3c43"};
-        background-color: ${primary ? "#5672cd" : "#ebebef"};
-        border-radius: 20px;
+        color: ${primary ? "white" : theme.text[1]};
+        background-color: ${primary ? theme.primary.default : theme.gray[3]};
+        border-radius: ${theme.radius.btn};
       `}
     >
       <button>{children}</button>

@@ -1,6 +1,5 @@
 import styled from "@emotion/styled"
 import { usePage } from "album.docs"
-import siteConfig from "@docs/site-config"
 
 const MainDocsContainer = styled.main`
   display: flex;
@@ -16,8 +15,8 @@ const MainDocsContainer = styled.main`
     min-width: 800px;
     padding: 48px 32px;
     min-height: calc(100vh - 76px);
-    background-color: white;
-    border-radius: 12px;
+    background-color: ${({ theme }) => theme.white};
+    border-radius: ${({theme}) => theme.radius.large};
   }
 
   .doc-footer {

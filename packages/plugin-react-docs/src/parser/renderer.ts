@@ -23,14 +23,19 @@ export function renderer({ highlighter, copyText, className }: RendererOptions):
       if (pure) {
         const themeCode = highlighter.codeToHtml(code, {
           lang: "text",
-          theme: "vitesse-light"
+          themes: {
+            light: "vitesse-light",
+            dark: "vitesse-dark"
+          }
         })
         code = `<pre><code><span ${className}="line">\`\`\`${lang}</span></code></pre>\n${themeCode}\n<pre><code><span ${className}="line">\`\`\`</span></code></pre>`
       } else {
         const themeCode = highlighter.codeToHtml(code, {
           lang: _lang,
-          theme: "vitesse-light",
-          transformers: [{}]
+          themes: {
+            light: "vitesse-light",
+            dark: "vitesse-dark"
+          }
         })
         code = `<div ${className}="u-code-lang">${_lang}</div><div ${className}="u-code-copy">${copyText}</div>\n<div dangerouslySetInnerHTML={{__html: \`${themeCode}\`}}></div>`
       }

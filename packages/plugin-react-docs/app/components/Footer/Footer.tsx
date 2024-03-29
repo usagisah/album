@@ -5,8 +5,7 @@ const FooterContainer = styled.footer`
   position: relative;
   padding: 32px 24px;
   font-size: 14px;
-  color: rgba(60, 60, 67, 0.78);
-  /* border-top: 1px solid #e2e2e3; */
+  color: ${({ theme }) => theme.text[2]};
 
   .content {
     margin: 0 auto;

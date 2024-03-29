@@ -62,8 +62,13 @@ declare module "@docs/site-theme" {
 }
 
 declare module "album.docs" {
-  import { LinkItem } from "@docs/site-config"
-  import React from "react"
+  export interface LinkItem {
+    label?: string
+    link?: string
+    icon?: string
+    children?: LinkItem[]
+  }
+
   export interface PageContext {
     store: Map<any, any>
     layouts: Record<string, React.FC<any>>
@@ -95,8 +100,6 @@ declare module "album.docs" {
 
 declare module "*.md" {
   import { FC } from "react"
-  const MDComponent: FC<any>
+  const MDComponent: FC<any> & { $frontmatter: Record<string, string | number> }
   export default MDComponent
-
-  export const $frontmatter: Record<string, string | number>
 }

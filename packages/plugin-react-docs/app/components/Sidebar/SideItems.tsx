@@ -13,7 +13,7 @@ const SideItemsContainer = styled.div`
     align-items: center;
     justify-content: space-between;
     padding: 4px 0;
-    color: #3c3c43c6;
+    color: ${({ theme }) => theme.text[2]};
     font-weight: 500;
     font-size: 14px;
     cursor: pointer;
@@ -32,7 +32,7 @@ const SideItemsContainer = styled.div`
   }
   .top-title {
     font-weight: 800;
-    color: #3c3c43;
+    color: ${({ theme }) => theme.text[1]};
   }
 
   .indicator {
@@ -41,8 +41,7 @@ const SideItemsContainer = styled.div`
     bottom: -2px;
     left: -16px;
     width: 1px;
-    background: rgba(226, 226, 227, 0.8);
-    border-radius: 4px;
+    border-radius: ${({theme}) => theme.radius.small};
   }
 `
 

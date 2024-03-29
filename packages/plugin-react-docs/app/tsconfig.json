@@ -8,12 +8,11 @@
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "allowImportingTsExtensions": false,
+    "baseUrl": "."
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "album.type.d.ts"
+    "./**/*.ts",
+    "./**/*"
   ]
 }

@@ -7,8 +7,8 @@ const NavSearchContainer = styled.button`
   padding: 0 10px 0 12px;
   height: 40px;
   font-size: 14px;
-  border: 1px solid #e2e2e3;
-  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.divider.default};;
+  border-radius: ${({theme}) => theme.radius.default};
 
   .placeholder {
     margin: 0 1rem 0 8px;
@@ -17,8 +17,8 @@ const NavSearchContainer = styled.button`
   .pointKeys {
     padding: 0px 6px;
     font-size: 12px;
-    border: 1px solid #e2e2e3;
-    border-radius: 4px;
+    border: 1px solid ${({ theme }) => theme.divider.default};;
+    border-radius: ${({theme}) => theme.radius.small};
   }
 `
 
