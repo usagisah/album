@@ -27,15 +27,18 @@ type ParseRouterParams = AppManagerModule & {
 export async function walkModules(params: ParseRouterParams) {
   const { modulePath } = params
   const modules: AppSpecialModule[] = []
-  for (const m of await readdir(modulePath, { withFileTypes: true })) {
-    if (m.isDirectory()) {
-      const res = await resolveModules({ ...params, modulePath: resolve(modulePath, m.name) })
-      if (!res) {
-        continue
+  const ms = await readdir(modulePath, { withFileTypes: true })
+  await Promise.all(
+    ms.map(async m => {
+      if (m.isDirectory()) {
+        const res = await resolveModules({ ...params, modulePath: resolve(modulePath, m.name) })
+        if (!res) {
+          return
+        }
+        modules.push(res)
       }
-      modules.push(res)
-    }
-  }
+    })
+  )
   return modules
 }
 
@@ -46,32 +49,39 @@ export async function resolveDirFiles(params: { findChildModule: boolean; module
   let childModuleDir: Dirent | null = null
 
   const dirFiles = await readdir(modulePath, { encoding: "utf-8", withFileTypes: true })
-  for (const file of dirFiles) {
-    const filename = file.name
-    const filepath = resolve(modulePath, file.name)
+  await Promise.all(
+    dirFiles.map(async file => {
+      const filename = file.name
+      const filepath = resolve(modulePath, file.name)
 
-    if (file.isDirectory()) {
-      if (findChildModule && filename === moduleName) {
-        childModuleDir = file
-      } else {
-        const dir = await resolveDirFiles({ findChildModule: false, moduleName, modulePath: resolve(modulePath, childModuleDir.name), fileExtensions })
-        dirs.push({ type: "dir", filename, filepath, files: dir.files, dirs: dir.dirs })
+      if (file.isDirectory()) {
+        if (findChildModule && filename === moduleName) {
+          childModuleDir = file
+        } else {
+          const dir = await resolveDirFiles({
+            findChildModule: false,
+            moduleName,
+            modulePath: resolve(modulePath, childModuleDir.name),
+            fileExtensions
+          })
+          dirs.push({ type: "dir", filename, filepath, files: dir.files, dirs: dir.dirs })
+        }
+        return
       }
-      continue
-    }
 
-    const { name, ext } = pathParse(filename)
-    if (fileExtensions.some(t => t.test(filename))) {
-      files.push({
-        type: "file",
-        filepath,
-        filename,
-        // xxx.page. 这是不合法的
-        appName: ext.length <= 1 ? filename : name,
-        ext: ext.slice(1)
-      })
-    }
-  }
+      const { name, ext } = pathParse(filename)
+      if (fileExtensions.some(t => t.test(filename))) {
+        files.push({
+          type: "file",
+          filepath,
+          filename,
+          // xxx.page. 这是不合法的
+          appName: ext.length <= 1 ? filename : name,
+          ext: ext.slice(1)
+        })
+      }
+    })
+  )
   return { files, dirs, childModuleDir }
 }
 
