@@ -3,16 +3,11 @@ import { copy, outputFile } from "@albumjs/tools/lib/fs-extra"
 import { rm } from "fs/promises"
 import { resolve } from "path"
 import { PluginContext } from "../docs.type.js"
-import { TempModule, TempModuleMap } from "./buildPages.js"
+import { TempModuleMap } from "./buildPages.js"
 
 export async function renderPages(tempMap: TempModuleMap, p: PluginBuildStartParam, context: PluginContext) {
-  let app: TempModule
-  tempMap.forEach(item => {
-    if (item.app) {
-      app = item
-    }
-  })
-  const { serverOutPath } = app
+  const { app, chunks, assets } = tempMap
+  const { clientChunk: appClientChunk, serverOutPath } = app
   const { ssgRender } = await import(serverOutPath)
   const { docsConfig, albumContext } = context
   const { cwd } = albumContext.inputs
@@ -21,16 +16,12 @@ export async function renderPages(tempMap: TempModuleMap, p: PluginBuildStartPar
 
   await rm(outDir, { force: true, recursive: true })
   await Promise.all(
-    Array.from(tempMap.values()).map(async item => {
-      if (item.app) {
-        return
-      }
-
-      const { serverOutPath, client, routePath } = item
+    Object.values(chunks).map(async chunk => {
+      const { serverOutPath, clientChunk, routePath } = chunk
       const html = await ssgRender({
-        entryPath: `/assets/${app.client.fileName}`,
+        entryPath: `/assets/${appClientChunk.fileName}`,
         importPath: serverOutPath,
-        contentPath: `/assets/${client.fileName}`,
+        contentPath: `/assets/${clientChunk.fileName}`,
         siteConfig,
         scripts
       })

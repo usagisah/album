@@ -4,8 +4,12 @@ import { basename, resolve } from "path"
 import { InlineConfig, Rollup, build, mergeConfig } from "vite"
 import { PluginContext } from "../docs.type.js"
 
-export type TempModule = { app: boolean; routePath: string; clientOutPath: string; serverOutPath: string; client: Rollup.OutputChunk; server: Rollup.OutputChunk }
-export type TempModuleMap = Map<string, TempModule>
+export type TempModule = { routePath: string; clientOutPath: string; serverOutPath: string; clientChunk: Rollup.OutputChunk; serverChunk: Rollup.OutputChunk }
+export type TempModuleMap = {
+  app: TempModule
+  chunks: Record<string, TempModule>
+  assets: Rollup.OutputAsset[]
+}
 
 export async function buildPages(p: PluginBuildStartParam, context: PluginContext) {
   const { resolveMiddlewareConfig, info } = p
@@ -71,35 +75,46 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
     copy(resolve(inputs.dumpInput, "plugin-react-docs/docs.css"), resolve(inputs.cwd, ".temp/server/docs.css")),
     copy(resolve(inputs.dumpInput, "plugin-react-docs/normalize.css"), resolve(inputs.cwd, ".temp/server/normalize.css"))
   ])
+  debugger
   return makeModuleMap(context, { ...moduleEntries, __app: "app" }, clientResult[0], serverResult[0])
 }
 
-function makeModuleMap(context: PluginContext, moduleEntries: Record<string, string>, clientResult: Rollup.RollupOutput, serverResult: Rollup.RollupOutput) {
+function makeModuleMap(context: PluginContext, moduleEntries: Record<string, string>, clientResult: Rollup.RollupOutput, serverResult: Rollup.RollupOutput): TempModuleMap {
   const { routeMap, albumContext } = context
   const { cwd } = albumContext.inputs
-  const map: TempModuleMap = new Map()
+  const map: TempModuleMap = { app: {}, chunks: {}, assets: [] } as any
+
   for (const name in moduleEntries) {
     const isApp = name === "__app"
     const filepath = moduleEntries[name]
-    map.set(filepath, { app: isApp, routePath: isApp ? null : routeMap.get(filepath).buildOutPath } as any)
+    if (isApp) {
+      map.app = {} as any
+    } else {
+      map.chunks[filepath] = { routePath: routeMap.get(filepath).buildOutPath } as any
+    }
   }
-  clientResult.output.forEach(item => {
-    if (item.type === "chunk") {
-      const record = item.name === "__app" ? map.get("app") : map.get(item.facadeModuleId)
+
+  clientResult.output.forEach(chunk => {
+    if (chunk.type === "chunk") {
+      const record = chunk.name === "__app" ? map.app : map.chunks[chunk.facadeModuleId]
       if (record) {
-        record.client = item
-        record.clientOutPath = resolve(cwd, ".temp/client", item.fileName)
+        record.clientChunk = chunk
+        record.clientOutPath = resolve(cwd, ".temp/client", chunk.fileName)
+      }
+      return
+    }
+    map.assets.push(chunk)
+  })
+
+  serverResult.output.forEach(chunk => {
+    if (chunk.type === "chunk") {
+      const record = chunk.name === "__app" ? map.app : map.chunks[chunk.facadeModuleId]
+      if (record) {
+        record.serverChunk = chunk
+        record.serverOutPath = resolve(cwd, ".temp/server", chunk.fileName)
       }
     }
   })
-  serverResult.output.forEach(item => {
-    if (item.type === "chunk") {
-      const record = item.name === "__app" ? map.get("app") : map.get(item.facadeModuleId)
-      if (record) {
-        record.server = item
-        record.serverOutPath = resolve(cwd, ".temp/server", item.fileName)
-      }
-    }
-  })
+
   return map
 }
