@@ -37,6 +37,11 @@ export async function ssgRender({ siteConfig, entryPath, importPath, contentPath
             <App />
           </div>
           <script type="text/json" id="_docs-meta" dangerouslySetInnerHTML={{ __html: JSON.stringify({ contentPath }) }}></script>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `Array.from(document.querySelectorAll("img")).forEach(m => {m.onerror = function(e){this.classList.add("error")} })`
+            }}
+          ></script>
           <script type="module" src={entryPath}></script>
         </body>
       </html>

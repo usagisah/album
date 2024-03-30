@@ -15,10 +15,13 @@ const EditInfoContainer = styled.div`
     justify-content: center;
     align-items: center;
     color: ${({ theme }) => theme.primary.default};
+    fill: ${({ theme }) => theme.primary.default};
     transition: all 0.25s;
 
-    svg {
-      fill: ${({ theme }) => theme.primary.default};
+    &:hover {
+      color: ${({ theme }) => theme.primary.hover};
+      border: 1px solid ${({ theme }) => theme.primary.hover};
+      fill: ${({ theme }) => theme.primary.hover};
     }
   }
 

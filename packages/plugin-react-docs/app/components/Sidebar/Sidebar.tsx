@@ -4,7 +4,7 @@ import { SideItems } from "./SideItems"
 
 const SidebarContainer = styled.ul`
   position: sticky;
-  top: 76px;
+  top: 100px;
   width: 240px;
   max-height: calc(100vh - 76px);
   overflow: auto;

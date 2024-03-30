@@ -12,13 +12,17 @@ const PrevNextContainer = styled.footer`
     display: block;
     padding: 12px;
     min-width: 48%;
-    border: 1px solid ${({ theme }) => theme.divider.default};;
+    border: 1px solid ${({ theme }) => theme.divider.default};
     border-radius: ${({theme}) => theme.radius.default};
     font-weight: 600;
     overflow: hidden;
 
     &:last-child {
       text-align: right;
+    }
+
+    &:hover {
+      border: 1px solid ${({ theme }) => theme.primary.default};
     }
   }
 

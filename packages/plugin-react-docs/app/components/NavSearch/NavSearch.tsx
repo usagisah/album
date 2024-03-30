@@ -7,8 +7,15 @@ const NavSearchContainer = styled.button`
   padding: 0 10px 0 12px;
   height: 40px;
   font-size: 14px;
-  border: 1px solid ${({ theme }) => theme.divider.default};;
-  border-radius: ${({theme}) => theme.radius.default};
+  border: 1px solid ${({ theme }) => theme.divider.default};
+  border-radius: ${({ theme }) => theme.radius.default};
+
+  &:hover {
+    background: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.primary.default};
+    fill: ${({ theme }) => theme.primary.default};
+    border: 1px solid ${({ theme }) => theme.primary.default};
+  }
 
   .placeholder {
     margin: 0 1rem 0 8px;
@@ -17,8 +24,8 @@ const NavSearchContainer = styled.button`
   .pointKeys {
     padding: 0px 6px;
     font-size: 12px;
-    border: 1px solid ${({ theme }) => theme.divider.default};;
-    border-radius: ${({theme}) => theme.radius.small};
+    border: 1px solid ${({ theme }) => theme.divider.default};
+    border-radius: ${({ theme }) => theme.radius.small};
   }
 `
 

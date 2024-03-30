@@ -3,7 +3,8 @@ import { usePage } from "album.docs"
 
 const MainDocsContainer = styled.main`
   display: flex;
-  gap: 4rem;
+  justify-content: space-between;
+  gap: 2rem;
   margin: 100px auto 0 auto;
   padding: 0 24px;
   max-width: 1400px;
@@ -11,7 +12,6 @@ const MainDocsContainer = styled.main`
   .content {
     flex: 1;
     flex-direction: column;
-    justify-content: space-between;
     min-width: 800px;
     padding: 48px 32px;
     min-height: calc(100vh - 76px);

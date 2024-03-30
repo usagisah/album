@@ -19,9 +19,12 @@ declare module "@emotion/react" {
       2: string
       3: string
       bg: string
+      block: string
     }
     primary: {
       default: string
+      hover: string
+      bg: string
     }
     radius: {
       small: string

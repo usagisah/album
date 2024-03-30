@@ -187,9 +187,13 @@ function CircleButton({ primary, href, children }: { primary?: boolean; href?: s
         font-weight: 600;
         text-align: center;
         white-space: nowrap;
-        color: ${primary ? "white" : theme.text[1]};
-        background-color: ${primary ? theme.primary.default : theme.gray[3]};
+        color: ${primary ? theme.white : theme.text[1]};
+        background-color: ${primary ? theme.primary.bg : theme.gray[3]};
         border-radius: ${theme.radius.btn};
+        &:hover {
+          color: ${primary ? theme.white : theme.text[1]};
+          background-color: ${primary ? theme.primary.hover : theme.gray[2]};
+        }
       `}
     >
       <button>{children}</button>

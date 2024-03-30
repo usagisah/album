@@ -14,6 +14,9 @@ const NavBarContainer = styled.ul`
 
   .item {
     cursor: pointer;
+    &:hover {
+      color: ${({ theme }) => theme.primary.default};
+    }
   }
 
   @media (min-width: 760px) {

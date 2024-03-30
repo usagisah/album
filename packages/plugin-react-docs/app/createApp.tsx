@@ -55,8 +55,10 @@ export async function createApp(siteConfig: SiteConfig, Content: FC<any>) {
     }
   })
   const store = new Map()
+  const events = new Map()
   const appContext: PageContext = {
     store,
+    events,
     layouts: themeConfig.layouts,
     components: themeConfig.components,
     themeMode: null as any,

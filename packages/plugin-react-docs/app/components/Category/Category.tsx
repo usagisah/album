@@ -2,9 +2,9 @@ import styled from "@emotion/styled"
 import { SideItems } from "../Sidebar/SideItems"
 
 const CategoryContainer = styled.aside`
-  width: 240px;
+  width: 220px;
   position: sticky;
-  top: 106px;
+  top: 100px;
   max-height: 80vh;
   color: ${({ theme }) => theme.text[2]};
   overflow: auto;
@@ -31,6 +31,18 @@ const CategoryContainer = styled.aside`
     .title {
       font-weight: 400;
       font-size: 14px;
+
+      &:hover {
+        ${({ theme }) => theme.primary.default}
+      }
+
+      &:active {
+        ${({ theme }) => theme.primary.default}
+      }
+
+      &.active {
+        ${({ theme }) => theme.primary.default}
+      }
     }
 
     .indicator {

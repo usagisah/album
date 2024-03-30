@@ -52,13 +52,7 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
         const { data, content } = gm(code)
         const { import: importers = [], export: exporters } = data
         const res = await parseMdToReact(content, parseMDConfig)
-        let mdContent = [
-          ...importers,
-          `export default function MarkdownComp(){ return <div className="md">${res}</div> }`,
-          `const frontmatter=${JSON.stringify(data)}`,
-          `MarkdownComp.frontmatter = frontmatter`
-        ].join("\n")
-        return mdContent
+        return createMDFile({ import: importers.join("\n"), content: res, fm: data })
       }
     },
 
@@ -132,4 +126,16 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
       jsxImportSource: "@emotion/react"
     })
   ]
+}
+
+function createMDFile(p: { import: string; content: string; fm: Record<string, any> }) {
+  return `import { usePage } from "album.docs"\n${p.import}
+  export default function MarkdownComp(){ 
+    const {  } = usePage()
+    const onImageLodeError = function(e) { e.currentTarget.classList.add("error") }
+    return <div className="md">${p.content}</div> 
+  }
+  const frontmatter=${JSON.stringify(p.fm)}
+  MarkdownComp.frontmatter = frontmatter
+`
 }

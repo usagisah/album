@@ -18,10 +18,13 @@ export const THEME: Theme = {
     1: "#dddde3",
     2: "#e4e4e9",
     3: "#ebebef",
-    bg: "#f8f9fb"
+    bg: "#f8f9fb",
+    block: "#f6f6f7"
   },
   primary: {
-    default: "#1677ff"
+    default: "#1677ff",
+    hover: "#1677ffcc",
+    bg: "#409eff"
   },
   radius: {
     small: "4px",
@@ -86,6 +89,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           font-size: 16px;
           font-weight: 400;
           color: ${theme.text[1]};
+          background: ${theme.gray.bg};
         }
 
         hr {
@@ -374,7 +378,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
 
         .u-block-info {
           color: ${theme.text[1]};
-          background-color: #8e96aa24;
+          background-color: ${theme.gray.block};
         }
 
         .u-block-tip {
@@ -394,7 +398,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
 
         .u-block-details {
           color: ${theme.text[1]};
-          background-color: #8e96aa24;
+          background-color: ${theme.gray.block};
         }
 
         /* -------------- code -------------- */
@@ -406,7 +410,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           padding: 0.5rem;
           max-width: 100%;
           overflow-x: auto;
-          border: 1px solid #e5e7eb;
+          border: 1px solid ${theme.gray.block};
           font-weight: 400;
           white-space: nowrap;
           box-shadow:
@@ -465,7 +469,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
         .u-code-highlighted {
           display: inline-block;
           width: 100%;
-          background-color: #8e96aa24;
+          background-color: ${theme.gray.block};
           border-radius: ${theme.radius.small};
         }
 
@@ -526,9 +530,10 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           font-weight: 400;
           opacity: 0;
         }
-
+        
         .u-h-anchor:hover {
           opacity: 1;
+          color: ${theme.primary.default};
         }
 
         .u-h span:hover + .u-h-anchor {
@@ -605,6 +610,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
 
         /* --------------  -------------- */
         .u-strong {
+          margin: 0 4px;
           font-weight: 600;
           font-size: 1.15rem;
         }
@@ -612,6 +618,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
         .u-a {
           color: ${theme.primary.default};
           font-weight: 500;
+          margin: 0 4px;
           padding: 0 2px;
           transition:
             color 0.25s,
@@ -623,6 +630,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
 
         .u-line-code {
           display: inline-flex;
+          margin: 0 4px;
           padding: 2px 4px;
           color: ${theme.primary.default};
           background-color: #8e96aa23;
@@ -639,6 +647,13 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           width: 95%;
           border-radius: ${theme.radius.default};
           border: 1px solid #e5e7eb;
+        }
+
+        .u-img.error {
+          margin: 1rem 0;
+          padding: 0;
+          width: 100%;
+          height: 40px;
         }
 
         /* -------------- shiki -------------- */

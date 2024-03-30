@@ -24,6 +24,10 @@ const SideItemsContainer = styled.div`
     .text {
       display: block;
       flex: 1;
+
+      &:hover {
+        color: ${({ theme }) => theme.primary.hover};
+      }
     }
   }
 
@@ -41,7 +45,7 @@ const SideItemsContainer = styled.div`
     bottom: -2px;
     left: -16px;
     width: 1px;
-    border-radius: ${({theme}) => theme.radius.small};
+    border-radius: ${({ theme }) => theme.radius.small};
   }
 `
 
