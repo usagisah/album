@@ -22,7 +22,7 @@ export function renderer({ highlighter, copyText, className, categoryQueue }: Re
       while (level <= (topCate = categoryQueue.at(-1)).level) {
         categoryQueue.pop()
       }
-      const cate: Category = { level, label: r.text, children: [] }
+      const cate: Category = { level, label: r.text, link: "#" + id, children: [] }
       topCate.children.push(cate)
       categoryQueue.push(cate)
 

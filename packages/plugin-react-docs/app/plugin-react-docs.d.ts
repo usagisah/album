@@ -29,6 +29,7 @@ declare module "album.docs" {
   export interface Category {
     level: number
     label: string
+    link: string
     children: Category[]
   }
 

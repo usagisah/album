@@ -1,6 +1,6 @@
-import { usePage } from "album.docs"
+import { Category, usePage } from "album.docs"
 
-export function CateItems(props: { items: any[]; indent?: number }) {
+export function CateItems(props: { items: Category[]; indent?: number }) {
   const { items, indent = 0 } = props
   const { location } = usePage()
   return (
@@ -8,7 +8,7 @@ export function CateItems(props: { items: any[]; indent?: number }) {
       {items.map((item, index) => (
         <div className="item" key={index + item.label}>
           <h2 className="title">
-            <a href={"#" + item.label} title={item.label} className={"text " + (location.hash === item.label ? "active" : "")}>
+            <a href={item.link} title={item.label} className={"text " + (location.hash === item.label ? "active" : "")}>
               {item.label}
             </a>
             <div className="icon" dangerouslySetInnerHTML={{ __html: item.icon ?? "" }}></div>
