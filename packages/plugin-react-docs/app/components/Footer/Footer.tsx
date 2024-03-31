@@ -31,8 +31,8 @@ export function Footer() {
   return (
     <FooterContainer className="footer">
       <div className="content">
-        <p className="message" dangerouslySetInnerHTML={{ __html: message }}></p>
-        <p className="copyright" dangerouslySetInnerHTML={{ __html: copyright }}></p>
+        {message && <p className="message" dangerouslySetInnerHTML={{ __html: message }}></p>}
+        {copyright && <p className="copyright" dangerouslySetInnerHTML={{ __html: copyright }}></p>}
       </div>
     </FooterContainer>
   )

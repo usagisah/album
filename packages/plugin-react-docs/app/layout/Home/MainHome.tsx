@@ -1,7 +1,6 @@
 import { css, useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import { usePage } from "album.docs"
-import { ReactNode } from "react"
 import bg from "../../assets/home.bg.png"
 
 const MainHomeContainer = styled.main`
@@ -148,7 +147,7 @@ const MainHomeContainer = styled.main`
 `
 
 export function MainHome() {
-  const { components } = usePage()
+  const { frontmatter, components } = usePage()
   const Features = components["Features"]
   const Content = components["Content"]
   return (
@@ -156,14 +155,16 @@ export function MainHome() {
       <img className="bgImg" src={bg} alt="" />
       <div className="wrapper">
         <div className="hero">
-          <p className="title">VitePress</p>
-          <p className="description">由 Vite 和 Vue 驱动的静态站点生成器</p>
-          <p className="tagline">将 Markdown 变成优雅的文档，只需几分钟</p>
-          <div className="fastActions">
-            <CircleButton primary>什么是 VitePress</CircleButton>
-            <CircleButton>快速开始</CircleButton>
-            <CircleButton>Github</CircleButton>
-          </div>
+          {frontmatter.title && <p className="title" dangerouslySetInnerHTML={{ __html: frontmatter.title }}></p>}
+          {frontmatter.description && <p className="description" dangerouslySetInnerHTML={{ __html: frontmatter.description }}></p>}
+          {frontmatter.tagline && <p className="tagline" dangerouslySetInnerHTML={{ __html: frontmatter.tagline }}></p>}
+          {Array.isArray(frontmatter.actions) && (
+            <div className="fastActions">
+              {frontmatter.actions.map((item, index) => (
+                <CircleButton item={item} index={index} key={index}></CircleButton>
+              ))}
+            </div>
+          )}
         </div>
         <div className="image">
           <div className="bg"></div>
@@ -176,11 +177,12 @@ export function MainHome() {
   )
 }
 
-function CircleButton({ primary, href, children }: { primary?: boolean; href?: string; children: ReactNode }) {
+function CircleButton({ index, item }: { index: number; item: { text: string; link: string } }) {
   const theme = useTheme()
+  const primary = index === 0
   return (
     <a
-      href={href}
+      href={item.link}
       css={css`
         display: inline-flex;
         padding: 10px 20px;
@@ -196,7 +198,7 @@ function CircleButton({ primary, href, children }: { primary?: boolean; href?: s
         }
       `}
     >
-      <button>{children}</button>
+      <button>{item.text}</button>
     </a>
   )
 }

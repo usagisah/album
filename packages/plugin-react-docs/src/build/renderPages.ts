@@ -12,18 +12,20 @@ export async function renderPages(tempMap: TempModuleMap, p: PluginBuildStartPar
   const { docsConfig, albumContext } = context
   const { cwd } = albumContext.inputs
   const { outDir } = albumContext.outputs
-  const { scripts, siteConfig } = docsConfig
+  const { head, script, siteConfig } = docsConfig
 
   await rm(outDir, { force: true, recursive: true })
   await Promise.all(
     Object.values(chunks).map(async chunk => {
-      const { serverOutPath, clientChunk, routePath } = chunk
+      const { appName, serverOutPath, clientChunk, routePath } = chunk
       const html = await ssgRender({
+        url: "/" + appName,
         entryPath: `/assets/${appClientChunk.fileName}`,
         importPath: serverOutPath,
         contentPath: `/assets/${clientChunk.fileName}`,
         siteConfig,
-        scripts
+        head,
+        script
       })
       await outputFile(resolve(outDir, routePath), html, "utf-8")
     })

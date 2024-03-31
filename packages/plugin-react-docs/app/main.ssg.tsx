@@ -1,10 +1,11 @@
-import { SiteConfig } from "@docs/site-config"
 import { renderToString } from "react-dom/server"
 import { createApp } from "./createApp"
 
 interface SSGRenderOption {
-  siteConfig: SiteConfig
-  scripts: any[]
+  url: string
+  siteConfig: any
+  head: string[]
+  script: string[]
   importPath: string
   contentPath: string
   entryPath: string
@@ -17,42 +18,42 @@ const key = "custom"
 const cache = createCache({ key })
 const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache)
 
-export async function ssgRender({ siteConfig, entryPath, importPath, contentPath, scripts }: SSGRenderOption) {
+export async function ssgRender({ url, siteConfig, entryPath, importPath, contentPath, head, script }: SSGRenderOption) {
   const { default: MDContent } = await import(/*@vite-ignore*/ importPath)
   siteConfig.frontmatter = MDContent.frontmatter
-  const App = await createApp(siteConfig, MDContent)
-  const stylePlaceholder = "__$_" + Date.now()
-  const HTML = () => {
-    return (
-      <html lang="en" dir="ltr">
-        <head>
-          <meta charSet="UTF-8" />
-          <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <title>{siteConfig.title}</title>
-          {stylePlaceholder}
-        </head>
-        <body>
-          <div id="album-docs">
-            <App />
-          </div>
-          <script type="text/json" id="_docs-meta" dangerouslySetInnerHTML={{ __html: JSON.stringify({ contentPath }) }}></script>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `Array.from(document.querySelectorAll("img")).forEach(m => {m.onerror = function(e){this.classList.add("error")} })`
-            }}
-          ></script>
-          <script type="module" src={entryPath}></script>
-        </body>
-      </html>
-    )
-  }
-  const html = renderToString(
+
+  const App = await createApp(url, siteConfig, MDContent)
+  const appHtml = renderToString(
     <CacheProvider value={cache}>
-      <HTML />
+      <App />
     </CacheProvider>
   )
-  const chunks = extractCriticalToChunks(html)
+
+  const chunks = extractCriticalToChunks(appHtml)
   const styles = constructStyleTagsFromChunks(chunks)
-  return html.replace(stylePlaceholder, styles)
+
+  const html = `<html lang="en" dir="ltr">
+  <head>
+    <meta charSet="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${siteConfig.title.value}</title>
+    ${head.join("")}
+    ${styles}
+  </head>
+  <body>
+    <div id="album-docs">
+      <App />
+    </div>
+    <script type="text/json" id="_docs-meta">"${contentPath}"</script>
+    <script>
+      Array.from(document.querySelectorAll("img")).forEach(m => {
+        m.onerror = function(e){this.classList.add("error")
+      }})
+    </script>
+    ${script.join("")}
+    <script type="module" src="${entryPath}"></script>
+  </body>
+</html>`
+  return html
 }

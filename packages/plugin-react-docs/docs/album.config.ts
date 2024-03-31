@@ -5,11 +5,10 @@ export default defineAlbumConfig<AlbumDocsConfig>({
   plugins: [
     Docs({
       docs: {
-        title: "AlbumPress",
-        description: "",
-        icon: "",
-        logo: "https://vitepress.dev/vitepress-logo-mini.svg",
+        title: {},
+        description: "由 AlbumPress 和 Album 驱动的静态站点生成器",
         navList: [
+          { label: "API", link: "/api" },
           { label: "指东", link: "/" },
           { label: "扭矩", link: "/" },
           { label: "你他丫的", link: "/" },

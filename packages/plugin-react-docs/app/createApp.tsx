@@ -1,4 +1,3 @@
-import { SiteConfig } from "@docs/site-config"
 import themeConfigs, { ThemeConfig } from "@docs/site-theme"
 import { ThemeProvider } from "@emotion/react"
 import { PageContext } from "album.docs"
@@ -10,6 +9,8 @@ import { Features } from "./components/Features/Features"
 import { Footer } from "./components/Footer/Footer"
 import { Github } from "./components/Github/Github"
 import { Header } from "./components/Header/Header"
+import { IconDown } from "./components/Icon/IconDown"
+import { IconMenuOutlined } from "./components/Icon/IconMenuOutlined"
 import { Lang } from "./components/Lang/Lang"
 import { NavBar } from "./components/NavBar/NavBar"
 import { NavSearch } from "./components/NavSearch/NavSearch"
@@ -31,7 +32,7 @@ async function mergeThemeConfig(defaultConfig: ThemeConfig) {
   return c
 }
 
-export async function createApp(siteConfig: SiteConfig, Content: FC<any>) {
+export async function createApp(url: string, siteConfig: any, Content: FC<any>) {
   const themeConfig = await mergeThemeConfig({
     meta: {},
     layouts: { default: DocsLayout, Home: HomeLayout, Docs: DocsLayout },
@@ -51,34 +52,39 @@ export async function createApp(siteConfig: SiteConfig, Content: FC<any>) {
       Switch,
       Category,
       Collapse,
-      Content
+      Content,
+      IconDown,
+      IconMenuOutlined
     }
   })
+
+  const sft = siteConfig.frontmatter.siteTitle
+  const title = [sft, siteConfig.title.value].filter(Boolean).join(siteConfig.title.sep)
+  if (typeof window !== "undefined") {
+    document.title = title
+  }
+
+  const { href, hash, pathname, searchParams } = import.meta.env.SSR ? new URL(`a://a${url}`) : new URL(location.href)
+  const query = [...searchParams.entries()].reduce((q, item) => {
+    q[decodeURIComponent(item[0])] = decodeURIComponent(item[1])
+    return q
+  }, {} as any)
+
   const store = new Map()
   const events = new Map()
   const appContext: PageContext = {
+    ...siteConfig,
     store,
     events,
     layouts: themeConfig.layouts,
     components: themeConfig.components,
-    themeMode: null as any,
+    theme: null as any,
     layout: siteConfig.frontmatter.layout ?? "default",
-    footer: siteConfig.footer,
-    frontmatter: siteConfig.frontmatter,
-    site: {
-      title: siteConfig.title,
-      description: siteConfig.description,
-      logo: siteConfig.logo,
-      icon: siteConfig.icon,
-      path: siteConfig.path
-    },
-    navList: siteConfig.navList,
-    sidebar: siteConfig.sidebar,
-    lang: siteConfig.lang
+    location: { href, hash, pathname, query }
   }
 
   return () => {
-    appContext.themeMode = useThemeMode()
+    appContext.theme = useThemeMode()
     let Layout = themeConfig.layouts[appContext.layout]
     if (!Layout) {
       Layout = themeConfig.layouts.default

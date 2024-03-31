@@ -1,4 +1,4 @@
-import { LinkItem } from "@docs/site-config"
+import { usePage, LinkItem } from "album.docs"
 import { Dropdown, DropdownProps } from "antd"
 import { ReactNode, useRef } from "react"
 
@@ -11,6 +11,8 @@ export interface SelectMenuProps extends React.ClassAttributes<HTMLDivElement>, 
 
 export function SelectMenu(props: SelectMenuProps) {
   const { arrow = true, linkItems = [], children, dropdownProps, ..._props } = props
+  const { components } = usePage()
+  const IconDown = components["IconDown"]
   if (linkItems.length === 0) {
     return children
   }
@@ -20,7 +22,7 @@ export function SelectMenu(props: SelectMenuProps) {
     <Dropdown placement="bottom" menu={{ items: items.current, style: { border: "none" } }} {...dropdownProps}>
       <div style={{ display: "flex", gap: "4px", alignItems: "center", cursor: "pointer" }} {..._props}>
         {children}
-        {arrow && 1}
+        {arrow && <IconDown size={14} />}
       </div>
     </Dropdown>
   )

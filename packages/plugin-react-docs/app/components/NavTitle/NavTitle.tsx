@@ -1,4 +1,5 @@
 import styled from "@emotion/styled"
+import { usePage } from "album.docs"
 
 const NavTitleContainer = styled.a`
   flex-shrink: 0;
@@ -16,18 +17,12 @@ const NavTitleContainer = styled.a`
   }
 `
 
-export interface NavTitleProps {
-  title?: string
-  path?: string
-  logo?: string
-}
-
-export function NavTitle(props: NavTitleProps) {
-  const { title = "", path = "/", logo } = props
+export function NavTitle() {
+  const { title, logo } = usePage()
   return (
-    <NavTitleContainer className="navTitle" href={path}>
-      {logo && <img className="img" src={logo} alt={title} />}
-      <span>{title}</span>
+    <NavTitleContainer className="navTitle" href={logo.href}>
+      {logo && <img className="img" src={logo.url} alt={title.value} />}
+      <span>{title.value}</span>
     </NavTitleContainer>
   )
 }

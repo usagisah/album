@@ -9,14 +9,25 @@ export interface LinkItem {
   children?: LinkItem[]
 }
 export interface DocsConfig {
+  /* 所有 url 的前缀 */
+  base?: string
+
   /* 标题 */
-  title?: string
+  title?: {
+    value?: string
+    sep?: string | boolean
+  }
   /* 站点图标 */
   icon?: string
   /* 描述 */
   description?: string
+  /* 关键词 */
+  keywords?: string
   /* logo */
-  logo?: string
+  logo?: {
+    url?: string
+    href?: string
+  }
 
   /* 主题文件路径 */
   theme?: string[]
@@ -28,17 +39,19 @@ export interface DocsConfig {
     locales?: Record<string, any>
   }
 
-  /* html.head {meta: { name: "xx" }} */
-  head?: Record<string, Record<string, string>>
-  /* <script /> 自定义脚本相关的 */
-  scripts?: { attrs?: Record<string, string | number>; content?: string }[]
+  /* 自定义 head */
+  head?: string[]
+  /* 自定义脚本 */
+  script?: string[]
   /* html.footer */
-  footer: { message: string; copyright: string }
+  footer?: { message: string; copyright: string }
 
   /* 导航链接选项 */
-  navList: LinkItem[]
+  navList?: LinkItem[]
   /* 侧边栏选项 */
-  sidebar: LinkItem[]
+  sidebar?: LinkItem[]
+  /* 自定义功能性图标 */
+  actions?: LinkItem[]
 
   /* 静态资源服务器配置 */
   server?: {
@@ -54,7 +67,8 @@ export interface PluginContext {
   parseMDConfig: ParseMDConfig
   reactConfig: ReactPlugin
   docsConfig: {
-    scripts: DocsConfig["scripts"]
+    head: string[]
+    script: string[]
     siteConfig: any
     server: DocsConfig["server"]
     resolveThemeFile: (cwd: string) => string
@@ -65,6 +79,7 @@ export interface PluginContext {
 }
 
 export interface MDRoute {
+  appName: string
   filepath: string
   buildOutPath?: string
   match: RegExp

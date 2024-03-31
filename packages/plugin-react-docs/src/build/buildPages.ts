@@ -1,10 +1,9 @@
 import { PluginBuildStartParam } from "@albumjs/album/server"
-import { copy } from "@albumjs/tools/lib/fs-extra"
 import { basename, resolve } from "path"
 import { InlineConfig, Rollup, build, mergeConfig } from "vite"
 import { PluginContext } from "../docs.type.js"
 
-export type TempModule = { routePath: string; clientOutPath: string; serverOutPath: string; clientChunk: Rollup.OutputChunk; serverChunk: Rollup.OutputChunk }
+export type TempModule = { appName: string; routePath: string; clientOutPath: string; serverOutPath: string; clientChunk: Rollup.OutputChunk; serverChunk: Rollup.OutputChunk }
 export type TempModuleMap = {
   app: TempModule
   chunks: Record<string, TempModule>
@@ -95,6 +94,10 @@ function makeModuleMap(context: PluginContext, moduleEntries: Record<string, str
       if (record) {
         record.clientChunk = chunk
         record.clientOutPath = resolve(cwd, ".temp/client", chunk.fileName)
+
+        if (chunk.name !== "__app") {
+          record.appName = routeMap.get(chunk.facadeModuleId).appName
+        }
       }
       return
     }

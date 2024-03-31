@@ -20,7 +20,6 @@ const EditInfoContainer = styled.div`
 
     &:hover {
       color: ${({ theme }) => theme.primary.hover};
-      border: 1px solid ${({ theme }) => theme.primary.hover};
       fill: ${({ theme }) => theme.primary.hover};
     }
   }

@@ -1,9 +1,7 @@
-import { useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import { usePage } from "album.docs"
-import { CSSProperties, useState } from "react"
-import { useScroll } from "../../hooks/useScroll"
 import { IpadActions, PCActions } from "./Actions"
+import { useHeaderScroll } from "./useHeaderScroll"
 
 const HeaderContainer = styled.header`
   position: relative;
@@ -36,36 +34,18 @@ const HeaderContainer = styled.header`
     padding: 0px 32px;
   }
 `
-
 export function Header() {
-  const { site, navList, components } = usePage()
+  const { navList, components } = usePage()
   const NavTitle = components["NavTitle"]
   const NavBar = components["NavBar"]
   const SelectMenu = components["SelectMenu"]
-  const theme = useTheme()
+  const scrollStyle = useHeaderScroll()
 
-  const [style, setStyle] = useState<CSSProperties>({})
-  useScroll(() => {
-    if (window.innerWidth < 1000) {
-      return
-    }
-    const isScrollTop = window.scrollY === 0
-    if (isScrollTop) {
-      if (style.borderBottom) {
-        setStyle({})
-      }
-      return
-    }
-
-    if (!style.borderBottom) {
-      setStyle({ background: theme.gray.bg, borderBottom: `1px solid ${theme.gray.bg}` })
-    }
-  })
   return (
-    <HeaderContainer className="header" style={style}>
+    <HeaderContainer className="header" style={scrollStyle}>
       <div className="container">
         <section className="nav-list">
-          <NavTitle title={site.title} path={site.path} logo={site.logo} />
+          <NavTitle />
           <div style={{ width: "2rem" }}></div>
           <NavBar list={navList} SelectMenu={SelectMenu} />
         </section>

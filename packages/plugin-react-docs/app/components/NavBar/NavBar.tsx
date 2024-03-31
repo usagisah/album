@@ -1,5 +1,5 @@
-import { LinkItem } from "@docs/site-config"
 import styled from "@emotion/styled"
+import { LinkItem, usePage } from "album.docs"
 
 const NavBarContainer = styled.ul`
   color: ${({ theme }) => theme.text[1]};
@@ -14,9 +14,14 @@ const NavBarContainer = styled.ul`
 
   .item {
     cursor: pointer;
-    &:hover {
-      color: ${({ theme }) => theme.primary.default};
-    }
+  }
+
+  .item.active {
+    color: ${({ theme }) => theme.primary.default};
+  }
+
+  .pc-nav .item:hover {
+    color: ${({ theme }) => theme.primary.hover}!important;
   }
 
   @media (min-width: 760px) {
@@ -38,13 +43,15 @@ export interface NavBarProps {
 }
 
 export function NavBar(props: NavBarProps) {
+  const { components, location } = usePage()
+  const { IconMenuOutlined } = components
   const { list, SelectMenu } = props
   return (
     <NavBarContainer className="navBar">
       <div className="pc-nav">
         {list.map((item, index) => (
           <SelectMenu key={index} linkItems={item.children ?? []}>
-            <li className="item">
+            <li className={"item " + (location.pathname === item.link ? "active" : "")}>
               <a href={item.link}>{item.label}</a>
             </li>
           </SelectMenu>
@@ -52,7 +59,7 @@ export function NavBar(props: NavBarProps) {
       </div>
 
       <SelectMenu linkItems={list} arrow={false} dropdownProps={{ className: "ipad-nav" }}>
-        {/* <MenuOutlined width={16} height={16} style={{ cursor: "pointer" }} /> */}
+        <IconMenuOutlined size={16} style={{ cursor: "pointer" }} />
       </SelectMenu>
     </NavBarContainer>
   )

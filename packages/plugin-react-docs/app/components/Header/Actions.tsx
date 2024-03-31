@@ -43,6 +43,7 @@ const IpadActionsContainer = styled.div`
 `
 export function IpadActions() {
   const { components, lang } = usePage()
+  const { select } = lang
   const NavSearch = components["NavSearch"]
   const Github = components["Github"]
   const theme = useTheme()
@@ -50,8 +51,8 @@ export function IpadActions() {
   const menuItems = useRef<any[]>()
   if (!menuItems.current) {
     const items: any[] = []
-    if (lang.length > 0) {
-      const children: any[] = lang.map(item => ({
+    if (select.length > 0) {
+      const children: any[] = select.map(item => ({
         key: item.link,
         label: (
           <a href={item.link}>

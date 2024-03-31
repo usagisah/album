@@ -37,7 +37,7 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
 
     load(id) {
       if (id === SITE_CONFIG) {
-        return `export default ${JSON.stringify(docsConfig.siteConfig)}`
+        return `export const siteConfig = ${JSON.stringify(docsConfig.siteConfig)}`
       } else if (id === SITE_THEME) {
         return docsConfig.resolveThemeFile(inputs.cwd)
       }
@@ -77,16 +77,18 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
         }
 
         const { filepath } = route
-        const { scripts, siteConfig } = context.docsConfig
+        const { head, script, siteConfig } = context.docsConfig
         const { dumpInput } = context.albumContext.inputs
         const { viteServer } = context.albumContext.serverManager
         const { ssgRender } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
         let html = await ssgRender({
+          url: req.originalUrl,
           entryPath: resolve(dumpInput, "plugin-react-docs/main.tsx"),
           importPath: filepath,
           contentPath: filepath,
           siteConfig,
-          scripts
+          head,
+          script
         })
         html = await viteServer.transformIndexHtml(req.originalUrl, html)
         return res.end(html)

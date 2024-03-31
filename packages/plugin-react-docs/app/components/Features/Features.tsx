@@ -1,28 +1,21 @@
 import styled from "@emotion/styled"
+import { usePage } from "album.docs"
 
 export function Features() {
+  const { features } = usePage().frontmatter
+  if (!Array.isArray(features)) {
+    return null
+  }
+
   return (
     <FeaturesContainer className="features">
-      <div className="item">
-        <div className="icon">🚀</div>
-        <h2 className="title">专注内容</h2>
-        <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-      </div>
-      <div className="item">
-        <div className="icon">🚀</div>
-        <h2 className="title">专注内容</h2>
-        <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-      </div>
-      <div className="item">
-        <div className="icon">🚀</div>
-        <h2 className="title">专注内容</h2>
-        <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-      </div>
-      <div className="item">
-        <div className="icon">🚀</div>
-        <h2 className="title">专注内容</h2>
-        <p className="detail">只需 Markdown 即可轻松创建美观的文档站点。</p>
-      </div>
+      {features.map((item, index) => (
+        <div className="item" key={index}>
+          {item.icon && <div className="icon" dangerouslySetInnerHTML={{ __html: item.icon }}></div>}
+          {item.title && <h2 className="title" dangerouslySetInnerHTML={{ __html: item.title }}></h2>}
+          {item.detail && <p className="detail" dangerouslySetInnerHTML={{ __html: item.detail }}></p>}
+        </div>
+      ))}
     </FeaturesContainer>
   )
 }
@@ -41,7 +34,7 @@ const FeaturesContainer = styled.div`
     flex-direction: column;
     padding: 24px;
     background-color: ${({ theme }) => theme.white};
-    border-radius: ${({theme}) => theme.radius.large};
+    border-radius: ${({ theme }) => theme.radius.large};
   }
 
   .icon {
@@ -52,7 +45,7 @@ const FeaturesContainer = styled.div`
     width: 48px;
     height: 48px;
     background-color: ${({ theme }) => theme.gray[3]};
-    border-radius: ${({theme}) => theme.radius.default};
+    border-radius: ${({ theme }) => theme.radius.default};
   }
 
   .title {

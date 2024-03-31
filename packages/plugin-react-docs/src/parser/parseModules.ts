@@ -15,9 +15,10 @@ function nextModules(specialModules: AppSpecialModule[], options: ParseOptions) 
   const { routeMap, routes } = context
   for (const module of specialModules) {
     const { pageFile, routePath, children } = module
-    const { filepath, ext } = pageFile
+    const { appName, filepath, ext } = pageFile
     const routePathReg = pathToRegexp(routePath, null, { sensitive: false })
     const route: MDRoute = {
+      appName,
       filepath,
       buildOutPath: normalizeOutName(routePath),
       match: routePathReg,
