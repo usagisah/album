@@ -23,6 +23,10 @@ export default defineAlbumConfig<AlbumDocsConfig>({
         ],
         sidebar: [
           {
+            label: "测试 api",
+            link: "/api"
+          },
+          {
             label: "简介",
             children: [
               { label: "什么是 VitePress？", link: "what-is-vitepress" },

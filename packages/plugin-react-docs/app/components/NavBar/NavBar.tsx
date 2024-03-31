@@ -20,6 +20,11 @@ const NavBarContainer = styled.ul`
     color: ${({ theme }) => theme.primary.default};
   }
 
+  .item.active + .icon-down {
+    color: ${({ theme }) => theme.primary.default};
+    fill: ${({ theme }) => theme.primary.default};
+  }
+
   .pc-nav .item:hover {
     color: ${({ theme }) => theme.primary.hover}!important;
   }

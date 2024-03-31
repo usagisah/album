@@ -1,4 +1,5 @@
 import { any, array, boolean, lazy, object, record, string, union } from "@albumjs/tools/lib/zod"
+import mt from "mime-types"
 import { resolve } from "path"
 import { DEFAULT_LOGO } from "./constants.js"
 import { DocsConfig } from "./docs.type.js"
@@ -94,7 +95,12 @@ export function normalizeDocsConfig(config: DocsConfig) {
     if (typeof title.value !== "string") siteConfig.title.value = "Album"
   }
 
-  if (!icon) siteConfig.icon = DEFAULT_LOGO
+  if (!icon) siteConfig.icon = { href: "/ico.svg", type: "image/svg+xml" } as any
+  else {
+    const index = icon.lastIndexOf(".")
+    const ext = index === -1 ? "" : mt.lookup(icon.slice(index, -1))
+    siteConfig.icon = { href: icon, type: ext } as any
+  }
 
   if (!logo) siteConfig.logo = { url: DEFAULT_LOGO, href: "/" }
   else {

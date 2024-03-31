@@ -26,6 +26,12 @@ declare module "album.docs" {
     children?: LinkItem[]
   }
 
+  export interface Category {
+    level: number
+    label: string
+    children: Category[]
+  }
+
   export interface PageContext {
     /* 所有 url 的前缀 */
     base: string
@@ -36,7 +42,7 @@ declare module "album.docs" {
       sep: string
     }
     /* 站点图标 */
-    icon: string
+    icon: { href: string; type: string }
     /* logo */
     logo: {
       url: string
@@ -60,6 +66,8 @@ declare module "album.docs" {
     /* 自定义功能性图标 */
     actions: LinkItem[]
 
+    /* 路由文档目录信息 */
+    category: Category[]
     /* 路由文档元信息 */
     frontmatter: Record<string, any>
 

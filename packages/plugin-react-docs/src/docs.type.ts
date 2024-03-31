@@ -2,6 +2,8 @@ import { AlbumContext } from "@albumjs/album/server"
 import react from "@vitejs/plugin-react-swc"
 import { ParseMDConfig } from "./parser/parseMdToReact.js"
 
+export type Category = { level: number; label: string; children: Category[] }
+
 export interface LinkItem {
   label?: string
   link?: string

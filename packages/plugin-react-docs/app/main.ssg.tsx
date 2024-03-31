@@ -20,6 +20,7 @@ const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionS
 
 export async function ssgRender({ url, siteConfig, entryPath, importPath, contentPath, head, script }: SSGRenderOption) {
   const { default: MDContent } = await import(/*@vite-ignore*/ importPath)
+  siteConfig.category = MDContent.category
   siteConfig.frontmatter = MDContent.frontmatter
 
   const App = await createApp(url, siteConfig, MDContent)
@@ -34,8 +35,8 @@ export async function ssgRender({ url, siteConfig, entryPath, importPath, conten
 
   const html = `<html lang="en" dir="ltr">
   <head>
-    <meta charSet="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta char-set="UTF-8" />
+    <link rel="icon" type="${siteConfig.icon.type}" href="${siteConfig.icon.href}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${siteConfig.title.value}</title>
     ${head.join("")}

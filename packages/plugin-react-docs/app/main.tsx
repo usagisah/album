@@ -7,6 +7,7 @@ async function createStaticApp() {
   ;(globalThis as any).__ALBUM_DOCS__ = "react"
   const meta = JSON.parse(document.getElementById("_docs-meta")!.textContent!)
   const { default: MDContent } = await import(/*@vite-ignore*/ meta)
+  siteConfig.category = MDContent.category
   siteConfig.frontmatter = MDContent.frontmatter
   const App = await createApp("", siteConfig, MDContent)
   return App

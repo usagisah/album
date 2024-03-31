@@ -3,7 +3,7 @@ import gm from "gray-matter"
 import { resolve } from "path"
 import { Plugin, ViteDevServer, mergeConfig } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
-import { PluginContext } from "./docs.type.js"
+import { Category, PluginContext } from "./docs.type.js"
 import { parseMdToReact } from "./parser/parseMdToReact.js"
 export { ParseMDConfig } from "./parser/parseMdToReact.js"
 
@@ -50,9 +50,9 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
     async transform(code: string, id: string) {
       if (id.endsWith(".md")) {
         const { data, content } = gm(code)
-        const { import: importers = [], export: exporters } = data
-        const res = await parseMdToReact(content, parseMDConfig)
-        return createMDFile({ import: importers.join("\n"), content: res, fm: data })
+        const { import: importers = [] } = data
+        const { componentContent, category } = await parseMdToReact(content, parseMDConfig)
+        return createMDFile({ import: importers.join("\n"), content: componentContent, fm: data, category })
       }
     },
 
@@ -130,7 +130,7 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
   ]
 }
 
-function createMDFile(p: { import: string; content: string; fm: Record<string, any> }) {
+function createMDFile(p: { import: string; content: string; fm: Record<string, any>, category: Category[] }) {
   return `import { usePage } from "album.docs"\n${p.import}
   export default function MarkdownComp(){ 
     const {  } = usePage()
@@ -138,6 +138,8 @@ function createMDFile(p: { import: string; content: string; fm: Record<string, a
     return <div className="md">${p.content}</div> 
   }
   const frontmatter=${JSON.stringify(p.fm)}
+  const category=${JSON.stringify(p.category)}
   MarkdownComp.frontmatter = frontmatter
+  MarkdownComp.category = category
 `
 }

@@ -1,20 +1,32 @@
 import { RendererObject } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
 import { PARSE_SKIP, numReg, scopeNumReg } from "../constants.js"
+import { Category } from "../docs.type.js"
 import { parseArgs } from "./parseArgs.js"
 
 export interface RendererOptions {
   highlighter: HighlighterGeneric<BundledLanguage, BundledTheme>
   copyText: string
   className: string
+  categoryQueue: Category[]
 }
 
-export function renderer({ highlighter, copyText, className }: RendererOptions): RendererObject {
+export function renderer({ highlighter, copyText, className, categoryQueue }: RendererOptions): RendererObject {
   return {
     heading(text, level) {
       const r = parseArgs(text)
       const id = r.args[0]?.startsWith("#") ? r.args[0].slice(1) : text
-      return `<h${level} ${className}="u-h u-h${level}" id="${id}"><span ${className}="text">${r.text}</span><a ${className}="u-h-anchor" href="#${id}">#</a></h${level}>`
+      const res = `<h${level} ${className}="u-h u-h${level}" id="${id}"><span ${className}="text">${r.text}</span><a ${className}="u-h-anchor" href="#${id}">#</a></h${level}>`
+
+      let topCate: Category
+      while (level <= (topCate = categoryQueue.at(-1)).level) {
+        categoryQueue.pop()
+      }
+      const cate: Category = { level, label: r.text, children: [] }
+      topCate.children.push(cate)
+      categoryQueue.push(cate)
+
+      return res
     },
     code(code, lang) {
       const { text: _lang, args } = parseArgs(lang ?? "")

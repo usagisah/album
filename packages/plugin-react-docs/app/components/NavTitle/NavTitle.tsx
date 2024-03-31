@@ -15,13 +15,20 @@ const NavTitleContainer = styled.a`
     width: 24px;
     height: 24px;
   }
+
+  .svg-logo {
+    width: 30px;
+    height: 30px;
+  }
 `
 
 export function NavTitle() {
   const { title, logo } = usePage()
+  const { url, href } = logo
+
   return (
-    <NavTitleContainer className="navTitle" href={logo.href}>
-      {logo && <img className="img" src={logo.url} alt={title.value} />}
+    <NavTitleContainer className="navTitle" href={href}>
+      {logo && (url.startsWith("<") ? <div className="svg-logo" dangerouslySetInnerHTML={{ __html: url }} /> : <img className="img" src={url} alt={title.value} />)}
       <span>{title.value}</span>
     </NavTitleContainer>
   )
