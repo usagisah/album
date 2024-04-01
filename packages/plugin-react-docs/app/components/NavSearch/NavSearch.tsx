@@ -11,7 +11,7 @@ const NavSearchContainer = styled.button`
   border-radius: ${({ theme }) => theme.radius.default};
 
   &:hover {
-    background: ${({ theme }) => theme.white};
+    background: ${({ theme }) => theme.default};
     color: ${({ theme }) => theme.primary.default};
     fill: ${({ theme }) => theme.primary.default};
     border: 1px solid ${({ theme }) => theme.primary.default};

@@ -193,7 +193,7 @@ function CircleButton({ index, item }: { index: number; item: { text: string; li
         background-color: ${primary ? theme.primary.bg : theme.gray[3]};
         border-radius: ${theme.radius.btn};
         &:hover {
-          color: ${primary ? theme.white : theme.text[1]};
+          color: ${primary ? theme.default : theme.text[1]};
           background-color: ${primary ? theme.primary.hover : theme.gray[2]};
         }
       `}

@@ -32,7 +32,9 @@ export interface DocsConfig {
   }
 
   /* 主题文件路径 */
-  theme?: string[]
+  theme?: {
+    custom?: string[]
+  }
 
   /* 多语言 */
   lang?: {
@@ -54,6 +56,9 @@ export interface DocsConfig {
   sidebar?: LinkItem[]
   /* 自定义功能性图标 */
   actions?: LinkItem[]
+
+  /* 搜索 */
+  search?: boolean | {}
 
   /* 静态资源服务器配置 */
   server?: {

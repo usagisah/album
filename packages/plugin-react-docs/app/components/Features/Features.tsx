@@ -33,7 +33,7 @@ const FeaturesContainer = styled.div`
     display: flex;
     flex-direction: column;
     padding: 24px;
-    background-color: ${({ theme }) => theme.white};
+    background-color: ${({ theme }) => theme.default};
     border-radius: ${({ theme }) => theme.radius.large};
   }
 

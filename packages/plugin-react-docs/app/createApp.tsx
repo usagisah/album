@@ -1,13 +1,12 @@
 import themeConfigs, { ThemeConfig } from "@docs/site-theme"
 import { ThemeProvider } from "@emotion/react"
 import { PageContext } from "album.docs"
-import { Collapse, Switch } from "antd"
-import { FC } from "react"
+import { theme as AntTheme, Collapse, ConfigProvider } from "antd"
+import { FC, useState } from "react"
 import { Category } from "./components/Category/Category"
 import { EditInfo } from "./components/EditInfo/EditInfo"
 import { Features } from "./components/Features/Features"
 import { Footer } from "./components/Footer/Footer"
-import { Github } from "./components/Github/Github"
 import { Header } from "./components/Header/Header"
 import { IconDown } from "./components/Icon/IconDown"
 import { IconMenuOutlined } from "./components/Icon/IconMenuOutlined"
@@ -19,10 +18,10 @@ import { PrevNext } from "./components/PrevNext/PrevNext"
 import { SelectMenu } from "./components/SelectMenu/SelectMenu"
 import { Sidebar } from "./components/Sidebar/Sidebar"
 import { AppProvide } from "./hooks/useAppContext"
-import { useThemeMode } from "./hooks/useThemeMode"
+import { useTheme } from "./hooks/useTheme"
 import { DocsLayout } from "./layout/Docs/Docs"
 import { HomeLayout } from "./layout/Home/Home"
-import { GlobalStyle, THEME } from "./theme"
+import { GlobalStyle } from "./theme"
 
 async function mergeThemeConfig(defaultConfig: ThemeConfig) {
   let c = defaultConfig
@@ -44,12 +43,10 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
       Features,
       Header,
       Footer,
-      Github,
       Lang,
       EditInfo,
       Sidebar,
       PrevNext,
-      Switch,
       Category,
       Collapse,
       Content,
@@ -84,7 +81,13 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
   }
 
   return () => {
-    appContext.theme = useThemeMode()
+    const [_, flush] = useState(0)
+    appContext.fullFlush = () => flush(Math.random())
+
+    const _theme = useTheme()
+    appContext.components.ThemeAction = _theme.ThemeAction
+    appContext.theme = _theme
+
     let Layout = themeConfig.layouts[appContext.layout]
     if (!Layout) {
       Layout = themeConfig.layouts.default
@@ -92,9 +95,11 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
     }
     return (
       <AppProvide context={appContext}>
-        <ThemeProvider theme={THEME}>
-          <GlobalStyle theme={THEME} />
-          <Layout />
+        <ThemeProvider theme={_theme.style}>
+          <ConfigProvider theme={{ algorithm: _theme.currentTheme === "light" ? AntTheme.defaultAlgorithm : AntTheme.darkAlgorithm }}>
+            <GlobalStyle theme={_theme.style} />
+            <Layout />
+          </ConfigProvider>
         </ThemeProvider>
       </AppProvide>
     )

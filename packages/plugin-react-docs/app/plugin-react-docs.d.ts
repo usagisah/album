@@ -1,3 +1,4 @@
+
 declare module "@docs/site-theme" {
   import { FC } from "react"
 
@@ -19,6 +20,7 @@ declare module "@docs/site-config" {
 }
 
 declare module "album.docs" {
+  import { Theme } from "@emotion/react"
   export interface LinkItem {
     label?: string
     link?: string
@@ -34,6 +36,8 @@ declare module "album.docs" {
   }
 
   export interface PageContext {
+    fullFlush: () => void
+
     /* 所有 url 的前缀 */
     base: string
 
@@ -67,6 +71,9 @@ declare module "album.docs" {
     /* 自定义功能性图标 */
     actions: LinkItem[]
 
+    /* 搜索 */
+    search: boolean | {}
+
     /* 路由文档目录信息 */
     category: Category[]
     /* 路由文档元信息 */
@@ -84,8 +91,12 @@ declare module "album.docs" {
 
     /* 主题信息 */
     theme: {
-      themeMode: string
+      list: string[]
+      readonly style: Theme
+      readonly currentTheme: string
+      readonly themeMode: string
       setThemeMode: (mode: string) => void
+      ThemeAction: any
     }
 
     /* 当前使用的布局 */

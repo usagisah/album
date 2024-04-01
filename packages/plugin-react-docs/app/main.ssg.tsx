@@ -41,6 +41,11 @@ export async function ssgRender({ url, siteConfig, entryPath, importPath, conten
     <title>${siteConfig.title.value}</title>
     ${head.join("")}
     ${styles}
+    <script>
+      let m = localStorage.getItem("_site-theme-mode")
+      if (m === "system") m = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
+      document.documentElement.classList.add(m)
+    </script>
   </head>
   <body>
     <div id="album-docs">

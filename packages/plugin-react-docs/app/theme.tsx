@@ -1,8 +1,14 @@
 import { Global, Theme, css } from "@emotion/react"
 
-export const THEME: Theme = {
+export const LIGHT: Theme = {
   white: "#fff",
-  black: "#000",
+  default: "#fff",
+  reverse: "#000",
+  bg: {
+    default: "#f8f9fb",
+    content: "#f8f9fb",
+    highlight: "#eeeff0"
+  },
   text: {
     1: "#3c3c43", // rgb(60, 60, 67)
     2: "#3c3c43c7", // rgba(60, 60, 67, 0.78)
@@ -18,13 +24,83 @@ export const THEME: Theme = {
     1: "#dddde3",
     2: "#e4e4e9",
     3: "#ebebef",
-    bg: "#f8f9fb",
     block: "#f6f6f7"
   },
   primary: {
     default: "#1677ff",
     hover: "#1677ffcc",
     bg: "#409eff"
+  },
+  info: {
+    color: "#3c3c43",
+    bg: "#8e96aa23"
+  },
+  tip: {
+    color: "#303032",
+    bg: "#646cff23"
+  },
+  warn: {
+    color: "#3c3c43",
+    bg: "#eab30824"
+  },
+  danger: {
+    color: "#3c3c43",
+    bg: "#f43f5e24"
+  },
+  radius: {
+    small: "4px",
+    default: "8px",
+    large: "12px",
+    btn: "20px",
+    max: "%50"
+  }
+}
+export const DARK: Theme = {
+  white: "#fff",
+  default: "#000",
+  bg: {
+    default: "#1b1b1f",
+    content: "transparent",
+    highlight: "#65758528"
+  },
+  reverse: "#fff",
+  text: {
+    1: "#fffff5db", // rgba(255, 255, 245, .86)
+    2: "#ebebf599", // rgba(235, 235, 245, .6)
+    3: "#ebebf560" // rgba(235, 235, 245, .38)
+  },
+  border: {
+    default: "#3c3f44"
+  },
+  divider: {
+    default: "#2e2e32"
+  },
+  gray: {
+    1: "#515c67",
+    2: "#414853",
+    3: "#32363f",
+    block: "transparent"
+  },
+  primary: {
+    default: "#1677ff",
+    hover: "#1677ffcc",
+    bg: "#409eff"
+  },
+  info: {
+    color: "#fffff5db",
+    bg: "#65758528"
+  },
+  tip: {
+    color: "#fffff5db",
+    bg: "#646cff28"
+  },
+  warn: {
+    color: "#fffff5db",
+    bg: "#eab30828"
+  },
+  danger: {
+    color: "#fffff5db",
+    bg: "#f43f5e28"
   },
   radius: {
     small: "4px",
@@ -89,7 +165,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           font-size: 16px;
           font-weight: 400;
           color: ${theme.text[1]};
-          background: ${theme.gray.bg};
+          background: ${theme.bg.default};
         }
 
         hr {
@@ -317,6 +393,27 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           display: none;
         }
 
+        /* -------------- shiki -------------- */
+        @media (prefers-color-scheme: dark) {
+          .shiki,
+          .shiki span {
+            color: var(--shiki-dark) !important;
+            background-color: var(--shiki-dark-bg);
+            font-style: var(--shiki-dark-font-style) !important;
+            font-weight: var(--shiki-dark-font-weight) !important;
+            text-decoration: var(--shiki-dark-text-decoration) !important;
+          }
+        }
+
+        html.dark .shiki,
+        html.dark .shiki span {
+          color: var(--shiki-dark) !important;
+          background-color: var(--shiki-dark-bg);
+          font-style: var(--shiki-dark-font-style) !important;
+          font-weight: var(--shiki-dark-font-weight) !important;
+          text-decoration: var(--shiki-dark-text-decoration) !important;
+        }
+
         /* -------------- docs.css -------------- */
         .u-container {
           position: relative;
@@ -377,28 +474,28 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
         }
 
         .u-block-info {
-          color: ${theme.text[1]};
-          background-color: ${theme.gray.block};
+          color: ${theme.info.color};
+          background-color: ${theme.info.bg};
         }
 
         .u-block-tip {
-          color: ${theme.text[1]};
-          background-color: #646cff24;
+          color: ${theme.tip.color};
+          background-color: ${theme.tip.bg};
         }
 
         .u-block-warn {
-          color: ${theme.text[1]};
-          background-color: #eab30824;
+          color: ${theme.warn.color};
+          background-color: ${theme.warn.bg};
         }
 
         .u-block-danger {
-          color: ${theme.text[1]};
-          background-color: #f43f5e24;
+          color: ${theme.danger.color};
+          background-color: ${theme.danger.bg};
         }
 
         .u-block-details {
-          color: ${theme.text[1]};
-          background-color: ${theme.gray.block};
+          color: ${theme.info.color};
+          background-color: ${theme.info.bg};
         }
 
         /* -------------- code -------------- */
@@ -446,12 +543,15 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
         }
 
         .u-code-copy {
+          padding: 8px;
           position: absolute;
           top: 8px;
           right: 8px;
           font-size: 16px;
-          color: ${theme.text[2]};
+          color: ${theme.reverse};
+          font-weight: 800;
           opacity: 0;
+          border-radius: ${theme.radius.small};
           cursor: pointer;
         }
 
@@ -462,14 +562,14 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
         .u-code-copy svg {
           width: 16px;
           height: 16px;
-          fill: #3c3c438f;
+          fill: ${theme.reverse};
           cursor: pointer;
         }
 
-        .u-code-highlighted {
+        html body .shiki span.u-code-highlighted {
           display: inline-block;
           width: 100%;
-          background-color: ${theme.gray.block};
+          background-color: ${theme.bg.highlight}!important;
           border-radius: ${theme.radius.small};
         }
 
@@ -486,14 +586,14 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
 
         .u-table th {
           padding: 4px;
-          border: 1px solid #e5e7eb;
-          background-color: #f5f5f5;
+          border: 1px solid ${theme.border.default};
+          background-color: transparent;
           font-weight: bold;
         }
 
         .u-table td {
           padding: 4px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid ${theme.border.default};
         }
 
         /* -------------- line -------------- */
@@ -530,7 +630,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           font-weight: 400;
           opacity: 0;
         }
-        
+
         .u-h-anchor:hover {
           opacity: 1;
           color: ${theme.primary.default};
@@ -633,7 +733,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           margin: 0 4px;
           padding: 2px 4px;
           color: ${theme.primary.default};
-          background-color: #8e96aa23;
+          background-color: ${theme.bg.highlight};
           font-weight: 400;
           border-radius: ${theme.radius.small};
           transition:
@@ -654,27 +754,6 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           padding: 0;
           width: 100%;
           height: 40px;
-        }
-
-        /* -------------- shiki -------------- */
-        @media (prefers-color-scheme: dark) {
-          .shiki,
-          .shiki span {
-            color: var(--shiki-dark) !important;
-            background-color: var(--shiki-dark-bg) !important;
-            font-style: var(--shiki-dark-font-style) !important;
-            font-weight: var(--shiki-dark-font-weight) !important;
-            text-decoration: var(--shiki-dark-text-decoration) !important;
-          }
-        }
-
-        html.dark .shiki,
-        html.dark .shiki span {
-          color: var(--shiki-dark) !important;
-          background-color: var(--shiki-dark-bg) !important;
-          font-style: var(--shiki-dark-font-style) !important;
-          font-weight: var(--shiki-dark-font-weight) !important;
-          text-decoration: var(--shiki-dark-text-decoration) !important;
         }
       `}
     />

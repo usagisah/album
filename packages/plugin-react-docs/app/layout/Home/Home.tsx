@@ -7,7 +7,7 @@ const HomeContainer = styled.div(({ theme }) => ({
   flexDirection: "column",
   minHeight: "100vh",
   minWidth: "375px",
-  background: theme.gray.bg
+  background: theme.bg.default
 }))
 
 export function HomeLayout() {

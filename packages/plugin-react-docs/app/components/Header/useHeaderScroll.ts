@@ -4,7 +4,7 @@ import { useScroll } from "../../hooks/useScroll"
 
 export function useHeaderScroll() {
   const theme = useTheme()
-  const glideStyle = { background: theme.gray.bg, borderBottom: `1px solid ${theme.gray.bg}` }
+  const glideStyle = { background: theme.bg.default, borderBottom: `1px solid ${theme.bg.default}` }
   const onScroll = () => {
     if (window.innerWidth < 1000) {
       return
@@ -20,7 +20,7 @@ export function useHeaderScroll() {
   useScroll(onScroll)
   useEffect(() => {
     onScroll()
-  }, [])
+  }, [theme])
   const [style, setStyle] = useState<CSSProperties>({})
   return style
 }

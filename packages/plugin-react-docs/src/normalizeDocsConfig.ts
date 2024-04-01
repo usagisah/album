@@ -34,7 +34,9 @@ function validate(config: DocsConfig) {
       href: string().optional()
     }).optional(),
 
-    theme: array(string(), { invalid_type_error: "docs.theme 必须是一个指向实际主题入口文件的字符串数组" }).optional(),
+    theme: object({
+      custom: array(string(), { invalid_type_error: "docs.theme.custom 必须是一个指向实际主题入口文件的字符串数组" }).optional()
+    }).optional(),
 
     lang: object(
       {
@@ -72,19 +74,22 @@ export function normalizeDocsConfig(config: DocsConfig) {
   validate(config)
 
   const { head = [], script = [], server, theme, ...siteConfig } = config
+  const { base, title, icon, logo, description, keywords, lang, footer, navList, actions, sidebar, search } = siteConfig
 
-  let resolveThemeFile = (cwd: string) => "export default []"
+  let resolveThemeFile = (cwd: string) => `export default []`
   if (theme) {
-    resolveThemeFile = cwd => {
-      const exporter: string[] = []
-      const importers = theme.map((item, index) => {
-        return `import T${index}from ${resolve(cwd, item)}`
-      })
-      return importers.join("\n") + "\n" + `export default [${exporter.join(",")}]\n`
+    if (theme.custom) {
+      const { custom } = theme
+      resolveThemeFile = cwd => {
+        const exporter: string[] = []
+        const importers = custom.map((item, index) => {
+          return `import T${index}from ${resolve(cwd, item)}/client`
+        })
+        return importers.join("\n") + "\n" + `export default [${exporter.join(",")}]\n`
+      }
     }
   }
 
-  const { base, title, icon, logo, description, keywords, lang, footer, navList, actions, sidebar } = siteConfig
   if (!base) siteConfig.base = ""
 
   if (!title) siteConfig.title = { sep: "|", value: "Album" }
@@ -135,6 +140,8 @@ export function normalizeDocsConfig(config: DocsConfig) {
   if (!navList) siteConfig.navList = []
   if (!actions) siteConfig.actions = []
   if (!sidebar) siteConfig.sidebar = []
+
+  if (!search) siteConfig.search = false
 
   return { head, script, resolveThemeFile, server, siteConfig }
 }

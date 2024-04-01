@@ -16,7 +16,7 @@ export async function parseMdToReact(mdContent: string, config: ParseMDConfig) {
     themes: Object.keys(bundledThemes),
     langs: Object.keys(bundledLanguages)
   })
-  const categoryQueue: Category[] = [{ level: -1, text: "", children: [] }]
+  const categoryQueue: Category[] = [{ level: -1, label: "", link: "", children: [] }]
   return {
     componentContent: await use({
       extensions: [blockExtension({ className })],
