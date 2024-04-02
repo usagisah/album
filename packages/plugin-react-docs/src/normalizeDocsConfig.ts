@@ -1,4 +1,4 @@
-import { any, array, boolean, lazy, object, record, string, union } from "@albumjs/tools/lib/zod"
+import { array, boolean, lazy, object, record, string, union } from "@albumjs/tools/lib/zod"
 import mt from "mime-types"
 import { resolve } from "path"
 import { DEFAULT_LOGO } from "./constants.js"
@@ -40,15 +40,12 @@ function validate(config: DocsConfig) {
 
     lang: object(
       {
-        use: string({ invalid_type_error: "docs.lang.use 必须是一个字符串" }).optional(),
-        select: array(
+        actions: array(
           object({
-            label: string().optional(),
-            link: string().optional(),
-            icon: string().optional()
+            label: string(),
+            link: string().optional()
           })
-        ).optional(),
-        locales: record(any(), { invalid_type_error: "docs.lang.locales 必须是一个包含多种语言的配置 json 对象" }).optional()
+        ).optional()
       },
       { invalid_type_error: "docs.lang 必须是一个包含多语言配置的对象" }
     ).optional(),
@@ -121,16 +118,12 @@ export function normalizeDocsConfig(config: DocsConfig) {
   }
 
   if (!lang) {
-    siteConfig.lang = { use: "", select: [], locales: {} }
+    siteConfig.lang = { actions: [] }
   } else {
-    const { use, select, locales } = lang
-    if (select.length > 0 && !use) {
-      siteConfig.lang.use = select[0].label
+    const { actions } = lang
+    if (!actions) {
+      siteConfig.lang = { actions: [] }
     }
-
-    if (!use) siteConfig.lang.use = ""
-    if (!select) siteConfig.lang.select = []
-    if (!locales) siteConfig.lang.locales = {}
   }
 
   if (!footer) {

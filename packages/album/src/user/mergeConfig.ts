@@ -8,14 +8,14 @@ export function mergeConfig(conf1: AlbumUserConfig, conf2: AlbumUserConfig, chec
     checkUserConfig(conf1)
     checkUserConfig(conf2)
   }
-  return mergeConfigRecursively(conf1, conf2)
+  return mergeConfigRecursively(conf1, conf2, "")
 }
 
-export function mergeConfigRecursively(conf1: AlbumUserConfig, conf2: AlbumUserConfig) {
+export function mergeConfigRecursively(conf1: any, conf2: any, prefix: string) {
   const merged = { ...conf1 }
   for (const key of Object.getOwnPropertyNames(conf2)) {
-    const mValue = merged[key]
-    const value = conf2[key]
+    let mValue = merged[key]
+    let value = conf2[key]
 
     if (isUndefined(mValue) || key === "logger") {
       merged[key] = value
@@ -27,10 +27,21 @@ export function mergeConfigRecursively(conf1: AlbumUserConfig, conf2: AlbumUserC
         throw "合并配置时，新的 config.app 不能是一个数组"
       }
       if (isArray(mValue)) {
-        merged.app = mValue.map(item => mergeConfigRecursively(item, value)) as any
+        merged.app = mValue.map(item => mergeConfigRecursively(item, value, "/app"))
       } else {
-        merged.app = mergeConfigRecursively(mValue, value) as any
+        merged.app = mergeConfigRecursively(mValue, value, "/app")
       }
+      continue
+    }
+
+    if (key === "module" && prefix === "/app") {
+      if (!isArray(value)) {
+        value = [value]
+      }
+      if (isArray(mValue)) {
+        mValue = [mValue]
+      }
+      merged.module = [...mValue, ...value]
       continue
     }
 
@@ -50,7 +61,7 @@ export function mergeConfigRecursively(conf1: AlbumUserConfig, conf2: AlbumUserC
     }
 
     if (isPlainObject(value)) {
-      merged[key] = mergeConfigRecursively(mValue, value)
+      merged[key] = mergeConfigRecursively(mValue, value, `${prefix}/${key}`)
       continue
     }
 

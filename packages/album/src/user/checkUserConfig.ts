@@ -17,6 +17,18 @@ const envValidator = array(
   { invalid_type_error: "config.env 必须是一个数组" }
 ).optional()
 
+const appModule = object(
+  {
+    path: string({ invalid_type_error: "config.app.module.path 必须是一个字符串" }).optional(),
+    name: string({ invalid_type_error: "config.app.module.name 必须是一个字符串" }).optional(),
+    ignore: array(union([string(), regexp()], { invalid_type_error: "config.app.module.ignore 必须是一个(正则|字符串)数组" })).optional(),
+    pageFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.pageFilter 必须是一个(正则|字符串)" }).optional(),
+    routerFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.routerFilter 必须是一个(正则|字符串)" }).optional(),
+    actionFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.actionFilter 必须是一个(正则|字符串)" }).optional(),
+    fileExtensions: array(union([string(), regexp()], { invalid_type_error: "config.app.module.fileExtensions 必须是一个(正则|字符串)数组" })).optional()
+  },
+  { invalid_type_error: "config.app.module 必须是一个对象" }
+).optional()
 const appValidator = object({
   id: string({ invalid_type_error: "config.app.id 必须是一个字符串" }).optional(),
   main: string({ invalid_type_error: "config.app.main 必须是一个字符串" }).optional(),
@@ -27,18 +39,7 @@ const appValidator = object({
     },
     { invalid_type_error: "config.app.ssrRender 必须是一个对象" }
   ).optional(),
-  module: object(
-    {
-      path: string({ invalid_type_error: "config.app.module.path 必须是一个字符串" }).optional(),
-      name: string({ invalid_type_error: "config.app.module.name 必须是一个字符串" }).optional(),
-      ignore: array(union([string(), regexp()], { invalid_type_error: "config.app.module.ignore 必须是一个(正则|字符串)数组" })).optional(),
-      pageFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.pageFilter 必须是一个(正则|字符串)" }).optional(),
-      routerFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.routerFilter 必须是一个(正则|字符串)" }).optional(),
-      actionFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.actionFilter 必须是一个(正则|字符串)" }).optional(),
-      fileExtensions: array(union([string(), regexp()], { invalid_type_error: "config.app.module.fileExtensions 必须是一个(正则|字符串)数组" })).optional()
-    },
-    { invalid_type_error: "config.app.module 必须是一个对象" }
-  ).optional(),
+  module: union([appModule, array(appModule)]).optional(),
   router: object(
     {
       basename: string({ invalid_type_error: "config.app.router.basename 必须是一个字符串" }).optional(),

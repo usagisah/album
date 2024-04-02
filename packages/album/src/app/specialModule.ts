@@ -6,17 +6,21 @@ import { AlbumContext } from "../context/context.dev.type.js"
 import { ILogger } from "../logger/logger.type.js"
 import { AppManagerModule, AppSpecialModule, AppSpecialModuleDir, AppSpecialModuleFile } from "./app.dev.type.js"
 
-export async function buildSpecialModules(context: AlbumContext): Promise<AppSpecialModule[]> {
+export function buildSpecialModules(context: AlbumContext): Promise<AppSpecialModule[][]> {
   const { ssrCompose, appManager, logger } = context
-  const { module } = appManager
-  if (isBlank(module.modulePath)) {
-    throw "make-special-module 发现约定式模块入口为空"
-  }
-  if (ssrCompose) {
-    const res = await resolveModules({ logger, parentModule: null, ...module })
-    return res ? [res] : []
-  }
-  return await walkModules({ logger, parentModule: null, ...module })
+  const { modules } = appManager
+  return Promise.all(
+    modules.map(async module => {
+      if (isBlank(module.modulePath)) {
+        throw "make-special-module 发现约定式模块入口为空"
+      }
+      return await walkModules({ logger, parentModule: null, ...module })
+    })
+  )
+  // if (ssrCompose) {
+  //   const res = await resolveModules({ logger, parentModule: null, ...module })
+  //   return res ? [res] : []
+  // }
 }
 
 type ParseRouterParams = AppManagerModule & {

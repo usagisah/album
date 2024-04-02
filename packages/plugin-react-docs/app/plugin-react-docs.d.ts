@@ -1,4 +1,3 @@
-
 declare module "@docs/site-theme" {
   import { FC } from "react"
 
@@ -56,9 +55,7 @@ declare module "album.docs" {
 
     /* 多语言 */
     lang: {
-      use: string
-      select: { label?: string; link?: string; icon?: string }[]
-      locales: Record<string, any>
+      locales: { key: string; label: string; link: string }[]
     }
 
     /* html.footer */

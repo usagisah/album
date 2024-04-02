@@ -30,7 +30,7 @@ export type PluginFindEntriesParam = {
   appId: string
   main?: string
   mainSSR?: string
-  module?: UserConfigAppModule
+  modules?: UserConfigAppModule[]
   router?: UserConfigAppRouter
   appConfig: UserConfigApp
 } & PluginGlobalMessage
@@ -49,9 +49,9 @@ export type PluginInitClientParam = {
     mainInput: string
     mainSSRInput: string | null
     ssrRender: AppManagerSSRRender
-    module: AppManagerModule
+    modules: AppManagerModule[]
     router: AppManagerRouter
-    specialModules: AppSpecialModule[]
+    specialModules: AppSpecialModule[][]
   }
   appFileManager: FileManager
   dumpFileManager: FileManager
@@ -68,9 +68,9 @@ export type PluginPatchClientParam = {
     mainInput: string
     mainSSRInput: string | null
     ssrRender: AppManagerSSRRender
-    module: AppManagerModule
+    modules: AppManagerModule[]
     router: AppManagerRouter
-    specialModules: AppSpecialModule[]
+    specialModules: AppSpecialModule[][]
   }
   appFileManager: FileManager
   dumpFileManager: FileManager

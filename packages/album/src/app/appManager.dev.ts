@@ -28,14 +28,14 @@ export async function createAppManager(config: AppManagerConfig) {
     main: mainInput,
     mainSSR: mainSSRInput,
     router: _routerConfig,
-    module: _moduleConfig = {}
+    modules: _moduleConfig = []
   } = await pluginManager.execute("findEntries", {
     appId,
     inputs,
     main: c.main,
     mainSSR: c.mainSSR,
     router: c.router,
-    module: c.module,
+    modules: isArray(c.module) ? c.module : c.module ? [c.module] : [],
     appConfig: c
   })
 
@@ -70,29 +70,35 @@ export async function createAppManager(config: AppManagerConfig) {
     routerConfig.redirect = redirect
   }
 
-  const moduleName = _moduleConfig.name ?? "modules"
-  const moduleConfig: AppManagerModule = {
-    moduleName,
-    modulePath:
-      _moduleConfig.path ??
-      (await resolveDirPath({
-        root: inputs.cwd,
-        name: moduleName,
-        prefixes: ["./", "src"]
-      })),
-    ignore: [/(^\.)|(^_)|(^common)|(^components)|(^node_modules)/],
-    pageFilter: isRegExp(_moduleConfig.pageFilter) ? _moduleConfig.pageFilter : /^[a-zA-Z]+\.page$|^page$/,
-    routerFilter: isRegExp(_moduleConfig.routerFilter) ? _moduleConfig.routerFilter : /^[a-zA-Z]+\.router$|^router$/,
-    actionFilter: isRegExp(_moduleConfig.actionFilter) ? _moduleConfig.actionFilter : /^[a-zA-Z]+\.action$|^action$/,
-    fileExtensions: [/\.ts$/, /\.tsx$/].concat(isArray(_moduleConfig.fileExtensions) ? (_moduleConfig.fileExtensions as RegExp[]) : [])
-  }
-  if (!moduleConfig.modulePath) {
-    throw `找不到${c.module?.path ? "指定的" : "默认的"} app.module.path 入口`
-  }
-  if (isArray(_moduleConfig.ignore)) {
-    const ignores = _moduleConfig.ignore.map(v => (isRegExp(v) ? v : new RegExp(`^${v}`)))
-    moduleConfig.ignore.push(...ignores)
-  }
+  const modulesConfig: AppManagerModule[] = await Promise.all(
+    _moduleConfig.map(async m => {
+      const { name, path, pageFilter, routerFilter, actionFilter, fileExtensions, ignore } = m
+      const moduleName = name ?? "modules"
+      const moduleConfig: AppManagerModule = {
+        moduleName,
+        modulePath:
+          path ??
+          (await resolveDirPath({
+            root: inputs.cwd,
+            name: moduleName,
+            prefixes: ["./", "src"]
+          })),
+        ignore: [/(^\.)|(^_)|(^common)|(^components)|(^node_modules)/],
+        pageFilter: isRegExp(pageFilter) ? pageFilter : /^[a-zA-Z]+\.page$|^page$/,
+        routerFilter: isRegExp(routerFilter) ? routerFilter : /^[a-zA-Z]+\.router$|^router$/,
+        actionFilter: isRegExp(actionFilter) ? actionFilter : /^[a-zA-Z]+\.action$|^action$/,
+        fileExtensions: [/\.ts$/, /\.tsx$/].concat(isArray(fileExtensions) ? (fileExtensions as RegExp[]) : [])
+      }
+      if (!moduleConfig.modulePath) {
+        throw `找不到${path ? "指定的" : "默认的"} app.module.path 入口`
+      }
+      if (isArray(ignore)) {
+        const ignores = ignore.map(v => (isRegExp(v) ? v : new RegExp(`^${v}`)))
+        moduleConfig.ignore.push(...ignores)
+      }
+      return moduleConfig
+    })
+  )
 
   const ssrRender: AppManagerSSRRender = { sendMode: c.ssrRender?.sendMode ?? "string" }
   const manager: AppManager = {
@@ -100,7 +106,7 @@ export async function createAppManager(config: AppManagerConfig) {
     mainSSRInput,
     ssrRender,
     router: routerConfig,
-    module: moduleConfig,
+    modules: modulesConfig,
     realClientInput: "",
     realSSRInput: "",
     specialModules: []

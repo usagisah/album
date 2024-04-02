@@ -33,7 +33,7 @@ export async function createSSRComposeManager(context: AlbumContext) {
   }
 
   const projectMap: Map<string, SSRComposeProject | StartProject> = (await createModuleInfo(_rewrites.encode, _startRoot)).projectMap
-  const { modulePath, ignore } = appManager.module
+  const { modulePath, ignore } = appManager.modules[0]
   const localModuleRoot = dirname(modulePath)
   for (const fileInfo of await readdir(localModuleRoot, { withFileTypes: true })) {
     if (!fileInfo.isDirectory()) continue

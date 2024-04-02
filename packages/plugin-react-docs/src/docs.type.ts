@@ -38,9 +38,7 @@ export interface DocsConfig {
 
   /* 多语言 */
   lang?: {
-    use?: string
-    select?: { label?: string; link?: string; icon?: string }[]
-    locales?: Record<string, any>
+    actions?: { label: string; link?: string }[]
   }
 
   /* 自定义 head */

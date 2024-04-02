@@ -23,10 +23,10 @@ export type AppManager = {
   mainInput: string
   mainSSRInput: string | null
   ssrRender: AppManagerSSRRender
-  module: AppManagerModule
+  modules: AppManagerModule[]
   router: AppManagerRouter
 
-  specialModules: AppSpecialModule[]
+  specialModules: AppSpecialModule[][]
   realClientInput: string
   realSSRInput: string
 }

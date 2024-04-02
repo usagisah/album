@@ -3,16 +3,16 @@ import { resolve, sep } from "path"
 import { AlbumContext } from "../../context/context.dev.type.js"
 
 export async function buildCoordinate(context: AlbumContext) {
-  if (!context.ssrComposeManager || !context.appManager.module.modulePath) return
+  if (!context.ssrComposeManager || !context.appManager.modules[0].modulePath) return
 
   const { inputs, outputs, appManager, ssrComposeManager, logger } = context
-  const { module } = appManager
+  const { modulePath } = appManager.modules[0]
 
   const { castExtensions } = ssrComposeManager
   const { cwd } = inputs
   const { clientOutDir } = outputs
   const manifest = JSON.parse(await readFile(`${clientOutDir}${sep}.vite/manifest.json`, "utf-8"))
-  const moduleRoot = resolve(module.modulePath, "../").slice(cwd.length + 1)
+  const moduleRoot = resolve(modulePath, "../").slice(cwd.length + 1)
 
   const _coordinate: Record<string, string> = {}
   for (const key of Object.getOwnPropertyNames(manifest)) {

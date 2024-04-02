@@ -13,7 +13,7 @@ function ThemeAction() {
   const items = list.map(item => {
     return {
       key: item,
-      label: item === themeMode ? <strong onClick={() => setThemeMode(item)}>{item}</strong> : <span onClick={() => setThemeMode(item)}>{item}</span>
+      label:<span onClick={() => setThemeMode(item)}>{item}</span>
     }
   })
   return (
@@ -39,6 +39,7 @@ export function useTheme() {
   let themeMode = globalThis.localStorage?.getItem("_site-theme-mode") ?? "light"
   let currentTheme = themeMode === "system" ? resolveSystemTheme() : themeMode
   const [style, setStyle] = useState(currentTheme === "light" ? LIGHT : DARK)
+  const [_, flush] = useState(Math.random())
 
   const setThemeMode = (mode: string) => {
     if (!THEME_LIST.includes(mode)) {
@@ -54,8 +55,9 @@ export function useTheme() {
     if (cur !== currentTheme) {
       document.documentElement.classList.replace(currentTheme, cur)
       currentTheme = cur
-      setStyle(currentTheme === "light" ? LIGHT : DARK)
+      return setStyle(currentTheme === "light" ? LIGHT : DARK)
     }
+    flush(Math.random())
   }
 
   useEffect(() => {

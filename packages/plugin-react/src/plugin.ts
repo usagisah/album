@@ -53,7 +53,7 @@ export default function pluginReact(config?: PluginReact): AlbumUserPlugin {
       const { info, appManager } = config
       const { ssr, inputs } = info
       const { specialModules } = appManager
-      const { clientRoutes, serverRoutes } = await buildReactRoutes(inputs.dumpInput, specialModules)
+      const { clientRoutes, serverRoutes } = await buildReactRoutes(inputs.dumpInput, specialModules[0])
       await pluginInitFile(clientRoutes, serverRoutes, config)
       config.realClientInput = resolve(inputs.dumpInput, "main.tsx")
       if (ssr) config.realSSRInput = resolve(inputs.dumpInput, "main.ssr.tsx")
@@ -62,7 +62,7 @@ export default function pluginReact(config?: PluginReact): AlbumUserPlugin {
       const { info, appManager } = param
       const { inputs } = info
       const { specialModules } = appManager
-      const { clientRoutes, serverRoutes } = await buildReactRoutes(inputs.dumpInput, specialModules)
+      const { clientRoutes, serverRoutes } = await buildReactRoutes(inputs.dumpInput, specialModules[0])
       await pluginPatchFile(clientRoutes, serverRoutes, param)
     },
     async serverConfig(params) {
@@ -79,7 +79,7 @@ export default function pluginReact(config?: PluginReact): AlbumUserPlugin {
     async buildEnd() {
       const { ssr, ssrCompose, inputs, outputs, appManager, ssrComposeManager, logger } = albumContext
       if (ssr && ssrCompose) {
-        const { module } = appManager
+        const module = appManager.modules[0]
         if (!module || !module.modulePath) return
 
         logger.log("正在打包 ssr-compose 前置文件，请耐心等待...", "plugin-react")
