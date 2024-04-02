@@ -1,5 +1,5 @@
 import { AlbumContext } from "../context/context.dev.type.js"
-import { buildSpecialModules } from "./specialModule.js"
+import { buildSpecialModules } from "./specialModules/specialModules.js"
 
 export async function initClient(context: AlbumContext) {
   const { appManager, fileManager, pluginManager, getStaticInfo } = context

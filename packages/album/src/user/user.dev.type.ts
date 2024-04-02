@@ -20,6 +20,7 @@ export interface UserConfigAppModule {
   routerFilter?: string | RegExp
   actionFilter?: string | RegExp
   fileExtensions?: (string | RegExp)[]
+  iteration?: "flat"
 }
 
 export interface UserConfigAppSSRRender {
@@ -31,7 +32,7 @@ export interface UserConfigApp {
   main?: string
   mainSSR?: string
   ssrRender?: UserConfigAppSSRRender
-  module?: UserConfigAppModule | UserConfigAppModule[]
+  module?: (UserConfigAppModule & Record<string, string>) | UserConfigAppModule[]
   router?: UserConfigAppRouter
 }
 

@@ -71,23 +71,26 @@ export async function createAppManager(config: AppManagerConfig) {
   }
 
   const modulesConfig: AppManagerModule[] = await Promise.all(
-    _moduleConfig.map(async m => {
-      const { name, path, pageFilter, routerFilter, actionFilter, fileExtensions, ignore } = m
+    _moduleConfig.map(async (m, i) => {
+      const { name, path, pageFilter, routerFilter, actionFilter, fileExtensions, ignore, iteration } = m
       const moduleName = name ?? "modules"
       const moduleConfig: AppManagerModule = {
         moduleName,
         modulePath:
-          path ??
-          (await resolveDirPath({
-            root: inputs.cwd,
-            name: moduleName,
-            prefixes: ["./", "src"]
-          })),
+          i === 0
+            ? path ??
+              (await resolveDirPath({
+                root: inputs.cwd,
+                name: moduleName,
+                prefixes: ["./", "src"]
+              }))
+            : null,
         ignore: [/(^\.)|(^_)|(^common)|(^components)|(^node_modules)/],
         pageFilter: isRegExp(pageFilter) ? pageFilter : /^[a-zA-Z]+\.page$|^page$/,
         routerFilter: isRegExp(routerFilter) ? routerFilter : /^[a-zA-Z]+\.router$|^router$/,
         actionFilter: isRegExp(actionFilter) ? actionFilter : /^[a-zA-Z]+\.action$|^action$/,
-        fileExtensions: [/\.ts$/, /\.tsx$/].concat(isArray(fileExtensions) ? (fileExtensions as RegExp[]) : [])
+        fileExtensions: [/\.ts$/, /\.tsx$/].concat(isArray(fileExtensions) ? (fileExtensions as RegExp[]) : []),
+        iteration: iteration ?? null
       }
       if (!moduleConfig.modulePath) {
         throw `找不到${path ? "指定的" : "默认的"} app.module.path 入口`

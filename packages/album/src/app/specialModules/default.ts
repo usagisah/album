@@ -1,27 +1,8 @@
-import { isBlank } from "@albumjs/tools/node"
 import { Dirent } from "fs"
 import { readdir } from "fs/promises"
 import { basename, parse as pathParse, resolve } from "path"
-import { AlbumContext } from "../context/context.dev.type.js"
-import { ILogger } from "../logger/logger.type.js"
-import { AppManagerModule, AppSpecialModule, AppSpecialModuleDir, AppSpecialModuleFile } from "./app.dev.type.js"
-
-export function buildSpecialModules(context: AlbumContext): Promise<AppSpecialModule[][]> {
-  const { ssrCompose, appManager, logger } = context
-  const { modules } = appManager
-  return Promise.all(
-    modules.map(async module => {
-      if (isBlank(module.modulePath)) {
-        throw "make-special-module 发现约定式模块入口为空"
-      }
-      return await walkModules({ logger, parentModule: null, ...module })
-    })
-  )
-  // if (ssrCompose) {
-  //   const res = await resolveModules({ logger, parentModule: null, ...module })
-  //   return res ? [res] : []
-  // }
-}
+import { ILogger } from "../../logger/logger.type.js"
+import { AppManagerModule, AppSpecialModule, AppSpecialModuleDir, AppSpecialModuleFile } from "../app.dev.type.js"
 
 type ParseRouterParams = AppManagerModule & {
   parentModule: AppSpecialModule | null

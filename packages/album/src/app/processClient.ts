@@ -16,12 +16,11 @@ export function processClient(context: AlbumContext) {
         if (pluginManager.getSize("patchClient") === 0) {
           return
         }
-        const m = modules.find(m => p.startsWith(m.modulePath))
-        if (!m) {
+        const ms = modules.filter(m => p.startsWith(m.modulePath))
+        if (ms.length === 0) {
           return
         }
-        const { pageFilter, routerFilter, actionFilter } = m
-        if (type === "unlinkDir" || pageFilter.test(p) || routerFilter.test(p) || actionFilter.test(p)) {
+        if (type === "unlinkDir" || ms.some(m => m.pageFilter.test(p) || m.routerFilter.test(p) || m.actionFilter.test(p))) {
           patchClient(context, { type, path: p })
         }
       }

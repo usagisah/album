@@ -25,7 +25,8 @@ const appModule = object(
     pageFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.pageFilter 必须是一个(正则|字符串)" }).optional(),
     routerFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.routerFilter 必须是一个(正则|字符串)" }).optional(),
     actionFilter: union([string(), regexp()], { invalid_type_error: "config.app.module.actionFilter 必须是一个(正则|字符串)" }).optional(),
-    fileExtensions: array(union([string(), regexp()], { invalid_type_error: "config.app.module.fileExtensions 必须是一个(正则|字符串)数组" })).optional()
+    fileExtensions: array(union([string(), regexp()], { invalid_type_error: "config.app.module.fileExtensions 必须是一个(正则|字符串)数组" })).optional(),
+    iteration: literal("flat", { invalid_type_error: "config.app.module.literal 必须是一个 (undefined|flat)" }).optional()
   },
   { invalid_type_error: "config.app.module 必须是一个对象" }
 ).optional()

@@ -35,6 +35,11 @@ export function mergeConfigRecursively(conf1: any, conf2: any, prefix: string) {
     }
 
     if (key === "module" && prefix === "/app") {
+      if (!isArray(mValue) && !isArray(value)) {
+        merged.module = mergeConfigRecursively(mValue, value, `${prefix}/module`)
+        continue
+      }
+
       if (!isArray(value)) {
         value = [value]
       }
