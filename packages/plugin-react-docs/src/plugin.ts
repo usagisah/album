@@ -34,22 +34,44 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
     routeMap: new Map(),
     albumContext: null
   }
+  const { locales } = context.docsConfig.siteConfig.lang
+  const langDirs = Object.keys(locales).filter(v => v !== "root")
   return {
     name: "album:plugin-react-docs",
 
-    config(config) {
-      if (config.config.ssrCompose) {
+    config(c) {
+      const { config } = c
+      if (config.ssrCompose) {
         console.error(red("使用 plugin-react-docs 插件时，禁止开启 ssr-compose 功能"))
       }
-      config.config = mergeConfig(config.config, {
+      c.config = mergeConfig(config, {
         app: {
           module: {
-            fileExtensions: [/\.md/]
+            path: "contents",
+            pageFilter: /\.md$/,
+            fileExtensions: [/\.md/],
+            iteration: "flat",
+            ignore: langDirs
           }
         },
         ssrCompose: undefined,
         server: { builtinModules: false }
       })
+      if (langDirs.length > 0) {
+        c.config = mergeConfig(c.config, {
+          app: {
+            module: langDirs.map(k => {
+              return {
+                path: "contents/" + k,
+                pageFilter: /\.md$/,
+                fileExtensions: [/\.md/],
+                iteration: "flat",
+                ignore: langDirs.filter(v => v !== k)
+              }
+            })
+          }
+        })
+      }
     },
 
     context({ albumContext }) {
@@ -65,7 +87,7 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
           const typePlugin = `/// <reference types=".album/plugin-react-docs/plugin-react-docs" />`
           return f.includes(typePlugin) ? f : `${f}${typePlugin}\n`
         }),
-        parseModules(appManager.specialModules, context)
+        ...appManager.specialModules.map((m, i) => parseModules(m, context, langDirs[i - 1]))
       ])
     },
 

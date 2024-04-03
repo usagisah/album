@@ -69,10 +69,11 @@ export default defineAlbumConfig<AlbumDocsConfig>({
           copyright: "版权所有 © 2019-2024 尤雨溪"
         },
         lang: {
-          select: [
-            { label: "English", link: "/e" },
-            { label: "中文", link: "/c" }
-          ]
+          locales: {
+            en: {
+              label: "English"
+            }
+          }
         },
 
         actions: [

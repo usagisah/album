@@ -38,16 +38,14 @@ function validate(config: DocsConfig) {
       custom: array(string(), { invalid_type_error: "docs.theme.custom 必须是一个指向实际主题入口文件的字符串数组" }).optional()
     }).optional(),
 
-    lang: object(
-      {
-        actions: array(
-          object({
-            label: string(),
-            link: string().optional()
-          })
-        ).optional()
-      },
-      { invalid_type_error: "docs.lang 必须是一个包含多语言配置的对象" }
+    lang: record(
+      object({
+        locales: object({
+          label: string(),
+          lang: string().optional(),
+          link: string().optional()
+        }).optional()
+      })
     ).optional(),
 
     head: string().optional(),
@@ -118,11 +116,11 @@ export function normalizeDocsConfig(config: DocsConfig) {
   }
 
   if (!lang) {
-    siteConfig.lang = { actions: [] }
+    siteConfig.lang = { locales: {} }
   } else {
-    const { actions } = lang
-    if (!actions) {
-      siteConfig.lang = { actions: [] }
+    const { locales } = lang
+    if (!locales) {
+      siteConfig.lang.locales = {}
     }
   }
 

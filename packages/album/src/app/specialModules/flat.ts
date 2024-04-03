@@ -30,7 +30,6 @@ export async function walkFlatModules(params: ParseRouterParams) {
 
 export async function resolveModules(params: ParseRouterParams) {
   const { root, isFile, modulePath, pageFilter, fileExtensions, ignore, modules } = params
-
   const filename = basename(modulePath)
   if (ignore.some(r => r.test(filename))) {
     return false
@@ -41,20 +40,18 @@ export async function resolveModules(params: ParseRouterParams) {
   }
 
   const fileInfo = pathParse(filename)
-  const appName = fileInfo.ext.length <= 1 ? filename : fileInfo.name
-  if (!pageFilter.test(appName) || !fileExtensions.some(t => t.test(filename))) {
+  if (!pageFilter.test(filename) || !fileExtensions.some(t => t.test(filename))) {
     return false
   }
 
+  const appName = fileInfo.ext.length <= 1 ? filename : fileInfo.name
   let routePath = ""
-  if (root && filename.toLocaleLowerCase() === "home") {
+  if (root && appName.toLocaleLowerCase() === "home") {
     routePath = "/"
-  } else if (root && filename.toLocaleLowerCase() === "error") {
-    routePath = "/*"
+  } else if (root && appName.toLocaleLowerCase() === "error") {
+    routePath = "/404"
   } else {
-    const index = filename.lastIndexOf(".page")
-    const name = filename.slice(0, index)
-    routePath = "/" + name === "index" ? filename : name
+    routePath = "/" + (appName === "index" ? filename : appName)
   }
 
   const pageFile: AppSpecialModuleFile = {

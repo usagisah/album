@@ -43,7 +43,7 @@ export function mergeConfigRecursively(conf1: any, conf2: any, prefix: string) {
       if (!isArray(value)) {
         value = [value]
       }
-      if (isArray(mValue)) {
+      if (!isArray(mValue)) {
         mValue = [mValue]
       }
       merged.module = [...mValue, ...value]

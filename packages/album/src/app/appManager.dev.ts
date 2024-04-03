@@ -1,6 +1,7 @@
 import { format } from "@albumjs/tools/lib/pretty-format"
 import { record, string } from "@albumjs/tools/lib/zod"
 import { isArray, isBlank, isRegExp, resolveDirPath } from "@albumjs/tools/node"
+import { resolve } from "path"
 import { Inputs } from "../context/context.dev.type.js"
 import { PluginManager } from "../plugins/plugin.dev.type.js"
 import { UserConfigApp } from "../user/user.dev.type.js"
@@ -77,17 +78,21 @@ export async function createAppManager(config: AppManagerConfig) {
     _moduleConfig.map(async (m, i) => {
       const { name, path, pageFilter, routerFilter, actionFilter, fileExtensions, ignore, iteration } = m
       const moduleName = name ?? "modules"
+
+      let modulePath = path
+      if (path && !path.startsWith("/")) {
+        modulePath = resolve(inputs.cwd, path)
+      } else if (i === 0) {
+        modulePath = await resolveDirPath({
+          root: inputs.cwd,
+          name: moduleName,
+          prefixes: ["./", "src"]
+        })
+      }
+
       const moduleConfig: AppManagerModule = {
         moduleName,
-        modulePath:
-          i === 0
-            ? path ??
-              (await resolveDirPath({
-                root: inputs.cwd,
-                name: moduleName,
-                prefixes: ["./", "src"]
-              }))
-            : null,
+        modulePath,
         ignore: [/(^\.)|(^_)|(^common)|(^components)|(^node_modules)/],
         pageFilter: isRegExp(pageFilter) ? pageFilter : /^(\$?[a-zA-Z][a-zA-Z0-9]+\.page|page)$/,
         routerFilter: isRegExp(routerFilter) ? routerFilter : /^[a-zA-Z]+\.router$|^router$/,
@@ -99,7 +104,7 @@ export async function createAppManager(config: AppManagerConfig) {
         throw `找不到${path ? "指定的" : "默认的"} app.module.path 入口`
       }
       if (isArray(ignore)) {
-        const ignores = ignore.map(v => (isRegExp(v) ? v : new RegExp(`^${v}`)))
+        const ignores = ignore.map(v => (isRegExp(v) ? v : new RegExp(`^${v}$`)))
         moduleConfig.ignore.push(...ignores)
       }
       return moduleConfig

@@ -38,7 +38,7 @@ export interface DocsConfig {
 
   /* 多语言 */
   lang?: {
-    actions?: { label: string; link?: string }[]
+    locales?: Record<string, { label: string; lang?: string; link?: string }>
   }
 
   /* 自定义 head */

@@ -32,7 +32,7 @@ export interface UserConfigApp {
   main?: string
   mainSSR?: string
   ssrRender?: UserConfigAppSSRRender
-  module?: (UserConfigAppModule & Record<string, string>) | UserConfigAppModule[]
+  module?: UserConfigAppModule | UserConfigAppModule[]
   router?: UserConfigAppRouter
 }
 

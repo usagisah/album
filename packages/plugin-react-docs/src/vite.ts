@@ -96,12 +96,9 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
     },
 
     handleHotUpdate(ctx) {
-      const { file, server } = ctx
-      if (ctx.file.endsWith(".md")) {
-        const { modulePath } = context.albumContext.appManager.module
-        if (file.startsWith(modulePath)) {
-          server.hot.send({ type: "full-reload" })
-        }
+      const { server, file } = ctx
+      if (file.endsWith(".md")) {
+        server.hot.send({ type: "full-reload" })
       }
     }
   }
@@ -130,7 +127,7 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
   ]
 }
 
-function createMDFile(p: { import: string; content: string; fm: Record<string, any>, category: Category[] }) {
+function createMDFile(p: { import: string; content: string; fm: Record<string, any>; category: Category[] }) {
   return `import { usePage } from "album.docs"\n${p.import}
   export default function MarkdownComp(){ 
     const {  } = usePage()
