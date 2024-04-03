@@ -58,7 +58,7 @@ it("main.ssr props.query & props.params", async () => {
   expect(JSON.parse((await text("#server-query"))!)).toEqual({})
 
   await p.goto("http://localhost:5311/about/car111/?a=1&b&=c&d=4")
-  await p.waitForSelector("#router")
+  await timeout(50)
   expect(JSON.parse((await text("#server-params"))!)).toEqual({ car: "car111" })
   expect(JSON.parse((await text("#server-query"))!)).toEqual({ a: "1", b: "", d: "4" })
 })

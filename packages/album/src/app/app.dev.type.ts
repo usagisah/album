@@ -8,7 +8,7 @@ export type AppManagerModule = {
   routerFilter: RegExp
   actionFilter: RegExp
   fileExtensions: RegExp[]
-  iteration: "flat" | null
+  iteration: "flat" | "default"
 }
 
 export type AppManagerRouter = {

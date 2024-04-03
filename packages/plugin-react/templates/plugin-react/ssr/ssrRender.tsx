@@ -20,6 +20,7 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   const { sources } = ssrComposeContext ?? {}
   const { PreRender, mainEntryPath, browserScript } = await SSRServerShared.resolveContext(renderOptions)
 
+  Object.assign(serverRouteData, await resolveRouteActions())
   const requestUrlOptions = req.albumOptions ?? { originalUrl: req.url, pathname: req.path }
   const { App, Head, data, redirect, onAfterSend, onError, render } = normalizeFactoryResult(
     requestUrlOptions.pathname,
@@ -82,7 +83,6 @@ export async function ssrRender(renderOptions: AlbumSSRRenderOptions) {
   }
 
   try {
-    Object.assign(serverRouteData, resolveRouteActions())
     const complete = () => {
       setTimeout(async () => {
         const _res = await onAfterSend?.()

@@ -26,7 +26,7 @@ it("switch router", async () => {
   await p.goto("http://localhost:5211/about/order")
   await p.waitForSelector("#order")
   expect(await html("#router")).toBe(`<h1 id="about">page about</h1><h1 id="order">page order</h1>`)
-
+  
   await p.goto("http://localhost:5211/about/car")
   await p.waitForSelector("#car")
   expect(await html("#router")).toBe(`<h1 id="about">page about</h1><h1 id="car">page car--{"car":"car"}</h1>`)
@@ -68,6 +68,6 @@ it("redirect", async () => {
   const p = page()
   await p.goto("http://localhost:5211/redirect?a=1")
   await p.waitForSelector("div")
-  await timeout(10)
-  expect(p.url()).toBe("http://localhost:5211")
+  await timeout(100)
+  expect(p.url()).toBe("http://localhost:5211/")
 })

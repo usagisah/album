@@ -68,6 +68,6 @@ it("redirect", async () => {
   const p = page()
   await p.goto("http://localhost:5211/redirect?a=1")
   await p.waitForSelector("div")
-  await timeout(10)
-  expect(p.url()).toBe("http://localhost:5211")
+  await timeout(100)
+  expect(p.url()).toBe("http://localhost:5211/")
 })

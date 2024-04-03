@@ -1,4 +1,3 @@
-import { Dirent } from "fs"
 import { readdir } from "fs/promises"
 import { basename, parse as pathParse, resolve } from "path"
 import { ILogger } from "../../logger/logger.type.js"
@@ -31,7 +30,7 @@ export async function resolveDirFiles(params: { findChildModule: boolean; module
   const { findChildModule, moduleName, modulePath, fileExtensions } = params
   const files: AppSpecialModuleFile[] = []
   const dirs: AppSpecialModuleDir[] = []
-  let childModuleDir: Dirent | null = null
+  let childModuleDir: AppSpecialModuleDir | null = null
 
   const dirFiles = await readdir(modulePath, { encoding: "utf-8", withFileTypes: true })
   await Promise.all(
@@ -41,12 +40,18 @@ export async function resolveDirFiles(params: { findChildModule: boolean; module
 
       if (file.isDirectory()) {
         if (findChildModule && filename === moduleName) {
-          childModuleDir = file
+          childModuleDir = {
+            type: "dir",
+            dirs: [],
+            files: [],
+            filename,
+            filepath
+          }
         } else {
           const dir = await resolveDirFiles({
             findChildModule: false,
-            moduleName,
-            modulePath: resolve(modulePath, childModuleDir.name),
+            moduleName: filename,
+            modulePath: filepath,
             fileExtensions
           })
           dirs.push({ type: "dir", filename, filepath, files: dir.files, dirs: dir.dirs })
@@ -93,12 +98,11 @@ export async function resolveModules(params: ParseRouterParams) {
     children: [],
     ...res
   }
-
   if (childModuleDir) {
     specialModule.children = await walkModules({
       ...ps,
-      moduleName,
-      modulePath: resolve(modulePath, childModuleDir.name),
+      moduleName: childModuleDir.filename,
+      modulePath: childModuleDir.filepath,
       fileExtensions,
       ignore,
       parentModule: specialModule,

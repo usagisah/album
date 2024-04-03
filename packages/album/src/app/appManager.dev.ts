@@ -70,6 +70,9 @@ export async function createAppManager(config: AppManagerConfig) {
     routerConfig.redirect = redirect
   }
 
+  if (_moduleConfig.length === 0) {
+    _moduleConfig.push({})
+  }
   const modulesConfig: AppManagerModule[] = await Promise.all(
     _moduleConfig.map(async (m, i) => {
       const { name, path, pageFilter, routerFilter, actionFilter, fileExtensions, ignore, iteration } = m
@@ -86,11 +89,11 @@ export async function createAppManager(config: AppManagerConfig) {
               }))
             : null,
         ignore: [/(^\.)|(^_)|(^common)|(^components)|(^node_modules)/],
-        pageFilter: isRegExp(pageFilter) ? pageFilter : /^[a-zA-Z]+\.page$|^page$/,
+        pageFilter: isRegExp(pageFilter) ? pageFilter : /^(\$?[a-zA-Z][a-zA-Z0-9]+\.page|page)$/,
         routerFilter: isRegExp(routerFilter) ? routerFilter : /^[a-zA-Z]+\.router$|^router$/,
         actionFilter: isRegExp(actionFilter) ? actionFilter : /^[a-zA-Z]+\.action$|^action$/,
         fileExtensions: [/\.ts$/, /\.tsx$/].concat(isArray(fileExtensions) ? (fileExtensions as RegExp[]) : []),
-        iteration: iteration ?? null
+        iteration: iteration ?? "default"
       }
       if (!moduleConfig.modulePath) {
         throw `找不到${path ? "指定的" : "默认的"} app.module.path 入口`

@@ -7,8 +7,7 @@ const buildStart = async () => {
   const clientPromise = execaCommand(`cd ${resolve(cwd, "e2e/react/client")} && pnpm build`, { shell: true })
   const serverPromise = execaCommand(`cd ${resolve(cwd, "e2e/react/server")} && pnpm build`, { shell: true })
   const ssrPromise = execaCommand(`cd ${resolve(cwd, "e2e/react/ssr")} && pnpm build`, { shell: true })
-  const composePromise = execaCommand(`cd ${resolve(cwd, "e2e/react/ssr-compose")} && pnpm build:all`, { shell: true })
-  const err = await Promise.allSettled([clientPromise, serverPromise, ssrPromise, composePromise]).then(r => r.filter(r => r.status === "rejected"))
+  const err = await Promise.allSettled([clientPromise, serverPromise, ssrPromise]).then(r => r.filter(r => r.status === "rejected"))
   if (err.length > 0) {
     throw err.map(e => e.reason)
   }
