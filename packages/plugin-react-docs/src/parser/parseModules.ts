@@ -4,7 +4,6 @@ import { MDRoute, PluginContext } from "../docs.type.js"
 
 export async function parseModules(specialModules: AppSpecialModule[], context: PluginContext, lang = "") {
   const { routeMap, routes } = context
-  debugger
   for (const module of specialModules) {
     const { pageFile, routePath } = module
     const { appName, filepath, ext } = pageFile

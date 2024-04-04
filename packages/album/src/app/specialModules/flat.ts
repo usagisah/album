@@ -9,6 +9,7 @@ type ParseRouterParams = AppManagerModule & {
   parentModule?: AppSpecialModule
   root?: boolean
   isFile?: boolean
+  parentRoutePath?: string
 }
 
 export async function walkFlatModules(params: ParseRouterParams) {
@@ -29,14 +30,15 @@ export async function walkFlatModules(params: ParseRouterParams) {
 }
 
 export async function resolveModules(params: ParseRouterParams) {
-  const { root, isFile, modulePath, pageFilter, fileExtensions, ignore, modules } = params
+  const { root, isFile, modulePath, pageFilter, fileExtensions, ignore, modules, parentRoutePath = "" } = params
+
   const filename = basename(modulePath)
   if (ignore.some(r => r.test(filename))) {
     return false
   }
 
   if (!isFile) {
-    await walkFlatModules(params)
+    await walkFlatModules({ ...params, root: false, parentRoutePath: parentRoutePath + "/" + filename })
   }
 
   const fileInfo = pathParse(filename)
@@ -51,7 +53,7 @@ export async function resolveModules(params: ParseRouterParams) {
   } else if (root && appName.toLocaleLowerCase() === "error") {
     routePath = "/404"
   } else {
-    routePath = "/" + (appName === "index" ? filename : appName)
+    routePath = parentRoutePath + "/" + (appName === "index" ? "" : appName)
   }
 
   const pageFile: AppSpecialModuleFile = {

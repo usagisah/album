@@ -11,12 +11,15 @@ interface SSGRenderOption {
   entryPath: string
 }
 
-import createCache from "@emotion/cache"
+import emotionCreateCache from "@emotion/cache"
 import { CacheProvider } from "@emotion/react"
 import createEmotionServer from "@emotion/server/create-instance"
-const key = "custom"
-const cache = createCache({ key })
-const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache)
+const emotionCache = emotionCreateCache({ key: "album" })
+const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache)
+
+import { StyleProvider, createCache as antCreateCache, extractStyle } from "@ant-design/cssinjs"
+import { PageContext } from "album.docs"
+const antCache = antCreateCache()
 
 export async function ssgRender({ url, siteConfig, entryPath, importPath, contentPath, head, script }: SSGRenderOption) {
   const { default: MDContent } = await import(/*@vite-ignore*/ importPath)
@@ -25,22 +28,27 @@ export async function ssgRender({ url, siteConfig, entryPath, importPath, conten
 
   const App = await createApp(url, siteConfig, MDContent)
   const appHtml = renderToString(
-    <CacheProvider value={cache}>
-      <App />
-    </CacheProvider>
+    <StyleProvider cache={antCache}>
+      <CacheProvider value={emotionCache}>
+        <App />
+      </CacheProvider>
+    </StyleProvider>
   )
 
-  const chunks = extractCriticalToChunks(appHtml)
-  const styles = constructStyleTagsFromChunks(chunks)
+  const langManager = new LangManager(siteConfig.lang)
 
-  const html = `<html lang="en" dir="ltr">
+  const emotionStyles = constructStyleTagsFromChunks(extractCriticalToChunks(appHtml))
+  const antStyles = extractStyle(antCache)
+
+  const html = `<html lang="${langManager.getHTMLLang(url)}" dir="ltr">
   <head>
     <meta char-set="UTF-8" />
     <link rel="icon" type="${siteConfig.icon.type}" href="${siteConfig.icon.href}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${siteConfig.title.value}</title>
     ${head.join("")}
-    ${styles}
+    ${emotionStyles}
+    ${antStyles}
     <script>
       let m = localStorage.getItem("_site-theme-mode")
       if (m === "system") m = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
@@ -62,4 +70,32 @@ export async function ssgRender({ url, siteConfig, entryPath, importPath, conten
   </body>
 </html>`
   return html
+}
+
+class LangManager {
+  static manager: LangManager
+  #localeMap = new Map<string, { label: string; lang?: string; link?: string }>()
+  constructor(lang: PageContext["lang"]) {
+    if (LangManager.manager) {
+      return LangManager.manager
+    }
+
+    const { locales } = lang
+    for (const dir in locales) {
+      this.#localeMap.set(dir, locales[dir])
+    }
+  }
+
+  getHTMLLang(url: string): string {
+    const { pathname } = new URL("a://a" + url)
+    const key = pathname.split("/")[1]
+
+    let res
+    if (this.#localeMap.has(key)) {
+      res = this.#localeMap.get(key)?.lang ?? key
+    } else {
+      res = this.#localeMap.get("root")?.lang
+    }
+    return res ?? "en"
+  }
 }

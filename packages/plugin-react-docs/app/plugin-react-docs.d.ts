@@ -55,7 +55,7 @@ declare module "album.docs" {
 
     /* 多语言 */
     lang: {
-      locales: Record<string, { label: string; lang?: string; link?: string }>
+      locales: { label: string; key: string; lang?: string; link?: string }[]
     }
 
     /* html.footer */

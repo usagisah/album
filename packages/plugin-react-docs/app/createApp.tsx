@@ -61,6 +61,21 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
     document.title = title
   }
 
+  const { locales } = siteConfig.lang as { locales: Record<string, { label: string; lang?: string; link?: string }> }
+  const lang = {
+    locales: Object.keys(locales).map(key => {
+      // { key, ...locales[key] }
+      const { label, lang, link } = locales[key]
+      const _link = link ?? (key === "root" ? "/" : `/${key}/`)
+      return {
+        label: <a href={_link}>{label}</a>,
+        key,
+        lang: lang ?? key,
+        link: _link
+      }
+    })
+  }
+
   const { href, hash, pathname, searchParams } = import.meta.env.SSR ? new URL(`a://a${url}`) : new URL(location.href)
   const query = [...searchParams.entries()].reduce((q, item) => {
     q[decodeURIComponent(item[0])] = decodeURIComponent(item[1])
@@ -71,6 +86,7 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
   const events = new Map()
   const appContext: PageContext = {
     ...siteConfig,
+    lang,
     store,
     events,
     layouts: themeConfig.layouts,

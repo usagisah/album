@@ -13,7 +13,7 @@ export function buildSpecialModules(context: AlbumContext): Promise<AppSpecialMo
   const { ssrCompose, appManager, logger } = context
   const { modules } = appManager
   return Promise.all(
-    modules.map(async module => {
+    modules.map(module => {
       if (isBlank(module.modulePath)) {
         throw "make-special-module 发现约定式模块入口为空"
       }
@@ -21,7 +21,7 @@ export function buildSpecialModules(context: AlbumContext): Promise<AppSpecialMo
       if (!walk) {
         throw "make-special-module 发现不受支持的列带类型"
       }
-      return await walk({ logger, parentModule: null, ...module })
+      return walk({ logger, parentModule: null, ...module })
     })
   )
   // if (ssrCompose) {

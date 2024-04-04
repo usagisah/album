@@ -58,7 +58,7 @@ export function PCActions() {
         <ThemeAction />
       </div>
     ),
-    lang.select.length > 0 && (
+    lang.locales.length > 0 && (
       <div className="item" key="lang">
         <Lang />
       </div>
@@ -91,25 +91,21 @@ const IpadActionsContainer = styled.div`
 `
 export function IpadActions() {
   const { components, lang, search, theme: albumTheme } = usePage()
-  const { select } = lang
+  const { locales } = lang
   const NavSearch = components["NavSearch"]
   const theme = useTheme()
 
   const menuItems = useRef<any[]>([])
   if (!menuItems.current) {
     const items: any[] = (menuItems.current = [])
-    if (select.length > 0) {
+    if (locales.length > 0) {
       items.push({
         type: "group",
         key: 1,
         label: "lang",
-        children: select.map(item => ({
+        children: locales.map(item => ({
           key: item.link,
-          label: (
-            <a href={item.link}>
-              {item.label} {item.icon}
-            </a>
-          )
+          label: <a href={item.link}>{item.label}</a>
         }))
       })
       items.push({ type: "divider" })
