@@ -3,6 +3,7 @@ import { record, string } from "@albumjs/tools/lib/zod"
 import { isArray, isBlank, isRegExp, resolveDirPath } from "@albumjs/tools/node"
 import { resolve } from "path"
 import { Inputs } from "../context/context.dev.type.js"
+import { ILogger } from "../logger/logger.type.js"
 import { PluginManager } from "../plugins/plugin.dev.type.js"
 import { UserConfigApp } from "../user/user.dev.type.js"
 import { AppManager, AppManagerModule, AppManagerRouter, AppManagerSSRRender } from "./app.dev.type.js"
@@ -13,10 +14,11 @@ type AppManagerConfig = {
   pluginManager: PluginManager
   ssrCompose: boolean
   userConfigApp?: UserConfigApp | UserConfigApp[]
+  logger: ILogger
 }
 
 export async function createAppManager(config: AppManagerConfig) {
-  const { appId, inputs, pluginManager, userConfigApp, ssrCompose } = config
+  const { appId, inputs, pluginManager, userConfigApp, ssrCompose, logger } = config
   const appConfigs = isArray(userConfigApp) ? (userConfigApp.length > 0 ? userConfigApp : [{}]) : [userConfigApp ?? {}]
   const ids = new Set<any>([...appConfigs.map(v => v.id)])
   if (ids.size !== appConfigs.length) throw "config.app 每项必须携带唯一id，这将用于启动匹配"
@@ -31,6 +33,7 @@ export async function createAppManager(config: AppManagerConfig) {
     router: _routerConfig,
     modules: _moduleConfig = []
   } = await pluginManager.execute("findEntries", {
+    logger,
     appId,
     inputs,
     main: c.main,

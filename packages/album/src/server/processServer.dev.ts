@@ -18,7 +18,7 @@ export async function processServer(context: AlbumContext) {
   const serverApp = await NestFactory.create(await loadRsModule(apiAppModuleInput), { logger, cors: true })
   const moduleLoader = serverApp.get(LazyModuleLoader)
   await Promise.all([moduleLoader.load(() => LoggerModule.forRoot(logger)), moduleLoader.load(() => AlbumContextModule.forRoot(context))])
-  await pluginManager.execute("server", { info: getStaticInfo(), app: serverApp })
+  await pluginManager.execute("server", { logger, info: getStaticInfo(), app: serverApp })
 
   serverApp.use(async (_, __, next) => {
     await context.clientManager.ready

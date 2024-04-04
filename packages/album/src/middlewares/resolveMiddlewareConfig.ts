@@ -21,8 +21,9 @@ export function resolveAlbumViteConfig(context: AlbumContext, forceClient = fals
 }
 
 export async function resolveMiddlewareConfig(context: AlbumContext, forceClient = false) {
-  const { pluginManager, userConfig, getStaticInfo } = context
+  const { pluginManager, userConfig, getStaticInfo, logger } = context
   const { midConfigs, viteConfigs } = await pluginManager.execute("serverConfig", {
+    logger,
     info: getStaticInfo(),
     midConfigs: expressConfigs(context),
     viteConfigs: [

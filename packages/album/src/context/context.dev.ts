@@ -48,6 +48,7 @@ export async function createContext(params: ContextParams): Promise<AlbumContext
     const [env, appManager, serverManager] = await waitPromiseAll([
       registryEnv(serverMode, inputs, userConfig.env),
       createAppManager({
+        logger,
         appId,
         inputs,
         pluginManager,

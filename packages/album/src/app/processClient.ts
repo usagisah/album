@@ -11,7 +11,7 @@ export function processClient(context: AlbumContext) {
 
   const ready = initClient(context)
   if (watcher) {
-    const filter = (type: string) => {
+    const filter = (type: "add" | "unlink" | "unlinkDir") => {
       return (p: string) => {
         if (pluginManager.getSize("patchClient") === 0) {
           return

@@ -27,7 +27,7 @@ export async function albumBuild(params: DevServerParams) {
     const _resolveMiddlewareConfig = (forceClient?: boolean) => {
       return resolveMiddlewareConfig(context, forceClient)
     }
-    const { forceQuit } = await pluginManager.execute("buildStart", { forceQuit: false, info: getStaticInfo(), resolveMiddlewareConfig: _resolveMiddlewareConfig })
+    const { forceQuit } = await pluginManager.execute("buildStart", { logger, forceQuit: false, info: getStaticInfo(), resolveMiddlewareConfig: _resolveMiddlewareConfig })
     if (forceQuit !== true) {
       const buildInfo: [string, string][] = [["clientOutDir", clientOutDir]]
       if (ssr) {
@@ -38,7 +38,7 @@ export async function albumBuild(params: DevServerParams) {
 
       await (ssr ? buildSSR(context) : buildClient(context))
       await buildApi(context)
-      await pluginManager.execute("buildEnd", { info: getStaticInfo(), resolveMiddlewareConfig: _resolveMiddlewareConfig })
+      await pluginManager.execute("buildEnd", { logger, info: getStaticInfo(), resolveMiddlewareConfig: _resolveMiddlewareConfig })
     }
     logger.log("所有资源打包完毕", "album")
   } catch (e) {

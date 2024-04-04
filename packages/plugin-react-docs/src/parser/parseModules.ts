@@ -3,7 +3,8 @@ import { pathToRegexp } from "path-to-regexp"
 import { MDRoute, PluginContext } from "../docs.type.js"
 
 export async function parseModules(specialModules: AppSpecialModule[], context: PluginContext, lang = "") {
-  const { routeMap, routes } = context
+  const routes: MDRoute[] = []
+  const routeMap = new Map<string, MDRoute>()
   for (const module of specialModules) {
     const { pageFile, routePath } = module
     const { appName, filepath, ext } = pageFile
@@ -18,6 +19,7 @@ export async function parseModules(specialModules: AppSpecialModule[], context: 
     routes.push(route)
     routeMap.set(filepath, route)
   }
+  return { routes, routeMap }
 }
 
 function normalizeOutName(lang: string, path: string) {
