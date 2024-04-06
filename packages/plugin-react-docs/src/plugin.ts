@@ -9,7 +9,7 @@ import { resolve } from "path"
 import { buildPages } from "./build/buildPages.js"
 import { renderPages } from "./build/renderPages.js"
 import { DEFAULT_COPY_TEXT } from "./constants.js"
-import { DocsConfig, MDRoute, PluginContext } from "./docs.type.js"
+import { DocsConfig, PluginContext } from "./docs.type.js"
 import { normalizeDocsConfig } from "./normalizeDocsConfig.js"
 import { parseModules } from "./parser/parseModules.js"
 import AlbumReactDocsVitePlugin, { ParseMDConfig } from "./vite.js"
@@ -82,32 +82,22 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       const name = "plugin-react-docs"
       await dumpFileManager.add("dir", name, { create: false })
 
-      const [results] = await Promise.all([
-        Promise.all(appManager.specialModules.map((m, i) => parseModules(m, context, langDirs[i - 1]))),
+      const [{ routes, routeMap }] = await Promise.all([
+        parseModules(appManager.specialModules, context, langDirs),
         copy(resolve(__dirname, "../app"), resolve(info.inputs.dumpInput, name), { overwrite: true }),
         appFileManager.setFile("album-env.d.ts", f => {
           const typePlugin = `/// <reference types=".album/plugin-react-docs/plugin-react-docs" />`
           return f.includes(typePlugin) ? f : `${f}${typePlugin}\n`
         })
       ])
-      context.routes = []
-      context.routeMap.clear()
-      results.forEach(({ routes, routeMap }) => {
-        context.routes.push(...routes)
-        routeMap.forEach((v, k) => context.routeMap.set(k, v))
-      })
+      context.routes = routes
+      context.routeMap = routeMap
     },
 
     async patchClient({ updateInfo, appManager, logger }) {
-      const results = await Promise.all(appManager.specialModules.map((m, i) => parseModules(m, context, langDirs[i - 1])))
-      const _routes: MDRoute[] = []
-      const _routeMap = new Map<string, MDRoute>()
-      results.forEach(({ routes, routeMap }) => {
-        _routes.push(...routes)
-        routeMap.forEach((v, k) => _routeMap.set(k, v))
-      })
-      context.routes = _routes
-      context.routeMap = _routeMap
+      const { routes, routeMap } = await parseModules(appManager.specialModules, context, langDirs)
+      context.routes = routes
+      context.routeMap = routeMap
 
       if (updateInfo.type === "add") {
         logger.log(`add content: ${updateInfo.path}`, "plugin-react-docs")

@@ -86,7 +86,9 @@ export interface PluginContext {
 export interface MDRoute {
   appName: string
   filepath: string
-  buildOutPath?: string
+  routePath: string
+  isErrorPage: boolean
+  buildOutPath: string
   match: RegExp
   ext: string
 }

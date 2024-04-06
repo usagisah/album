@@ -58,41 +58,43 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
 
     configureServer(_server) {
       server = _server
-      server.middlewares.use(async (req, res, next) => {
-        let path: string = (req as any).path
-        if (req.method !== "GET") {
-          return next()
-        }
-
-        const { routes } = context
-        const route = routes.find(r => {
-          if (!r.match) {
-            return false
+      return () => {
+        server.middlewares.use(async (req, res, next) => {
+          let path: string = (req as any).path
+          if (req.method !== "GET") {
+            return next()
           }
-          return r.match.test(path)
-        })
 
-        if (!route) {
-          return next()
-        }
+          const { routes } = context
+          const route = routes.find(r => {
+            if (!r.match) {
+              return false
+            }
+            return r.match.test(path)
+          })
 
-        const { filepath } = route
-        const { head, script, siteConfig } = context.docsConfig
-        const { dumpInput } = context.albumContext.inputs
-        const { viteServer } = context.albumContext.serverManager
-        const { ssgRender } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
-        let html = await ssgRender({
-          url: req.originalUrl,
-          entryPath: resolve(dumpInput, "plugin-react-docs/main.tsx"),
-          importPath: filepath,
-          contentPath: filepath,
-          siteConfig,
-          head,
-          script
+          if (!route) {
+            return next()
+          }
+
+          const { filepath } = route
+          const { head, script, siteConfig } = context.docsConfig
+          const { dumpInput } = context.albumContext.inputs
+          const { viteServer } = context.albumContext.serverManager
+          const { ssgRender } = await viteServer.ssrLoadModule(resolve(dumpInput, "plugin-react-docs/main.ssg.tsx"))
+          let html = await ssgRender({
+            url: req.originalUrl,
+            entryPath: resolve(dumpInput, "plugin-react-docs/main.tsx"),
+            importPath: filepath,
+            contentPath: filepath,
+            siteConfig,
+            head,
+            script
+          })
+          html = await viteServer.transformIndexHtml(req.originalUrl, html)
+          return res.end(html)
         })
-        html = await viteServer.transformIndexHtml(req.originalUrl, html)
-        return res.end(html)
-      })
+      }
     },
 
     handleHotUpdate(ctx) {

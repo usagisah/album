@@ -20,6 +20,7 @@ import { Sidebar } from "./components/Sidebar/Sidebar"
 import { AppProvide } from "./hooks/useAppContext"
 import { useTheme } from "./hooks/useTheme"
 import { DocsLayout } from "./layout/Docs/Docs"
+import { ErrorLayout } from "./layout/Error/Error"
 import { HomeLayout } from "./layout/Home/Home"
 import { GlobalStyle } from "./theme"
 
@@ -34,7 +35,7 @@ async function mergeThemeConfig(defaultConfig: ThemeConfig) {
 export async function createApp(url: string, siteConfig: any, Content: FC<any>) {
   const themeConfig = await mergeThemeConfig({
     meta: {},
-    layouts: { default: DocsLayout, Home: HomeLayout, Docs: DocsLayout },
+    layouts: { default: DocsLayout, Home: HomeLayout, Docs: DocsLayout, Error: ErrorLayout },
     components: {
       NavBar,
       NavSearch,

@@ -1,24 +1,47 @@
 import { AppSpecialModule } from "@albumjs/album/server"
+import { resolve } from "path"
 import { pathToRegexp } from "path-to-regexp"
 import { MDRoute, PluginContext } from "../docs.type.js"
 
-export async function parseModules(specialModules: AppSpecialModule[], context: PluginContext, lang = "") {
+export async function parseModules(specialModules: AppSpecialModule[][], context: PluginContext, langDirs: string[]) {
   const routes: MDRoute[] = []
   const routeMap = new Map<string, MDRoute>()
-  for (const module of specialModules) {
-    const { pageFile, routePath } = module
-    const { appName, filepath, ext } = pageFile
-    const routePathReg = pathToRegexp((lang.length > 0 ? `/${lang}` : lang) + routePath, null, { sensitive: false })
-    const route: MDRoute = {
-      appName,
-      filepath,
-      buildOutPath: normalizeOutName(lang, routePath),
-      match: routePathReg,
-      ext
+  specialModules.map((item, index) => {
+    const lang = langDirs[index - 1] ?? ""
+    for (const module of item) {
+      const { pageFile, routePath } = module
+      const { appName, filepath, ext } = pageFile
+
+      if (routePath !== "/*" && routePath.includes("*")) {
+        continue
+      }
+
+      const routePathReg = pathToRegexp((lang.length > 0 ? `/${lang}` : lang) + routePath, null, { sensitive: false })
+      const route: MDRoute = {
+        appName,
+        filepath,
+        isErrorPage: false,
+        routePath: lang + routePath,
+        buildOutPath: normalizeOutName(lang, routePath),
+        match: routePathReg,
+        ext
+      }
+      routes.push(route)
+      routeMap.set(filepath, route)
     }
-    routes.push(route)
-    routeMap.set(filepath, route)
+  })
+  const { dumpInput } = context.albumContext.inputs
+  const route = {
+    appName: "error",
+    filepath: resolve(dumpInput, "plugin-react-docs/mds/error.md"),
+    isErrorPage: true,
+    routePath: "/error",
+    buildOutPath: "error.html",
+    match: pathToRegexp("/:error", null, { sensitive: false }),
+    ext: "tsx"
   }
+  routes.push(route)
+  routeMap.set(route.filepath, route)
   return { routes, routeMap }
 }
 
@@ -28,6 +51,9 @@ function normalizeOutName(lang: string, path: string) {
   }
   if (!path.startsWith("/")) {
     path = "/" + path
+  }
+  if (path === "/*") {
+    path = "/error"
   }
   let name = `${lang}${path}.html`
   if (name.startsWith("/")) {

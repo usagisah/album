@@ -51,7 +51,7 @@ export async function resolveModules(params: ParseRouterParams) {
   if (root && appName.toLocaleLowerCase() === "home") {
     routePath = "/"
   } else if (root && appName.toLocaleLowerCase() === "error") {
-    routePath = "/404"
+    routePath = "/*"
   } else {
     routePath = parentRoutePath + "/" + (appName === "index" ? "" : appName)
   }
