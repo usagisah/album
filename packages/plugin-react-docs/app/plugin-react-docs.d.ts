@@ -1,16 +1,7 @@
 declare module "@docs/site-theme" {
-  import { FC } from "react"
+  import { PageContext } from "album.docs"
 
-  export interface ThemeConfig {
-    meta: Record<string, any>
-    layouts: Record<string, FC<any>>
-    components: Record<string, FC<any>>
-  }
-  export interface ThemeFactory {
-    (config: ThemeConfig): any
-  }
-
-  const themeExports: ThemeFactory[]
+  const themeExports: ((ctx: PageContext) => any)[]
   export default themeExports
 }
 

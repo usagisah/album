@@ -77,7 +77,10 @@ export function normalizeDocsConfig(config: DocsConfig) {
       resolveThemeFile = cwd => {
         const exporter: string[] = []
         const importers = custom.map((item, index) => {
-          return `import T${index}from ${resolve(cwd, item)}/client`
+          const name = `T${index}`
+          const path = item.startsWith("/") ? item : resolve(cwd, item)
+          exporter.push(name)
+          return `import ${name} from "${path}"`
         })
         return importers.join("\n") + "\n" + `export default [${exporter.join(",")}]\n`
       }

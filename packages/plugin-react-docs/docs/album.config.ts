@@ -1,7 +1,7 @@
 import { defineAlbumConfig } from "@albumjs/album/config"
-import Docs, { AlbumDocsConfig } from "../dist/plugin.js"
+import Docs, { PluginReactDocsConfig } from "../dist/plugin.js"
 
-export default defineAlbumConfig<AlbumDocsConfig>({
+export default defineAlbumConfig<PluginReactDocsConfig>({
   plugins: [
     Docs({
       docs: {
@@ -92,7 +92,11 @@ export default defineAlbumConfig<AlbumDocsConfig>({
             link: "https://github.com"
           }
         ],
-        search: {}
+        search: {},
+
+        theme: {
+          custom: ["./theme"]
+        }
       }
     })
   ]

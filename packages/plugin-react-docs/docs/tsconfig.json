@@ -23,7 +23,9 @@
     ".album/**/*.ts",
     ".album/**/*.tsx",
     "**/*.d.ts",
-    "./album.config.ts"
+    "./album.config.ts",
+    "theme/**/*.tsx",
+    "theme/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -24,38 +24,9 @@ import { ErrorLayout } from "./layout/Error/Error"
 import { HomeLayout } from "./layout/Home/Home"
 import { GlobalStyle } from "./theme"
 
-async function mergeThemeConfig(defaultConfig: ThemeConfig) {
-  let c = defaultConfig
-  for (const config of themeConfigs) {
-    await config(c)
-  }
-  return c
-}
+
 
 export async function createApp(url: string, siteConfig: any, Content: FC<any>) {
-  const themeConfig = await mergeThemeConfig({
-    meta: {},
-    layouts: { default: DocsLayout, Home: HomeLayout, Docs: DocsLayout, Error: ErrorLayout },
-    components: {
-      NavBar,
-      NavSearch,
-      NavTitle,
-      SelectMenu,
-      Features,
-      Header,
-      Footer,
-      Lang,
-      EditInfo,
-      Sidebar,
-      PrevNext,
-      Category,
-      Collapse,
-      Content,
-      IconDown,
-      IconMenuOutlined
-    }
-  })
-
   const sft = siteConfig.frontmatter.siteTitle
   const title = [sft, siteConfig.title.value].filter(Boolean).join(siteConfig.title.sep)
   if (typeof window !== "undefined") {
@@ -65,7 +36,6 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
   const { locales } = siteConfig.lang as { locales: Record<string, { label: string; lang?: string; link?: string }> }
   const lang = {
     locales: Object.keys(locales).map(key => {
-      // { key, ...locales[key] }
       const { label, lang, link } = locales[key]
       const _link = link ?? (key === "root" ? "/" : `/${key}/`)
       return {
@@ -90,8 +60,25 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
     lang,
     store,
     events,
-    layouts: themeConfig.layouts,
-    components: themeConfig.components,
+    layouts: { default: DocsLayout, Home: HomeLayout, Docs: DocsLayout, Error: ErrorLayout },
+    components: {
+      NavBar,
+      NavSearch,
+      NavTitle,
+      SelectMenu,
+      Features,
+      Header,
+      Footer,
+      Lang,
+      EditInfo,
+      Sidebar,
+      PrevNext,
+      Category,
+      Collapse,
+      Content,
+      IconDown,
+      IconMenuOutlined
+    },
     theme: null as any,
     layout: siteConfig.frontmatter.layout ?? "default",
     location: { href, hash, pathname, query }
@@ -105,9 +92,13 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
     appContext.components.ThemeAction = _theme.ThemeAction
     appContext.theme = _theme
 
-    let Layout = themeConfig.layouts[appContext.layout]
+    for (const config of themeConfigs) {
+      config(appContext)
+    }
+
+    let Layout = appContext.layouts[appContext.layout]
     if (!Layout) {
-      Layout = themeConfig.layouts.default
+      Layout = appContext.layouts.default
       console.log(`album-react-docs ssr-error: 找不到使用的布局组件(${siteConfig.layout}), 回退到默认`)
     }
     return (
