@@ -1,7 +1,6 @@
 import { css, useTheme } from "@emotion/react"
 import styled from "@emotion/styled"
 import { usePage } from "album.docs"
-import bg from "../../assets/home.bg.png"
 
 const MainHomeContainer = styled.main`
   flex: 1;
@@ -14,7 +13,6 @@ const MainHomeContainer = styled.main`
     top: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1;
   }
 
   .wrapper {
@@ -78,7 +76,7 @@ const MainHomeContainer = styled.main`
       height: 320px;
       border-radius: ${({ theme }) => theme.radius.max};
       transform: translate(-50%, -50%);
-      background: ${({ theme }) => `linear-gradient(-45deg, ${theme.primary.default} 50%, slateblue 50%)`};
+      background-color: rgba(68, 153, 205, 0.4);
       filter: blur(68px);
     }
 
@@ -147,12 +145,12 @@ const MainHomeContainer = styled.main`
 `
 
 export function MainHome() {
-  const { frontmatter, components } = usePage()
+  const { frontmatter, components, logo } = usePage()
   const Features = components["Features"]
   const Content = components["Content"]
   return (
     <MainHomeContainer className="mainHome">
-      <img className="bgImg" src={bg} alt="" />
+      <img className="bgImg" src="/home.bg.png" alt="" />
       <div className="wrapper">
         <div className="hero">
           {frontmatter.title && <p className="title" dangerouslySetInnerHTML={{ __html: frontmatter.title }}></p>}
@@ -168,7 +166,7 @@ export function MainHome() {
         </div>
         <div className="image">
           <div className="bg"></div>
-          <img src="https://vitepress.dev/vitepress-logo-large.webp" alt="" />
+          {logo.href && <img src={logo.href} alt="" />}
         </div>
       </div>
       <Features />

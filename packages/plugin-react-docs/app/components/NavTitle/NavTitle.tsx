@@ -27,8 +27,8 @@ export function NavTitle() {
   const { url, href } = logo
 
   return (
-    <NavTitleContainer className="navTitle" href={href}>
-      {logo && (url.startsWith("<") ? <div className="svg-logo" dangerouslySetInnerHTML={{ __html: url }} /> : <img className="img" src={url} alt={title.value} />)}
+    <NavTitleContainer className="navTitle" href={url}>
+      {logo && <img className="img" src={href} alt={title.value} />}
       <span>{title.value}</span>
     </NavTitleContainer>
   )

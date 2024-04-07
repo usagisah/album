@@ -1,7 +1,6 @@
 import { array, boolean, lazy, object, record, string, union } from "@albumjs/tools/lib/zod"
 import mt from "mime-types"
 import { resolve } from "path"
-import { DEFAULT_LOGO } from "./constants.js"
 import { DocsConfig } from "./docs.type.js"
 
 const linkItem: any = lazy(() => {
@@ -95,17 +94,17 @@ export function normalizeDocsConfig(config: DocsConfig) {
     if (typeof title.value !== "string") siteConfig.title.value = "Album"
   }
 
-  if (!icon) siteConfig.icon = { href: "/ico.svg", type: "image/svg+xml" } as any
+  if (!icon) siteConfig.icon = { href: "/logo.svg", type: "image/svg+xml" } as any
   else {
     const index = icon.lastIndexOf(".")
     const ext = index === -1 ? "" : mt.lookup(icon.slice(index, -1))
     siteConfig.icon = { href: icon, type: ext } as any
   }
 
-  if (!logo) siteConfig.logo = { url: DEFAULT_LOGO, href: "/" }
+  if (!logo) siteConfig.logo = { url: "/", href: "/logo.svg" }
   else {
-    if (!logo.href) siteConfig.logo.href = "/"
-    if (!logo.url) siteConfig.logo.url = DEFAULT_LOGO
+    if (!logo.href) siteConfig.logo.href = "/logo.svg"
+    if (!logo.url) siteConfig.logo.url = "/"
   }
 
   if (description) {
