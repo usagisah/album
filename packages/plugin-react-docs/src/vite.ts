@@ -130,9 +130,19 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
 }
 
 function createMDFile(p: { import: string; content: string; fm: Record<string, any>; category: Category[] }) {
-  return `import { usePage } from "album.docs"\n${p.import}
+  return `import { usePage } from "album.docs"\nimport {message} from "antd"\n${p.import}\n
   export default function MarkdownComp(){ 
-    const {  } = usePage()
+    const { events } = usePage()
+    const copy = async (e) => {
+      let success = true
+      try {
+        success = await events.get("copy")(e)
+      } catch(e) {
+        success = false
+        console.error(e)
+      }
+      message[success ?"success":"error"](\`copy \${success?"success":"fail"}\`)
+    }
     const onImageLodeError = function(e) { e.currentTarget.classList.add("error") }
     return <div className="md">${p.content}</div> 
   }

@@ -82,14 +82,16 @@ export function renderer({ highlighter, copyText, className, categoryQueue }: Re
         ].join("")
       } else {
         const themeCode = codeToThemeCode([...highLine], code, _lang, 0)
-        code = [
-          `<div ${className}="u-code-lang">${_lang}</div>`,
-          `<div ${className}="u-code-copy">${copyText}</div>`,
-          `<div ${className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}}></div>`
-        ].join("")
+        code = `<div ${className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}}></div>`
       }
 
-      return `<div ${className}="u-code u-code-${_lang}">${code}</div>`
+      return [
+        `<div ${className}="u-code u-code-${_lang}">`,
+        `<div ${className}="u-code-lang">${_lang}</div>`,
+        `<div ${className}="u-code-copy" onClick={copy}>${copyText}</div>`,
+        `<div ${className}="u-code-wrapper">${code}</div>`,
+        `</div>`
+      ].join("")
     },
     hr() {
       return `<div ${className}="u-hr"></div>`

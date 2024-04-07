@@ -1,4 +1,4 @@
-import themeConfigs, { ThemeConfig } from "@docs/site-theme"
+import themeConfigs from "@docs/site-theme"
 import { ThemeProvider } from "@emotion/react"
 import { PageContext } from "album.docs"
 import { theme as AntTheme, Collapse, ConfigProvider } from "antd"
@@ -23,8 +23,6 @@ import { DocsLayout } from "./layout/Docs/Docs"
 import { ErrorLayout } from "./layout/Error/Error"
 import { HomeLayout } from "./layout/Home/Home"
 import { GlobalStyle } from "./theme"
-
-
 
 export async function createApp(url: string, siteConfig: any, Content: FC<any>) {
   const sft = siteConfig.frontmatter.siteTitle
@@ -55,6 +53,11 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
 
   const store = new Map()
   const events = new Map()
+  events.set("copy", async (e: any) => {
+    await navigator.clipboard.writeText(e.target.parentElement.nextElementSibling.textContent)
+    return true
+  })
+
   const appContext: PageContext = {
     ...siteConfig,
     lang,
