@@ -1,7 +1,6 @@
 import { siteConfig } from "@docs/site-config"
 import { createRoot, hydrateRoot } from "react-dom/client"
 import { createApp } from "./createApp"
-import "./docs.css"
 
 async function createStaticApp() {
   ;(globalThis as any).__ALBUM_DOCS__ = "react"

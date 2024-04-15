@@ -1,7 +1,9 @@
+import { AlbumContext } from "@albumjs/album/server"
 import { RendererObject } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
 import { PARSE_SKIP, numReg, scopeNumReg } from "../constants.js"
 import { Category } from "../docs.type.js"
+import { genDemoCode } from "./genDemoCode.js"
 import { parseArgs } from "./parseArgs.js"
 
 export interface RendererOptions {
@@ -9,9 +11,11 @@ export interface RendererOptions {
   copyText: string
   className: string
   categoryQueue: Category[]
+  albumContext: AlbumContext
 }
 
-export function renderer({ highlighter, copyText, className, categoryQueue }: RendererOptions): RendererObject {
+export function renderer(options: RendererOptions): RendererObject {
+  const { className, categoryQueue } = options
   return {
     heading(text, level) {
       const r = parseArgs(text)
@@ -29,69 +33,7 @@ export function renderer({ highlighter, copyText, className, categoryQueue }: Re
       return res
     },
     code(code, lang) {
-      const { text: _lang, args } = parseArgs(lang ?? "")
-
-      const lineCode = code.split("\n")
-      const highLine = new Set<number>()
-      args.forEach(v => {
-        if (numReg.test(v)) {
-          highLine.add(Number(v))
-        } else if (scopeNumReg.test(v)) {
-          let [l, r] = v.split("-").map(Number)
-          if (l <= r) {
-            while (l <= r) {
-              highLine.add(Number(l))
-              l++
-            }
-          }
-        }
-      })
-
-      const codeToThemeCode = (highLine: number[], code: string, lang: string, shouldSubLine: number) => {
-        return highlighter.codeToHtml(code, {
-          lang: lang,
-          themes: {
-            light: "vitesse-light",
-            dark: "vitesse-dark"
-          },
-          decorations: highLine.map(index => {
-            const lineIndex = index - shouldSubLine
-            return {
-              start: { line: lineIndex, character: 0 },
-              end: { line: lineIndex, character: lineCode[lineIndex]?.length },
-              properties: { class: "u-code-highlighted" }
-            }
-          })
-        })
-      }
-      const pure = args.includes("pure")
-      if (pure) {
-        const lastIndex = lineCode.length + 2 - 1
-        const highFirst = highLine.has(0)
-        const highLast = highLine.has(lastIndex)
-        highLine.delete(0)
-        highLine.delete(lastIndex)
-
-        const themeCode = codeToThemeCode([...highLine], code, "text", 1)
-        const lineFirst = `<pre><code><span ${className}="line">\`\`\`${_lang}</span></code></pre>`
-        const lineLast = `<pre><code><span ${className}="line">\`\`\`</span></code></pre>`
-        code = [
-          highFirst ? `<span ${className}="u-code-highlighted">${lineFirst}</span>` : lineFirst,
-          `<div ${className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}}></div>`,
-          highLast ? `<span ${className}="u-code-highlighted">${lineLast}</span>` : lineLast
-        ].join("")
-      } else {
-        const themeCode = codeToThemeCode([...highLine], code, _lang, 0)
-        code = `<div ${className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}}></div>`
-      }
-
-      return [
-        `<div ${className}="u-code u-code-${_lang}">`,
-        `<div ${className}="u-code-lang">${_lang}</div>`,
-        `<div ${className}="u-code-copy" onClick={copy}>${copyText}</div>`,
-        `<div ${className}="u-code-wrapper">${code}</div>`,
-        `</div>`
-      ].join("")
+      return renderCode({ code, lang, renderOptions: options, from: "code" })
     },
     hr() {
       return `<div ${className}="u-hr"></div>`
@@ -139,4 +81,89 @@ export function renderer({ highlighter, copyText, className, categoryQueue }: Re
       return `<div ${className}="u-br"></div>`
     }
   }
+}
+
+export type RenderCodeOptions = {
+  code: string
+  lang: string
+  from: "code" | "block"
+  renderOptions: RendererOptions
+  canRender?: boolean
+}
+export function renderCode(options: RenderCodeOptions) {
+  let { code, lang, renderOptions, canRender = true, from } = options
+  let { className, copyText, highlighter, albumContext } = renderOptions
+
+  const originCode = code
+  const { text: _lang, args } = parseArgs(lang ?? "")
+
+  const _className = from === "code" ? className : "class"
+
+  const lineCode = code.split("\n")
+  const highLine = new Set<number>()
+  args.forEach(v => {
+    if (numReg.test(v)) {
+      highLine.add(Number(v))
+    } else if (scopeNumReg.test(v)) {
+      let [l, r] = v.split("-").map(Number)
+      if (l <= r) {
+        while (l <= r) {
+          highLine.add(Number(l))
+          l++
+        }
+      }
+    }
+  })
+
+  const codeToThemeCode = (highLine: number[], code: string, lang: string, shouldSubLine: number) => {
+    return highlighter.codeToHtml(code, {
+      lang: lang,
+      themes: {
+        light: "vitesse-light",
+        dark: "vitesse-dark"
+      },
+      decorations: highLine.map(index => {
+        const lineIndex = index - shouldSubLine
+        return {
+          start: { line: lineIndex, character: 0 },
+          end: { line: lineIndex, character: lineCode[lineIndex]?.length },
+          properties: { class: "u-code-highlighted" }
+        }
+      })
+    })
+  }
+  const pure = args.includes("pure")
+  if (pure) {
+    const lastIndex = lineCode.length + 2 - 1
+    const highFirst = highLine.has(0)
+    const highLast = highLine.has(lastIndex)
+    highLine.delete(0)
+    highLine.delete(lastIndex)
+
+    const themeCode = codeToThemeCode([...highLine], code, "text", 1)
+    const lineFirst = `<pre><code><span ${_className}="line">\`\`\`${_lang}</span></code></pre>`
+    const lineLast = `<pre><code><span ${_className}="line">\`\`\`</span></code></pre>`
+    code = [
+      highFirst ? `<span ${_className}="u-code-highlighted">${lineFirst}</span>` : lineFirst,
+      from === "code" ? `<div ${_className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}} />` : `<div ${_className}="u-code-content">${themeCode}</div>`,
+      highLast ? `<span ${_className}="u-code-highlighted">${lineLast}</span>` : lineLast
+    ].join("")
+  } else {
+    const themeCode = codeToThemeCode([...highLine], code, _lang, 0)
+    code = from === "code" ? `<div ${className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}} />` : `<div ${_className}="u-code-content">${themeCode}</div>`
+  }
+
+  const themeCode = [
+    `<div ${_className}="u-code u-code-${_lang}">`,
+    `<div ${_className}="u-code-lang">${_lang}</div>`,
+    `<div ${_className}="u-code-copy" ${from === "code" ? "onClick={copy}" : ""}>${copyText}</div>`,
+    `<div ${_className}="u-code-wrapper">${code}</div>`,
+    `</div>`
+  ].join("")
+
+  if (canRender && args.includes("render")) {
+    const compPath = ["jsx", "tsx"].includes(_lang) ? genDemoCode(albumContext, originCode) : undefined
+    return `<DemoBox component={${compPath}} tabItems={[{label:"",code:\`${themeCode}\`}]} />`
+  }
+  return themeCode
 }

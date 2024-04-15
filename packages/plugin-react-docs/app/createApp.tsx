@@ -4,6 +4,7 @@ import { PageContext } from "album.docs"
 import { theme as AntTheme, Collapse, ConfigProvider } from "antd"
 import { FC, useState } from "react"
 import { Category } from "./components/Category/Category"
+import { DemoBox } from "./components/DemoBox/DemoBox"
 import { EditInfo } from "./components/EditInfo/EditInfo"
 import { Features } from "./components/Features/Features"
 import { Footer } from "./components/Footer/Footer"
@@ -80,7 +81,8 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
       Collapse,
       Content,
       IconDown,
-      IconMenuOutlined
+      IconMenuOutlined,
+      DemoBox
     },
     theme: null as any,
     layout: siteConfig.frontmatter.layout ?? "default",

@@ -22,11 +22,11 @@ export interface PluginReactDocsConfig {
 
 const { __dirname } = createCommonJS(import.meta.url)
 export default function pluginReactDocs(config: PluginReactDocsConfig = {}): AlbumUserPlugin {
-  const { md = {}, docs = {} as any, react = {} } = config
+  const { md, docs = {} as any, react = {} } = config
   const context: PluginContext = {
     parseMDConfig: {
-      className: md.className ?? "className",
-      copyText: md.copyText ?? DEFAULT_COPY_TEXT
+      className: md?.className ?? "className",
+      copyText: md?.copyText ?? DEFAULT_COPY_TEXT
     },
     docsConfig: normalizeDocsConfig(docs),
     reactConfig: react,

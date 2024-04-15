@@ -26,6 +26,10 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
       })
     },
 
+    configResolved(config) {
+      config.mode
+    },
+
     resolveId(id) {
       switch (id) {
         case SITE_CONFIG:
@@ -51,7 +55,7 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
       if (id.endsWith(".md")) {
         const { data, content } = gm(code)
         const { import: importers = [] } = data
-        const { componentContent, category } = await parseMdToReact(content, parseMDConfig)
+        const { componentContent, category } = await parseMdToReact(content, parseMDConfig, albumContext)
         return createMDFile({ import: importers.join("\n"), content: componentContent, fm: data, category })
       }
     },
@@ -132,7 +136,8 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
 function createMDFile(p: { import: string; content: string; fm: Record<string, any>; category: Category[] }) {
   return `import { usePage } from "album.docs"\nimport {message} from "antd"\n${p.import}\n
   export default function MarkdownComp(){ 
-    const { events } = usePage()
+    const { events, components } = usePage()
+    const { DemoBox } = components
     const copy = async (e) => {
       let success = true
       try {
@@ -144,7 +149,7 @@ function createMDFile(p: { import: string; content: string; fm: Record<string, a
       message[success ?"success":"error"](\`copy \${success?"success":"fail"}\`)
     }
     const onImageLodeError = function(e) { e.currentTarget.classList.add("error") }
-    return <div className="md">${p.content}</div> 
+    return (<div className="md">${p.content}</div>)
   }
   const frontmatter=${JSON.stringify(p.fm)}
   const category=${JSON.stringify(p.category)}
