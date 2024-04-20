@@ -1,4 +1,5 @@
 import { AlbumContext } from "@albumjs/album/server"
+import { Obj } from "@albumjs/tools/node"
 import { RendererObject } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
 import { PARSE_SKIP, numReg, scopeNumReg } from "../constants.js"
@@ -33,7 +34,7 @@ export function renderer(options: RendererOptions): RendererObject {
       return res
     },
     code(code, lang) {
-      return renderCode({ code, lang, renderOptions: options, from: "code" })
+      return renderCode({ code, lang, renderOptions: options })
     },
     hr() {
       return `<div ${className}="u-hr"></div>`
@@ -86,34 +87,17 @@ export function renderer(options: RendererOptions): RendererObject {
 export type RenderCodeOptions = {
   code: string
   lang: string
-  from: "code" | "block"
   renderOptions: RendererOptions
   canRender?: boolean
 }
 export function renderCode(options: RenderCodeOptions) {
-  let { code, lang, renderOptions, canRender = true, from } = options
+  let { code, lang, renderOptions, canRender = true } = options
   let { className, copyText, highlighter, albumContext } = renderOptions
 
   const originCode = code
   const { text: _lang, args } = parseArgs(lang ?? "")
-
-  const _className = from === "code" ? className : "class"
-
   const lineCode = code.split("\n")
-  const highLine = new Set<number>()
-  args.forEach(v => {
-    if (numReg.test(v)) {
-      highLine.add(Number(v))
-    } else if (scopeNumReg.test(v)) {
-      let [l, r] = v.split("-").map(Number)
-      if (l <= r) {
-        while (l <= r) {
-          highLine.add(Number(l))
-          l++
-        }
-      }
-    }
-  })
+  const hightLines = resolveHighLines(args)
 
   const codeToThemeCode = (highLine: number[], code: string, lang: string, shouldSubLine: number) => {
     return highlighter.codeToHtml(code, {
@@ -129,41 +113,94 @@ export function renderCode(options: RenderCodeOptions) {
           end: { line: lineIndex, character: lineCode[lineIndex]?.length },
           properties: { class: "u-code-highlighted" }
         }
-      })
+      }),
+      transformers: [
+        {
+          span(node) {
+            node.children.forEach(child => {
+              if (child.type === "text") {
+                child.value = child.value.replace(/(\{|\}|<|>)/g, `{"$1"}`)
+              }
+            })
+          }
+        }
+      ]
     })
   }
+
   const pure = args.includes("pure")
   if (pure) {
-    const lastIndex = lineCode.length + 2 - 1
-    const highFirst = highLine.has(0)
-    const highLast = highLine.has(lastIndex)
-    highLine.delete(0)
-    highLine.delete(lastIndex)
+    const lastLineIndex = lineCode.length + 2 - 1
+    const isHighFirst = hightLines.has(0)
+    const isHighLast = hightLines.has(lastLineIndex)
+    hightLines.delete(0)
+    hightLines.delete(lastLineIndex)
 
-    const themeCode = codeToThemeCode([...highLine], code, "text", 1)
-    const lineFirst = `<pre><code><span ${_className}="line">\`\`\`${_lang}</span></code></pre>`
-    const lineLast = `<pre><code><span ${_className}="line">\`\`\`</span></code></pre>`
+    const themeCode = codeToThemeCode([...hightLines], code, "text", 1)
+    const themeFirstLine = `<pre><code><span ${className}="line">\`\`\`${_lang}</span></code></pre>`
+    const themeLastLine = `<pre><code><span ${className}="line">\`\`\`</span></code></pre>`
+
     code = [
-      highFirst ? `<span ${_className}="u-code-highlighted">${lineFirst}</span>` : lineFirst,
-      from === "code" ? `<div ${_className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}} />` : `<div ${_className}="u-code-content">${themeCode}</div>`,
-      highLast ? `<span ${_className}="u-code-highlighted">${lineLast}</span>` : lineLast
+      isHighFirst ? `<span ${className}="u-code-highlighted">${themeFirstLine}</span>` : themeFirstLine,
+      `<div ${className}="u-code-content">${themeCode}</div>`,
+      isHighLast ? `<span ${className}="u-code-highlighted">${themeLastLine}</span>` : themeLastLine
     ].join("")
   } else {
-    const themeCode = codeToThemeCode([...highLine], code, _lang, 0)
-    code = from === "code" ? `<div ${className}="u-code-content" dangerouslySetInnerHTML={{__html: \`${themeCode}\`}} />` : `<div ${_className}="u-code-content">${themeCode}</div>`
+    const themeCode = codeToThemeCode([...hightLines], code, _lang, 0)
+    code = `<div ${className}="u-code-content">${themeCode}</div>`
   }
 
-  const themeCode = [
-    `<div ${_className}="u-code u-code-${_lang}">`,
-    `<div ${_className}="u-code-lang">${_lang}</div>`,
-    `<div ${_className}="u-code-copy" ${from === "code" ? "onClick={copy}" : ""}>${copyText}</div>`,
-    `<div ${_className}="u-code-wrapper">${code}</div>`,
+  let themeCode = [
+    `<div ${className}="u-code u-code-${_lang}">`,
+    `<div ${className}="u-code-lang">${_lang}</div>`,
+    `<div ${className}="u-code-copy" onClick={copy}>${copyText}</div>`,
+    `<div ${className}="u-code-wrapper">${code}</div>`,
     `</div>`
   ].join("")
 
+  themeCode = themeCode.replace(/\s{1}class="(.*?)"/g, ` ${className}="$1"`)
+  themeCode = themeCode.replace(/\s{1}style="(.*?)"/g, (_, content: string) => {
+    if (content.startsWith("{{") && content.endsWith("}}")) {
+      return `style=${content}`
+    }
+
+    const style: Obj = {}
+    content.split(";").map(item => {
+      let [k, v] = item.split(":")
+      k = k.trim()
+      v = v.trim()
+
+      if (k.startsWith("--")) {
+        style[k] = v
+      } else {
+        style[k.replace(/-([a-z])/g, (_, char) => char.toUpperCase())] = v
+      }
+    })
+    return ` style={${JSON.stringify(style, null, 2)}}`
+  })
+
   if (canRender && args.includes("render")) {
-    const compPath = ["jsx", "tsx"].includes(_lang) ? genDemoCode(albumContext, originCode) : undefined
-    return `<DemoBox component={${compPath}} tabItems={[{label:"",code:\`${themeCode}\`}]} />`
+    const id = ["jsx", "tsx"].includes(_lang) ? genDemoCode(albumContext, originCode) : undefined
+    const isRenderComp = typeof id === "number"
+    return `<DemoBox client={${isRenderComp ? `resolveDemoClientPath?.(${id})` : "''"}} server={${isRenderComp ? `resolveDemoNodePath?.(${id})` : "''"}}><div data-label="">${themeCode}</div></DemoBox>`
   }
   return themeCode
+}
+
+function resolveHighLines(args: string[]) {
+  const highLines = new Set<number>()
+  args.forEach(v => {
+    if (numReg.test(v)) {
+      highLines.add(Number(v))
+    } else if (scopeNumReg.test(v)) {
+      let [l, r] = v.split("-").map(Number)
+      if (l <= r) {
+        while (l <= r) {
+          highLines.add(Number(l))
+          l++
+        }
+      }
+    }
+  })
+  return highLines
 }

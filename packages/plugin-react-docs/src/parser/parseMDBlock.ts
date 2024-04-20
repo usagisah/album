@@ -55,22 +55,21 @@ export function blockExtension({ highlighter, copyText, className, albumContext 
           const shouldRender = args.includes("render")
           const codes = resolveBlockCodes(body)
 
-          let compPath = undefined
-          const tabItems: any[] = []
+          let id = undefined
+          const tabItems: string[] = []
           codes.map((item, index) => {
             if (shouldRender && index === 0 && ["tsx", "jsx"].includes(item._lang)) {
-              compPath = genDemoCode(albumContext, item.code)
+              id = genDemoCode(albumContext, item.code)
             }
             const themeCode = renderCode({
               code: item.code,
               lang: item.lang,
               renderOptions: { highlighter, className, copyText, categoryQueue: [], albumContext },
-              canRender: false,
-              from: "block"
+              canRender: false
             })
-            tabItems.push({ label: item._args[0], code: themeCode })
+            tabItems.push(`<div data-label="${item._args[0]}">${themeCode}</div>`)
           })
-          return `<DemoBox component={${compPath}} tabItems={${JSON.stringify(tabItems)}} />`
+          return `<DemoBox client={${id ? `resolveDemoClientPath?.(${id})` : ""}} server={${id ? `resolveDemoNodePath?.(${id})` : ""}}>${tabItems.join("")}</DemoBox>`
         }
         case "info":
         case "tip":

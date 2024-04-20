@@ -4,11 +4,13 @@ import { createApp } from "./createApp"
 interface SSGRenderOption {
   url: string
   siteConfig: any
-  head: string[]
-  script: string[]
-  importPath: string
-  contentPath: string
-  entryPath: string
+  head: string[] /* head import */
+  script: string[] /* script import */
+  importPath: string /* md content import by node */
+  contentPath: string /* md content import by browser */
+  entryPath: string /* client entry of js-script */
+  demoImportPath: string /* demo-box by node */
+  demoClientPath: string /* demo-box by browser */
 }
 
 import emotionCreateCache from "@emotion/cache"
@@ -19,12 +21,17 @@ const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionS
 
 import { StyleProvider, createCache as antCreateCache, extractStyle } from "@ant-design/cssinjs"
 import { PageContext } from "album.docs"
+import { resolve } from "path"
 const antCache = antCreateCache()
 
-export async function ssgRender({ url, siteConfig, entryPath, importPath, contentPath, head, script }: SSGRenderOption) {
+export async function ssgRender(options: SSGRenderOption) {
+  const { url, siteConfig, entryPath, importPath, contentPath, head, script, demoClientPath, demoImportPath } = options
   const { default: MDContent } = await import(/*@vite-ignore*/ importPath)
   siteConfig.category = MDContent.category
   siteConfig.frontmatter = MDContent.frontmatter
+  siteConfig.utils = {
+    resolveDemoNodePath: (count: number) => `${demoImportPath}${count}.tsx`
+  }
 
   const App = await createApp(url, siteConfig, MDContent)
   const appHtml = renderToString(
@@ -59,7 +66,7 @@ export async function ssgRender({ url, siteConfig, entryPath, importPath, conten
     <div id="album-docs">
       <App />
     </div>
-    <script type="text/json" id="_docs-meta">"${contentPath}"</script>
+    <script type="text/json" id="_docs-meta">${JSON.stringify({ contentPath, demoClientPath })}</script>
     <script>
       Array.from(document.querySelectorAll("img")).forEach(m => {
         m.onerror = function(e){this.classList.add("error")

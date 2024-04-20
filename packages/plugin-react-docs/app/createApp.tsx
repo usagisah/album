@@ -25,6 +25,8 @@ import { ErrorLayout } from "./layout/Error/Error"
 import { HomeLayout } from "./layout/Home/Home"
 import { GlobalStyle } from "./theme"
 
+console.error = () => {}
+
 export async function createApp(url: string, siteConfig: any, Content: FC<any>) {
   const sft = siteConfig.frontmatter.siteTitle
   const title = [sft, siteConfig.title.value].filter(Boolean).join(siteConfig.title.sep)

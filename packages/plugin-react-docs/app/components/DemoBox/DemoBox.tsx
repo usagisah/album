@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
-import { usePage } from "album.docs"
 import { Tabs } from "antd"
-import { Suspense, createElement, lazy, useMemo, useRef, useState } from "react"
+import { Children, Suspense, createElement, useEffect, useMemo, useState } from "react"
 
 const DemoBoxContainer = styled.div(({ theme }) => ({
   width: "100%",
@@ -14,8 +13,8 @@ const DemoBoxContainer = styled.div(({ theme }) => ({
 
   ".demo": {
     padding: "40px 24px",
-    background: theme.bg.default,
-    borderBottom: "1px solid " + theme.border.default
+    background: theme.default,
+    borderRadius: theme.radius.large
   },
 
   ".ant-tabs-nav": {
@@ -33,51 +32,55 @@ const DemoBoxContainer = styled.div(({ theme }) => ({
   },
 
   ".u-code": {
-    marginTop: "1rem"
+    marginTop: "1rem",
+    backgroundColor: "transparent",
+    border: "none",
+    boxShadow: "none",
+
+    pre: {
+      background: `transparent!important`
+    }
   }
 }))
 
 export interface DemoBoxProps {
-  component?: string
-  tabItems: { label: string; code: string }[]
+  client?: string
+  server?: string
+  children: any[]
 }
 
-export function DemoBox(props: DemoBoxProps) {debugger
-  const {} = usePage()
-  const { tabItems, component } = props
-  const [collapse, setCollapse] = useState(true)
+export function DemoBox(props: DemoBoxProps) {
+  const { client, server, children } = props
   const items = useMemo(() => {
-    return tabItems.map((item, index) => {
+    return Children.map(children, (item, i) => {
       return {
-        key: index.toString(),
-        label: item.label,
-        children: <div style={{ display: collapse ? "none" : "block" }} dangerouslySetInnerHTML={{ __html: item.code }}></div>
+        key: i.toString(),
+        label: item.props["data-label"],
+        children: item
       }
     })
-  }, [collapse])
-  const Comp = useRef(component && createElement(lazy(() => import(/*@vite-ignore*/ component))))
+  }, [])
+
   return (
     <DemoBoxContainer>
-      {component && (
-        <div className="demo">
-          <Suspense>{Comp.current}</Suspense>
-        </div>
-      )}
-      <Tabs
-        defaultActiveKey="1"
-        tabBarExtraContent={{
-          right: <Actions component={component} collapse={collapse} setCollapse={setCollapse} />
-        }}
-        items={items}
-      />
+      <Suspense>
+        <LazyComponent client={client} server={server} />
+      </Suspense>
+      <Tabs defaultActiveKey="0" items={items} />
     </DemoBoxContainer>
   )
 }
 
-function Actions({ collapse, setCollapse }: any) {
-  return (
-    <div className="actions">
-      <span onClick={() => setCollapse(!collapse)}>{collapse ? "展开" : "折叠"}</span>
-    </div>
-  )
+function LazyComponent({ client, server }: { client?: string; server?: string }) {
+  if (!client && !server) {
+    return <div></div>
+  }
+
+  const [Comp, setComp] = useState<any>(null)
+  useEffect(() => {
+    import(/*@vite-ignore*/ client!).then(res => {
+      setComp(createElement(res.default))
+    })
+  }, [])
+  return <div className="demo">{Comp}</div>
 }

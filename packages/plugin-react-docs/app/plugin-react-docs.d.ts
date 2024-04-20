@@ -91,6 +91,8 @@ declare module "album.docs" {
     layout: string
 
     location: { href: string; hash: string; pathname: string; query: Record<string, string> }
+
+    utils: Record<string, ((...args: any[]) => any)[]>
   }
   export function usePage(): PageContext
 }

@@ -25,7 +25,8 @@ export async function renderPages(tempMap: TempModuleMap, p: PluginBuildStartPar
         contentPath: `/assets/${clientChunk.fileName}`,
         siteConfig,
         head,
-        script
+        script,
+        demoImportPath: "/demos/Comp"
       })
       await outputFile(resolve(outDir, routePath), html, "utf-8")
     })

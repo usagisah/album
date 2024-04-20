@@ -93,7 +93,9 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
             contentPath: filepath,
             siteConfig,
             head,
-            script
+            script,
+            demoImportPath: resolve(dumpInput, "plugin-react-docs/demos/Comp"),
+            demoClientPath: resolve(dumpInput, "plugin-react-docs/demos/Comp") + "_$_.tsx"
           })
           html = await viteServer.transformIndexHtml(req.originalUrl, html)
           return res.end(html)
@@ -134,26 +136,27 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
 }
 
 function createMDFile(p: { import: string; content: string; fm: Record<string, any>; category: Category[] }) {
-  return `import { usePage } from "album.docs"\nimport {message} from "antd"\n${p.import}\n
+  return `import { usePage } from "album.docs";\nimport {message} from "antd";\n${p.import}\n
   export default function MarkdownComp(){ 
-    const { events, components } = usePage()
-    const { DemoBox } = components
+    const { events, components, utils } = usePage();
+    const { DemoBox } = components;
+    const { resolveDemoClientPath, resolveDemoNodePath } = utils;
     const copy = async (e) => {
-      let success = true
+      let success = true;
       try {
-        success = await events.get("copy")(e)
+        success = await events.get("copy")(e);
       } catch(e) {
-        success = false
-        console.error(e)
+        success = false;
+        console.error(e);
       }
-      message[success ?"success":"error"](\`copy \${success?"success":"fail"}\`)
+      message[success ?"success":"error"](\`copy \${success?"success":"fail"}\`);
     }
-    const onImageLodeError = function(e) { e.currentTarget.classList.add("error") }
+    const onImageLodeError = function(e) { e.currentTarget.classList.add("error") };
     return (<div className="md">${p.content}</div>)
   }
-  const frontmatter=${JSON.stringify(p.fm)}
-  const category=${JSON.stringify(p.category)}
-  MarkdownComp.frontmatter = frontmatter
-  MarkdownComp.category = category
+  const frontmatter=${JSON.stringify(p.fm)};
+  const category=${JSON.stringify(p.category)};
+  MarkdownComp.frontmatter = frontmatter;
+  MarkdownComp.category = category;
 `
 }

@@ -507,6 +507,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           padding: 0.5rem;
           max-width: 100%;
           overflow-x: auto;
+          background-color: ${theme.default};
           border: 1px solid ${theme.gray.block};
           font-weight: 400;
           white-space: nowrap;
@@ -522,6 +523,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
         }
 
         .u-code .line {
+          display: block;
           line-height: 1.8;
         }
 
@@ -529,7 +531,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           position: absolute;
           right: 0;
           top: 0;
-          top: 12px;
+          top: 10px;
           right: 12px;
           z-index: 2;
           font-size: 12px;
@@ -545,7 +547,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
         .u-code-copy {
           padding: 8px;
           position: absolute;
-          top: 8px;
+          top: 4px;
           right: 8px;
           font-size: 16px;
           color: ${theme.reverse};
