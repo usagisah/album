@@ -43,7 +43,7 @@ export function blockExtension({ highlighter, copyText, className, albumContext 
     },
     renderer({ cls, args, body }) {
       const _cls = cls.toLowerCase()
-      const title = args[0] ?? _cls.toUpperCase()
+      const title = args[0] ?? _cls.toLowerCase()
       const buildBasicBlock = (cls: string, title: string, body: string) => {
         const code = []
         if (title) code.push(`<div ${className}="u-block-title">${title}</div>`)
@@ -67,9 +67,9 @@ export function blockExtension({ highlighter, copyText, className, albumContext 
               renderOptions: { highlighter, className, copyText, categoryQueue: [], albumContext },
               canRender: false
             })
-            tabItems.push(`<div data-label="${item._args[0]}">${themeCode}</div>`)
+            tabItems.push(`<div data-label="${item._args[0] ?? item._lang}">${themeCode}</div>`)
           })
-          return `<DemoBox client={${id ? `resolveDemoClientPath?.(${id})` : ""}} server={${id ? `resolveDemoNodePath?.(${id})` : ""}}>${tabItems.join("")}</DemoBox>`
+          return `<DemoBox client={${id ? `resolveDemoClientPath?.(${id})` : "''"}} server={${id ? `resolveDemoNodePath?.(${id})` : "''"}}>${tabItems.join("")}</DemoBox>`
         }
         case "info":
         case "tip":

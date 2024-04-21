@@ -1,5 +1,6 @@
 import { AlbumContext } from "@albumjs/album/server"
 import { Obj } from "@albumjs/tools/node"
+import { h } from "hastscript"
 import { RendererObject } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
 import { PARSE_SKIP, numReg, scopeNumReg } from "../constants.js"
@@ -96,88 +97,71 @@ export function renderCode(options: RenderCodeOptions) {
 
   const originCode = code
   const { text: _lang, args } = parseArgs(lang ?? "")
-  const lineCode = code.split("\n")
   const hightLines = resolveHighLines(args)
 
-  const codeToThemeCode = (highLine: number[], code: string, lang: string, shouldSubLine: number) => {
+  const codeToThemeCode = (code: string, lang: string) => {
     return highlighter.codeToHtml(code, {
       lang: lang,
       themes: {
         light: "vitesse-light",
         dark: "vitesse-dark"
       },
-      decorations: highLine.map(index => {
-        const lineIndex = index - shouldSubLine
-        return {
-          start: { line: lineIndex, character: 0 },
-          end: { line: lineIndex, character: lineCode[lineIndex]?.length },
-          properties: { class: "u-code-highlighted" }
-        }
-      }),
       transformers: [
         {
           span(node) {
             node.children.forEach(child => {
               if (child.type === "text") {
-                child.value = child.value.replace(/(\{|\}|<|>)/g, `{"$1"}`)
+                child.value = "{`" + child.value.replace(/`/g, "\\`") + "`}"
               }
             })
+          },
+          line(hast, line) {
+            if (hightLines.has(line)) {
+              hast.children = [h("div", { [className]: "u-code-highlighted" }, hast.children)]
+            }
+          },
+          postprocess(html, options) {
+            return html
+              .replace(/\s{1}class="(.*?)"/g, ` ${className}="$1"`)
+              .replace(/\s{1}style="(.*?)"/g, (_, content: string) => {
+                if (content.startsWith("{{") && content.endsWith("}}")) {
+                  return `style=${content}`
+                }
+
+                const style: Obj = {}
+                content.split(";").map(item => {
+                  let [k, v] = item.split(":")
+                  k = k.trim()
+                  v = v.trim()
+
+                  if (k.startsWith("--")) {
+                    style[k] = v
+                  } else {
+                    style[k.replace(/-([a-z])/g, (_, char) => char.toUpperCase())] = v
+                  }
+                })
+                return ` style={${JSON.stringify(style, null, 2)}}`
+              })
+              .replace(/(&#x3C;)/g, "<")
           }
         }
       ]
     })
   }
 
-  const pure = args.includes("pure")
-  if (pure) {
-    const lastLineIndex = lineCode.length + 2 - 1
-    const isHighFirst = hightLines.has(0)
-    const isHighLast = hightLines.has(lastLineIndex)
-    hightLines.delete(0)
-    hightLines.delete(lastLineIndex)
-
-    const themeCode = codeToThemeCode([...hightLines], code, "text", 1)
-    const themeFirstLine = `<pre><code><span ${className}="line">\`\`\`${_lang}</span></code></pre>`
-    const themeLastLine = `<pre><code><span ${className}="line">\`\`\`</span></code></pre>`
-
-    code = [
-      isHighFirst ? `<span ${className}="u-code-highlighted">${themeFirstLine}</span>` : themeFirstLine,
-      `<div ${className}="u-code-content">${themeCode}</div>`,
-      isHighLast ? `<span ${className}="u-code-highlighted">${themeLastLine}</span>` : themeLastLine
-    ].join("")
+  if (args.includes("pure")) {
+    code = codeToThemeCode(`\`\`\`\n${code}\n\`\`\``, "text")
   } else {
-    const themeCode = codeToThemeCode([...hightLines], code, _lang, 0)
-    code = `<div ${className}="u-code-content">${themeCode}</div>`
+    code = codeToThemeCode(code, _lang)
   }
 
   let themeCode = [
     `<div ${className}="u-code u-code-${_lang}">`,
     `<div ${className}="u-code-lang">${_lang}</div>`,
     `<div ${className}="u-code-copy" onClick={copy}>${copyText}</div>`,
-    `<div ${className}="u-code-wrapper">${code}</div>`,
+    `<div ${className}="u-code-wrapper"><div ${className}="u-code-content">${code}</div></div>`,
     `</div>`
   ].join("")
-
-  themeCode = themeCode.replace(/\s{1}class="(.*?)"/g, ` ${className}="$1"`)
-  themeCode = themeCode.replace(/\s{1}style="(.*?)"/g, (_, content: string) => {
-    if (content.startsWith("{{") && content.endsWith("}}")) {
-      return `style=${content}`
-    }
-
-    const style: Obj = {}
-    content.split(";").map(item => {
-      let [k, v] = item.split(":")
-      k = k.trim()
-      v = v.trim()
-
-      if (k.startsWith("--")) {
-        style[k] = v
-      } else {
-        style[k.replace(/-([a-z])/g, (_, char) => char.toUpperCase())] = v
-      }
-    })
-    return ` style={${JSON.stringify(style, null, 2)}}`
-  })
 
   if (canRender && args.includes("render")) {
     const id = ["jsx", "tsx"].includes(_lang) ? genDemoCode(albumContext, originCode) : undefined

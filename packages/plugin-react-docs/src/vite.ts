@@ -5,6 +5,7 @@ import { Plugin, ViteDevServer, mergeConfig } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
 import { Category, PluginContext } from "./docs.type.js"
 import { parseMdToReact } from "./parser/parseMdToReact.js"
+import { green } from "@albumjs/tools/lib/colorette"
 export { ParseMDConfig } from "./parser/parseMdToReact.js"
 
 export default function AlbumReactDocsVitePlugin(context: PluginContext) {
@@ -56,7 +57,8 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
         const { data, content } = gm(code)
         const { import: importers = [] } = data
         const { componentContent, category } = await parseMdToReact(content, parseMDConfig, albumContext)
-        return createMDFile({ import: importers.join("\n"), content: componentContent, fm: data, category })
+        const res = createMDFile({ import: importers.join("\n"), content: componentContent, fm: data, category })
+        return res
       }
     },
 
@@ -151,8 +153,8 @@ function createMDFile(p: { import: string; content: string; fm: Record<string, a
       }
       message[success ?"success":"error"](\`copy \${success?"success":"fail"}\`);
     }
-    const onImageLodeError = function(e) { e.currentTarget.classList.add("error") };
-    return (<div className="md">${p.content}</div>)
+    const onImageLodeError = function(e) { e.currentTarget.classList.add("error") }
+    return <div className="md">${p.content}</div>
   }
   const frontmatter=${JSON.stringify(p.fm)};
   const category=${JSON.stringify(p.category)};
