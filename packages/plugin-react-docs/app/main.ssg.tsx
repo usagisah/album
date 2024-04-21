@@ -21,7 +21,6 @@ const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionS
 
 import { StyleProvider, createCache as antCreateCache, extractStyle } from "@ant-design/cssinjs"
 import { PageContext } from "album.docs"
-import { resolve } from "path"
 const antCache = antCreateCache()
 
 export async function ssgRender(options: SSGRenderOption) {
@@ -47,12 +46,14 @@ export async function ssgRender(options: SSGRenderOption) {
   const emotionStyles = constructStyleTagsFromChunks(extractCriticalToChunks(appHtml))
   const antStyles = extractStyle(antCache)
 
+  const siteTitle = MDContent.frontmatter.siteTitle ?? MDContent.category[0]?.label ?? siteConfig.title.value
+
   const html = `<html lang="${langManager.getHTMLLang(url)}" dir="ltr">
   <head>
-    <meta char-set="UTF-8" />
+    <meta charset="UTF-8" />
     <link rel="icon" type="${siteConfig.icon.type}" href="${siteConfig.icon.href}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${siteConfig.title.value}</title>
+    <title>${siteTitle}</title>
     ${head.join("")}
     ${emotionStyles}
     ${antStyles}

@@ -28,12 +28,6 @@ import { GlobalStyle } from "./theme"
 console.error = () => {}
 
 export async function createApp(url: string, siteConfig: any, Content: FC<any>) {
-  const sft = siteConfig.frontmatter.siteTitle
-  const title = [sft, siteConfig.title.value].filter(Boolean).join(siteConfig.title.sep)
-  if (typeof window !== "undefined") {
-    document.title = title
-  }
-
   const { locales } = siteConfig.lang as { locales: Record<string, { label: string; lang?: string; link?: string }> }
   const lang = {
     locales: Object.keys(locales).map(key => {

@@ -34,7 +34,6 @@ declare module "album.docs" {
     /* 标题 */
     title: {
       value: string
-      sep: string
     }
     /* 站点图标 */
     icon: { href: string; type: string }

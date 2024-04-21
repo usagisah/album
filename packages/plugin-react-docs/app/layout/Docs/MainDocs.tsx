@@ -15,7 +15,7 @@ const MainDocsContainer = styled.main`
     min-width: 800px;
     padding: 48px 32px;
     min-height: calc(100vh - 76px);
-    background-color: ${({ theme }) => theme.contentBg};
+    background-color: ${({ theme }) => theme.bg.content};
     border-radius: ${({theme}) => theme.radius.large};
   }
 

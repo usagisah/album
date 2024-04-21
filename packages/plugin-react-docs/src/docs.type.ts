@@ -17,14 +17,9 @@ export interface DocsConfig {
   /* 标题 */
   title?: {
     value?: string
-    sep?: string | boolean
   }
   /* 站点图标 */
   icon?: string
-  /* 描述 */
-  description?: string
-  /* 关键词 */
-  keywords?: string
   /* logo */
   logo?: {
     url?: string

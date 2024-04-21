@@ -6,7 +6,6 @@ export default defineAlbumConfig<PluginReactDocsConfig>({
     Docs({
       docs: {
         title: {},
-        description: "由 AlbumPress 和 Album 驱动的静态站点生成器",
         navList: [
           { label: "API", link: "/api" },
           { label: "指东", link: "/" },

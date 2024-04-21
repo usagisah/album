@@ -1,4 +1,5 @@
-import { array, boolean, lazy, object, record, string, union } from "@albumjs/tools/lib/zod"
+import { array, lazy, object, record, string } from "@albumjs/tools/lib/zod"
+import { isString } from "@albumjs/tools/node"
 import mt from "mime-types"
 import { resolve } from "path"
 import { DocsConfig } from "./docs.type.js"
@@ -21,13 +22,10 @@ function validate(config: DocsConfig) {
     base: string().optional(),
 
     title: object({
-      value: string().optional(),
-      sep: union([string(), boolean()]).optional()
+      value: string().optional()
     }).optional(),
 
     icon: string({ invalid_type_error: "docs.icon 必须是一个字符串" }).optional(),
-    description: string({ invalid_type_error: "docs.description 必须是一个字符串" }).optional(),
-    keywords: string({ invalid_type_error: "docs.keywords 必须是一个字符串" }).optional(),
     logo: object({
       url: string().optional(),
       href: string().optional()
@@ -68,7 +66,7 @@ export function normalizeDocsConfig(config: DocsConfig) {
   validate(config)
 
   const { head = [], script = [], server, theme, ...siteConfig } = config
-  const { base, title, icon, logo, description, keywords, lang, footer, navList, actions, sidebar, search } = siteConfig
+  const { base, title, icon, logo, lang, footer, navList, actions, sidebar, search } = siteConfig
 
   let resolveThemeFile = (cwd: string) => `export default []`
   if (theme) {
@@ -89,12 +87,9 @@ export function normalizeDocsConfig(config: DocsConfig) {
 
   if (!base) siteConfig.base = ""
 
-  if (!title) siteConfig.title = { sep: "|", value: "Album" }
+  if (!title) siteConfig.title = { value: "Album" }
   else {
-    if (typeof title.sep !== "string") siteConfig.title.sep = "|"
-    else siteConfig.title.sep = " "
-
-    if (typeof title.value !== "string") siteConfig.title.value = "Album"
+    if (!isString(title.value)) siteConfig.title.value = "Album"
   }
 
   if (!icon) siteConfig.icon = { href: "/logo.svg", type: "image/svg+xml" } as any
@@ -108,13 +103,6 @@ export function normalizeDocsConfig(config: DocsConfig) {
   else {
     if (!logo.href) siteConfig.logo.href = "/logo.svg"
     if (!logo.url) siteConfig.logo.url = "/"
-  }
-
-  if (description) {
-    head.push(`<meta name="description" content="${description}">`)
-  }
-  if (keywords) {
-    head.push(`<meta name="keywords" content="${keywords}">`)
   }
 
   if (!lang) {
