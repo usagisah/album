@@ -7,7 +7,7 @@ const DemoBoxContainer = styled.div(({ theme }) => ({
   margin: "1rem 0",
   padding: ".5rem",
   borderRadius: theme.radius.default,
-  background: theme.bg.default,
+  background: theme.bg.demo,
   overflow: "hidden",
   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1),0 2px 4px -2px rgb(0 0 0 / 0.1)",
 

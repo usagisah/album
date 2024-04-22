@@ -1,6 +1,6 @@
-import { usePage, LinkItem } from "album.docs"
+import { LinkItem, usePage } from "album.docs"
 import { Dropdown, DropdownProps } from "antd"
-import { ReactNode, useMemo, useRef } from "react"
+import { ReactNode } from "react"
 
 export interface SelectMenuProps extends React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
   arrow?: boolean

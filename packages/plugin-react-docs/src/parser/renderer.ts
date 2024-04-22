@@ -3,7 +3,7 @@ import { Obj } from "@albumjs/tools/node"
 import { h } from "hastscript"
 import { RendererObject } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
-import { PARSE_SKIP, numReg, scopeNumReg } from "../constants.js"
+import { numReg, scopeNumReg } from "../constants.js"
 import { Category } from "../docs.type.js"
 import { genDemoCode } from "./genDemoCode.js"
 import { parseArgs } from "./parseArgs.js"
@@ -47,9 +47,6 @@ export function renderer(options: RendererOptions): RendererObject {
       return html
     },
     paragraph(text) {
-      if (text.startsWith(PARSE_SKIP)) {
-        return text.slice(PARSE_SKIP.length)
-      }
       return `<div ${className}="u-line">${text}</div>`
     },
     blockquote(quote) {

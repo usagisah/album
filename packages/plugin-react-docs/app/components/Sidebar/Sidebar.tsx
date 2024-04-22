@@ -54,6 +54,10 @@ const SidebarContainer = styled.ul`
       color: ${({ theme }) => theme.text[1]};
     }
   }
+
+  @media (max-width: 800px) {
+    display: none;
+  }
 `
 export function Sidebar() {
   const { sidebar } = usePage()

@@ -7,6 +7,7 @@ export const LIGHT: Theme = {
   bg: {
     default: "#f8f9fb",
     content: "#f8f9fb",
+    demo: "#f8f9fb",
     highlight: "#eeeff0"
   },
   text: {
@@ -61,6 +62,7 @@ export const DARK: Theme = {
   bg: {
     default: "#1b1b1f",
     content: "transparent",
+    demo: "#121212",
     highlight: "#65758528"
   },
   reverse: "#fff",

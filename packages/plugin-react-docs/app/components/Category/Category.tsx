@@ -70,6 +70,10 @@ const CategoryContainer = styled.aside`
     border-radius: ${({ theme }) => theme.radius.small};
     transition: top 0.1s;
   }
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
 `
 
 export function Category() {

@@ -22,12 +22,17 @@ const MainDocsContainer = styled.main`
   .doc-footer {
     margin-top: 64px;
   }
+
+  @media (max-width: 1024px) {
+    .content {
+      min-width: auto;
+    }
+  }
 `
 
 export function MainDocs() {
   const { components } = usePage()
   const Sidebar = components["Sidebar"]
-  const EditInfo = components["EditInfo"]
   const PrevNext = components["PrevNext"]
   const Category = components["Category"]
   const Content = components["Content"]
@@ -39,7 +44,6 @@ export function MainDocs() {
           <Content />
         </article>
         <section className="doc-footer">
-          <EditInfo />
           <PrevNext />
         </section>
       </section>

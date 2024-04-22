@@ -5,7 +5,6 @@ import { theme as AntTheme, Collapse, ConfigProvider } from "antd"
 import { FC, useState } from "react"
 import { Category } from "./components/Category/Category"
 import { DemoBox } from "./components/DemoBox/DemoBox"
-import { EditInfo } from "./components/EditInfo/EditInfo"
 import { Features } from "./components/Features/Features"
 import { Footer } from "./components/Footer/Footer"
 import { Header } from "./components/Header/Header"
@@ -70,7 +69,6 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
       Header,
       Footer,
       Lang,
-      EditInfo,
       Sidebar,
       PrevNext,
       Category,

@@ -129,7 +129,7 @@ const MainHomeContainer = styled.main`
     }
 
     .image {
-      transform: translateY(-270%);
+      transform: translateY(-210%);
 
       .bg {
         width: 270px;
@@ -140,6 +140,12 @@ const MainHomeContainer = styled.main`
         width: 270px;
         height: 270px;
       }
+    }
+  }
+
+  @media (max-width: 450px) {
+    .image {
+      transform: translateY(-270%);
     }
   }
 `

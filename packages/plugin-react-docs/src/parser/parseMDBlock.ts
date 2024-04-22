@@ -1,7 +1,6 @@
 import { AlbumContext } from "@albumjs/album/server"
 import { TokenizerAndRendererExtension } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
-import { PARSE_SKIP } from "../constants.js"
 import { Category } from "../docs.type.js"
 import { genDemoCode } from "./genDemoCode.js"
 import { parseArgs } from "./parseArgs.js"
@@ -79,7 +78,7 @@ export function blockExtension({ highlighter, copyText, className, albumContext 
           return buildBasicBlock(_cls, title, body)
         }
         case "raw": {
-          return PARSE_SKIP + body
+          return body
         }
         case "details": {
           return `<details ${className}="u-block u-block-plain u-block-details"><summary ${className}="u-block-title">${title}</summary><div ${className}="u-block-msg">${body}</div></details>`

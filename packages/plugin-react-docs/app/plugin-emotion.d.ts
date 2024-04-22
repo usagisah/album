@@ -7,6 +7,7 @@ declare module "@emotion/react" {
     bg: {
       default: string
       content: string
+      demo: string
       highlight: string
     }
     text: {

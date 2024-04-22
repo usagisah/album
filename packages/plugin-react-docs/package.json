@@ -47,7 +47,7 @@
     "@emotion/styled": "^11.11.0",
     "@types/mime-types": "^2.1.4",
     "@vitejs/plugin-react-swc": "^3.6.0",
-    "antd": "^5.16.2",
+    "antd": "^5.16.4",
     "gray-matter": "^4.0.3",
     "hastscript": "^9.0.0",
     "marked": "^12.0.1",
