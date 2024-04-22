@@ -500,6 +500,12 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           background-color: ${theme.info.bg};
         }
 
+        /* --------------  -------------- */
+        .ant-dropdown-menu-submenu-title {
+          display: flex;
+          align-items: center;
+        }
+
         /* -------------- code -------------- */
         .u-code {
           position: relative;
