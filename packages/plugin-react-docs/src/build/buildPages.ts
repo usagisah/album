@@ -3,10 +3,10 @@ import { basename, resolve } from "path"
 import { InlineConfig, Rollup, build, mergeConfig } from "vite"
 import { PluginContext } from "../docs.type.js"
 
-export type TempModule = { appName: string; routePath: string; clientOutPath: string; serverOutPath: string; clientChunk: Rollup.OutputChunk; serverChunk: Rollup.OutputChunk }
-export type TempModuleMap = {
-  app: TempModule
-  chunks: Record<string, TempModule>
+export type BuildTempModule = { appName: string; routePath: string; clientOutPath: string; serverOutPath: string; clientChunk: Rollup.OutputChunk; serverChunk: Rollup.OutputChunk }
+export type BuildTempModuleMap = {
+  app: BuildTempModule
+  chunks: Record<string, BuildTempModule>
   assets: Rollup.OutputAsset[]
 }
 
@@ -16,9 +16,9 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
   const { inputs } = info
   const { viteConfigs } = await resolveMiddlewareConfig(true)
 
-  const moduleEntries: Record<string, string> = { __app: "" }
+  const sourceModuleEntries: Record<string, string> = { __app: "" }
   routes.map(item => {
-    moduleEntries[basename(item.filepath)] = item.filepath
+    sourceModuleEntries[basename(item.filepath)] = item.filepath
   })
 
   const clientBuildConfig = mergeConfig(viteConfigs, {
@@ -28,6 +28,7 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
       outDir: resolve(inputs.cwd, ".temp/client"),
       ssr: false,
       ssrEmitAssets: false,
+      copyPublicDir: true,
       manifest: false,
       ssrManifest: false,
       minify: true,
@@ -43,13 +44,12 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
         }
       },
       lib: {
-        entry: { ...moduleEntries, __app: resolve(inputs.dumpInput, "plugin-react-docs/main.tsx") },
+        entry: { ...sourceModuleEntries, __app: resolve(inputs.dumpInput, "plugin-react-docs/main.tsx") },
         formats: ["es"]
       }
     }
   } as InlineConfig)
   const serverBuildConfig = mergeConfig(viteConfigs, {
-    mode: "production",
     build: {
       cssCodeSplit: false,
       emptyOutDir: true,
@@ -60,7 +60,7 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
       cssMinify: false,
       sourcemap: false,
       lib: {
-        entry: { ...moduleEntries, __app: resolve(inputs.dumpInput, "plugin-react-docs/main.ssg.tsx") },
+        entry: { ...sourceModuleEntries, __app: resolve(inputs.dumpInput, "plugin-react-docs/main.ssg.tsx") },
         formats: ["es"]
       }
     }
@@ -70,17 +70,22 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
     serverBuildConfig.plugins.splice(index, 1)
   }
   const [clientResult, serverResult] = await Promise.all<any>([build(clientBuildConfig), build(serverBuildConfig)])
-  return makeModuleMap(context, { ...moduleEntries, __app: "app" }, clientResult[0], serverResult[0])
+  return makeOutModuleMap(context, { ...sourceModuleEntries, __app: "app" }, clientResult[0], serverResult[0])
 }
 
-function makeModuleMap(context: PluginContext, moduleEntries: Record<string, string>, clientResult: Rollup.RollupOutput, serverResult: Rollup.RollupOutput): TempModuleMap {
+function makeOutModuleMap(
+  context: PluginContext,
+  sourceModuleEntries: Record<string, string>,
+  clientResult: Rollup.RollupOutput,
+  serverResult: Rollup.RollupOutput
+): BuildTempModuleMap {
   const { routeMap, albumContext } = context
   const { cwd } = albumContext.inputs
-  const map: TempModuleMap = { app: {}, chunks: {}, assets: [] } as any
+  const map: BuildTempModuleMap = { app: {}, chunks: {}, assets: [] } as any
 
-  for (const name in moduleEntries) {
+  for (const name in sourceModuleEntries) {
     const isApp = name === "__app"
-    const filepath = moduleEntries[name]
+    const filepath = sourceModuleEntries[name]
     if (isApp) {
       map.app = {} as any
     } else {

@@ -45,12 +45,11 @@ const DemoBoxContainer = styled.div(({ theme }) => ({
 
 export interface DemoBoxProps {
   client?: string
-  server?: string
   children: any[]
 }
 
 export function DemoBox(props: DemoBoxProps) {
-  const { client, server, children } = props
+  const { client, children } = props
   const items = useMemo(() => {
     return Children.map(children, (item, i) => {
       return {
@@ -64,15 +63,15 @@ export function DemoBox(props: DemoBoxProps) {
   return (
     <DemoBoxContainer>
       <Suspense>
-        <LazyComponent client={client} server={server} />
+        <LazyComponent client={client} />
       </Suspense>
       <Tabs defaultActiveKey="0" items={items} />
     </DemoBoxContainer>
   )
 }
 
-function LazyComponent({ client, server }: { client?: string; server?: string }) {
-  if (!client && !server) {
+function LazyComponent({ client }: { client?: string }) {
+  if (!client) {
     return <div></div>
   }
 

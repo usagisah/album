@@ -55,6 +55,7 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
   })
 
   const appContext: PageContext = {
+    utils: {},
     ...siteConfig,
     lang,
     store,

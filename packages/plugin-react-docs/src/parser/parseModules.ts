@@ -6,13 +6,14 @@ import { MDRoute, PluginContext } from "../docs.type.js"
 export async function parseModules(specialModules: AppSpecialModule[][], context: PluginContext, langDirs: string[]) {
   const routes: MDRoute[] = []
   const routeMap = new Map<string, MDRoute>()
+
   specialModules.map((item, index) => {
     const lang = langDirs[index - 1] ?? ""
     for (const module of item) {
       const { pageFile, routePath } = module
       const { appName, filepath, ext } = pageFile
 
-      if (routePath !== "/*" && routePath.includes("*")) {
+      if (routePath.includes("*")) {
         continue
       }
 
@@ -30,6 +31,13 @@ export async function parseModules(specialModules: AppSpecialModule[][], context
       routeMap.set(filepath, route)
     }
   })
+
+  mixinErrorRoute(routes, routeMap, context)
+
+  return { routes, routeMap }
+}
+
+function mixinErrorRoute(routes: MDRoute[], routeMap: Map<string, MDRoute>, context: PluginContext) {
   const { dumpInput } = context.albumContext.inputs
   const route = {
     appName: "error",
@@ -42,7 +50,6 @@ export async function parseModules(specialModules: AppSpecialModule[][], context
   }
   routes.push(route)
   routeMap.set(route.filepath, route)
-  return { routes, routeMap }
 }
 
 function normalizeOutName(lang: string, path: string) {
@@ -51,9 +58,6 @@ function normalizeOutName(lang: string, path: string) {
   }
   if (!path.startsWith("/")) {
     path = "/" + path
-  }
-  if (path === "/*") {
-    path = "/error"
   }
   let name = `${lang}${path}.html`
   if (name.startsWith("/")) {

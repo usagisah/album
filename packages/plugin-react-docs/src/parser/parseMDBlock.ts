@@ -1,12 +1,13 @@
 import { AlbumContext } from "@albumjs/album/server"
 import { TokenizerAndRendererExtension } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
-import { Category } from "../docs.type.js"
+import { Category, MDDemo } from "../docs.type.js"
 import { genDemoCode } from "./genDemoCode.js"
 import { parseArgs } from "./parseArgs.js"
 import { renderCode } from "./renderer.js"
 
 export interface BlockExtensionConfig {
+  demos: MDDemo[]
   highlighter: HighlighterGeneric<BundledLanguage, BundledTheme>
   copyText: string
   className: string
@@ -14,7 +15,7 @@ export interface BlockExtensionConfig {
   albumContext: AlbumContext
 }
 
-export function blockExtension({ highlighter, copyText, className, albumContext }: BlockExtensionConfig): TokenizerAndRendererExtension {
+export function blockExtension({ highlighter, copyText, className, albumContext, demos }: BlockExtensionConfig): TokenizerAndRendererExtension {
   return {
     name: "block",
     level: "block",
@@ -58,17 +59,17 @@ export function blockExtension({ highlighter, copyText, className, albumContext 
           const tabItems: string[] = []
           codes.map((item, index) => {
             if (shouldRender && index === 0 && ["tsx", "jsx"].includes(item._lang)) {
-              id = genDemoCode(albumContext, item.code)
+              id = genDemoCode(demos, albumContext, item.code)
             }
             const themeCode = renderCode({
               code: item.code,
               lang: item.lang,
-              renderOptions: { highlighter, className, copyText, categoryQueue: [], albumContext },
+              renderOptions: { highlighter, className, copyText, categoryQueue: [], albumContext, demos },
               canRender: false
             })
             tabItems.push(`<div data-label="${item._args[0] ?? item._lang}">${themeCode}</div>`)
           })
-          return `<DemoBox client={${id ? `resolveDemoClientPath?.(${id})` : "''"}} server={${id ? `resolveDemoNodePath?.(${id})` : "''"}}>${tabItems.join("")}</DemoBox>`
+          return `<DemoBox client={${id ? `resolveDemoClientPath?.(${id})` : "''"}}>${tabItems.join("")}</DemoBox>`
         }
         case "info":
         case "tip":

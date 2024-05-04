@@ -115,14 +115,16 @@ export function Category() {
       { rootMargin: "-60px" }
     )
 
-    const titleElems = [...document.querySelectorAll(".article .md .u-h")]
-    const cateElems = [...document.querySelectorAll(".topic a")]
-    if (cateElems.length === titleElems.length) {
-      titleElems.forEach((el, index) => {
-        elemMap.set(el, (lastRecord = { show: false, cateElem: cateElems[index] as HTMLElement }))
-        observer.observe(el)
-      })
-    }
+    setTimeout(() => {
+      const titleElems = [...document.querySelectorAll(".article .md .u-h")]
+      const cateElems = [...document.querySelectorAll(".topic a")]
+      if (cateElems.length === titleElems.length) {
+        titleElems.forEach((el, index) => {
+          elemMap.set(el, (lastRecord = { show: false, cateElem: cateElems[index] as HTMLElement }))
+          observer.observe(el)
+        })
+      }
+    }, 800)
     return () => {
       observer.disconnect()
     }

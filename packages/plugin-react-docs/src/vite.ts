@@ -5,12 +5,11 @@ import { Plugin, ViteDevServer, mergeConfig } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
 import { Category, PluginContext } from "./docs.type.js"
 import { parseMdToReact } from "./parser/parseMdToReact.js"
-import { green } from "@albumjs/tools/lib/colorette"
 export { ParseMDConfig } from "./parser/parseMdToReact.js"
 
 export default function AlbumReactDocsVitePlugin(context: PluginContext) {
-  const { docsConfig, reactConfig, parseMDConfig, albumContext } = context
-  const { inputs } = albumContext
+  const { docsConfig, reactConfig, parseMDConfig, demos, albumContext } = context
+  const { serverMode, inputs } = albumContext
 
   let server: ViteDevServer
 
@@ -56,8 +55,9 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
       if (id.endsWith(".md")) {
         const { data, content } = gm(code)
         const { import: importers = [] } = data
-        const { componentContent, category } = await parseMdToReact(content, parseMDConfig, albumContext)
+        const { componentContent, category, demos: _demos } = await parseMdToReact(content, parseMDConfig, albumContext)
         const res = createMDFile({ import: importers.join("\n"), content: componentContent, fm: data, category })
+        demos.push(..._demos)
         return res
       }
     },
@@ -96,7 +96,6 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
             siteConfig,
             head,
             script,
-            demoImportPath: resolve(dumpInput, "plugin-react-docs/demos/Comp"),
             demoClientPath: resolve(dumpInput, "plugin-react-docs/demos/Comp") + "_$_.tsx"
           })
           html = await viteServer.transformIndexHtml(req.originalUrl, html)
@@ -117,7 +116,7 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
     plugin,
     ...react({
       ...reactConfig,
-      plugins: [],
+      plugins: serverMode === "build" ? [] : undefined,
       parserConfig: id => {
         if (id.endsWith(".md") || id.endsWith(".tsx")) {
           return {
@@ -142,7 +141,7 @@ function createMDFile(p: { import: string; content: string; fm: Record<string, a
   export default function MarkdownComp(){ 
     const { events, components, utils } = usePage();
     const { DemoBox } = components;
-    const { resolveDemoClientPath, resolveDemoNodePath } = utils;
+    const { resolveDemoClientPath } = utils;
     const copy = async (e) => {
       let success = true;
       try {

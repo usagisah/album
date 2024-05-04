@@ -7,7 +7,5 @@ title 优先级
 打包bug 打包压缩 https://www.npmjs.com/package/html-minifier-terser
 
 seo 布局优化，组件提取，类型优化，样式合并，优化代码
-最后 各个屏幕测试bug
-
 cli
-搜索框
+搜索框 用 minisearch

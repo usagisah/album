@@ -576,7 +576,7 @@ export function GlobalStyle({ theme }: { theme: Theme }) {
           cursor: pointer;
         }
 
-        html body .shiki span.u-code-highlighted {
+        html body .shiki .u-code-highlighted {
           display: inline-block;
           width: 100%;
           background-color: ${theme.bg.highlight}!important;

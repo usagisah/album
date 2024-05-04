@@ -7,6 +7,7 @@ import react from "@vitejs/plugin-react-swc"
 import { rm } from "fs/promises"
 import { resolve } from "path"
 import { buildPages } from "./build/buildPages.js"
+import { renderDemos } from "./build/renderDemos.js"
 import { renderPages } from "./build/renderPages.js"
 import { DEFAULT_COPY_TEXT } from "./constants.js"
 import { DocsConfig, PluginContext } from "./docs.type.js"
@@ -32,7 +33,8 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
     reactConfig: react,
     routes: [],
     routeMap: new Map(),
-    albumContext: null
+    albumContext: null,
+    demos: []
   }
   const { locales } = context.docsConfig.siteConfig.lang
   const langDirs = Object.keys(locales).filter(v => v !== "root")
@@ -135,6 +137,12 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       spinner.start(green("render docs pages..."))
       await renderPages(map, p, context)
       spinner.succeed()
+
+      if (context.demos.length > 0) {
+        spinner.start(green("render docs demos..."))
+        await renderDemos(p, context)
+        spinner.succeed()
+      }
 
       spinner.start(green("clear temp cache..."))
       await Promise.all([rm(resolve(inputs.cwd, ".swc"), { force: true, recursive: true }), rm(resolve(inputs.cwd, ".temp"), { force: true, recursive: true })])

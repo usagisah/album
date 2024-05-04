@@ -9,7 +9,6 @@ interface SSGRenderOption {
   importPath: string /* md content import by node */
   contentPath: string /* md content import by browser */
   entryPath: string /* client entry of js-script */
-  demoImportPath: string /* demo-box by node */
   demoClientPath: string /* demo-box by browser */
 }
 
@@ -24,13 +23,10 @@ import { PageContext } from "album.docs"
 const antCache = antCreateCache()
 
 export async function ssgRender(options: SSGRenderOption) {
-  const { url, siteConfig, entryPath, importPath, contentPath, head, script, demoClientPath, demoImportPath } = options
+  const { url, siteConfig, entryPath, importPath, contentPath, head, script, demoClientPath } = options
   const { default: MDContent } = await import(/*@vite-ignore*/ importPath)
   siteConfig.category = MDContent.category
   siteConfig.frontmatter = MDContent.frontmatter
-  siteConfig.utils = {
-    resolveDemoNodePath: (count: number) => `${demoImportPath}${count}.tsx`
-  }
 
   const App = await createApp(url, siteConfig, MDContent)
   const appHtml = renderToString(

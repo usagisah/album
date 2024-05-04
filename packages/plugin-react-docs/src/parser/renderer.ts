@@ -4,7 +4,7 @@ import { h } from "hastscript"
 import { RendererObject } from "marked"
 import { BundledLanguage, BundledTheme, HighlighterGeneric } from "shiki"
 import { numReg, scopeNumReg } from "../constants.js"
-import { Category } from "../docs.type.js"
+import { Category, MDDemo } from "../docs.type.js"
 import { genDemoCode } from "./genDemoCode.js"
 import { parseArgs } from "./parseArgs.js"
 
@@ -14,10 +14,11 @@ export interface RendererOptions {
   className: string
   categoryQueue: Category[]
   albumContext: AlbumContext
+  demos: MDDemo[]
 }
 
 export function renderer(options: RendererOptions): RendererObject {
-  const { className, categoryQueue } = options
+  const { className, categoryQueue, demos } = options
   return {
     heading(text, level) {
       const r = parseArgs(text)
@@ -90,7 +91,7 @@ export type RenderCodeOptions = {
 }
 export function renderCode(options: RenderCodeOptions) {
   let { code, lang, renderOptions, canRender = true } = options
-  let { className, copyText, highlighter, albumContext } = renderOptions
+  let { className, copyText, highlighter, albumContext, demos } = renderOptions
 
   const originCode = code
   const { text: _lang, args } = parseArgs(lang ?? "")
@@ -161,9 +162,9 @@ export function renderCode(options: RenderCodeOptions) {
   ].join("")
 
   if (canRender && args.includes("render")) {
-    const id = ["jsx", "tsx"].includes(_lang) ? genDemoCode(albumContext, originCode) : undefined
+    const id = ["jsx", "tsx"].includes(_lang) ? genDemoCode(demos, albumContext, originCode) : undefined
     const isRenderComp = typeof id === "number"
-    return `<DemoBox client={${isRenderComp ? `resolveDemoClientPath?.(${id})` : "''"}} server={${isRenderComp ? `resolveDemoNodePath?.(${id})` : "''"}}><div data-label="">${themeCode}</div></DemoBox>`
+    return `<DemoBox client={${isRenderComp ? `resolveDemoClientPath?.(${id})` : "''"}}><div data-label="">${themeCode}</div></DemoBox>`
   }
   return themeCode
 }

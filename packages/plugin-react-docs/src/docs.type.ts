@@ -73,6 +73,7 @@ export interface PluginContext {
     server: DocsConfig["server"]
     resolveThemeFile: (cwd: string) => string
   }
+  demos: MDDemo[]
   routes: MDRoute[]
   routeMap: Map<string, MDRoute>
   albumContext: AlbumContext
@@ -86,4 +87,9 @@ export interface MDRoute {
   buildOutPath: string
   match: RegExp
   ext: string
+}
+
+export interface MDDemo {
+  name: string
+  filepath: string
 }
