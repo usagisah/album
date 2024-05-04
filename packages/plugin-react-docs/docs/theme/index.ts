@@ -1,7 +1,4 @@
-import { PageContext } from "album.docs";
+import { PageContext } from "album.docs"
 import "./style.css"
 
-
-export default function(ctx: PageContext) {
-
-}
+export default function (ctx: PageContext) {}

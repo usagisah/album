@@ -44,15 +44,13 @@ export function DemoBox(props: DemoBoxProps) {
 }
 
 function LazyComponent({ client }: { client?: string }) {
-  if (!client) {
-    return <div></div>
-  }
-
   const [Comp, setComp] = useState<any>(null)
   useEffect(() => {
-    import(/*@vite-ignore*/ client!).then(res => {
-      setComp(createElement("div", { className: "demo" }, createElement(res.default) as any))
-    })
+    if (client) {
+      import(/*@vite-ignore*/ client!).then(res => {
+        setComp(createElement("div", { className: "demo", children: createElement(res.default) }))
+      })
+    }
   }, [])
   return Comp
 }

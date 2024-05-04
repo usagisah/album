@@ -1,7 +1,7 @@
 import themeConfigs from "@docs/site-theme"
 import { ThemeProvider } from "@emotion/react"
 import { PageContext } from "album.docs"
-import { theme as AntTheme, Collapse, ConfigProvider } from "antd"
+import { theme as AntTheme, ConfigProvider } from "antd"
 import { FC, useState } from "react"
 import { Category } from "./components/Category/Category"
 import { DemoBox } from "./components/DemoBox/DemoBox"
@@ -73,7 +73,6 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
       Sidebar,
       PrevNext,
       Category,
-      Collapse,
       Content,
       IconDown,
       IconMenuOutlined,

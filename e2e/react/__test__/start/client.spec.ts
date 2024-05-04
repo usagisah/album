@@ -26,7 +26,7 @@ it("switch router", async () => {
   await p.goto("http://localhost:5211/about/order")
   await p.waitForSelector("#order")
   expect(await html("#router")).toBe(`<h1 id="about">page about</h1><h1 id="order">page order</h1>`)
-  
+
   await p.goto("http://localhost:5211/about/car")
   await p.waitForSelector("#car")
   expect(await html("#router")).toBe(`<h1 id="about">page about</h1><h1 id="car">page car--{"car":"car"}</h1>`)

@@ -1,5 +1,6 @@
 import { renderToString } from "react-dom/server"
 import { createApp } from "./createApp"
+import { PageContext } from "album.docs"
 
 interface SSGRenderOption {
   url: string
@@ -18,9 +19,6 @@ import createEmotionServer from "@emotion/server/create-instance"
 const emotionCache = emotionCreateCache({ key: "album" })
 const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(emotionCache)
 
-import { StyleProvider, createCache as antCreateCache, extractStyle } from "@ant-design/cssinjs"
-import { PageContext } from "album.docs"
-const antCache = antCreateCache()
 
 export async function ssgRender(options: SSGRenderOption) {
   const { url, siteConfig, entryPath, importPath, contentPath, head, script, demoClientPath } = options
@@ -30,18 +28,13 @@ export async function ssgRender(options: SSGRenderOption) {
 
   const App = await createApp(url, siteConfig, MDContent)
   const appHtml = renderToString(
-    <StyleProvider cache={antCache}>
       <CacheProvider value={emotionCache}>
         <App />
       </CacheProvider>
-    </StyleProvider>
   )
 
   const langManager = new LangManager(siteConfig.lang)
-
   const emotionStyles = constructStyleTagsFromChunks(extractCriticalToChunks(appHtml))
-  const antStyles = extractStyle(antCache)
-
   const siteTitle = MDContent.frontmatter.siteTitle ?? MDContent.category[0]?.label ?? siteConfig.title.value
 
   const html = `<html lang="${langManager.getHTMLLang(url)}" dir="ltr">
@@ -52,7 +45,6 @@ export async function ssgRender(options: SSGRenderOption) {
     <title>${siteTitle}</title>
     ${head.join("")}
     ${emotionStyles}
-    ${antStyles}
     <script>
       let m = localStorage.getItem("_site-theme-mode")
       if (m === "system") m = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
