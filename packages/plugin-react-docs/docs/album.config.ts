@@ -2,6 +2,9 @@ import { defineAlbumConfig } from "@albumjs/album/config"
 import Docs, { PluginReactDocsConfig } from "../dist/plugin.js"
 
 export default defineAlbumConfig<PluginReactDocsConfig>({
+  vite: {
+    plugins: []
+  },
   plugins: [
     Docs({
       docs: {

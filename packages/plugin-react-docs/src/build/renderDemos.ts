@@ -15,6 +15,7 @@ export async function renderDemos(p: PluginBuildStartParam, context: PluginConte
   demos.forEach(({ name, filepath }) => (demosEntry[name] = filepath))
 
   const tempOutDir = resolve(inputs.cwd, ".temp/Comp")
+
   const demoBuildConfig = mergeConfig(viteConfigs, {
     build: {
       cssCodeSplit: false,
@@ -28,6 +29,9 @@ export async function renderDemos(p: PluginBuildStartParam, context: PluginConte
       minify: true,
       cssMinify: true,
       sourcemap: false,
+      rollupOptions: {
+        external: [/emotion\/react/]
+      },
       lib: {
         entry: demosEntry,
         formats: ["es"]

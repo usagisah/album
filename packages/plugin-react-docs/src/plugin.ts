@@ -4,6 +4,7 @@ import { copy } from "@albumjs/tools/lib/fs-extra"
 import { createCommonJS } from "@albumjs/tools/lib/mlly"
 import ora from "@albumjs/tools/lib/ora"
 import react from "@vitejs/plugin-react-swc"
+import { existsSync } from "fs"
 import { rm } from "fs/promises"
 import { resolve } from "path"
 import { buildPages } from "./build/buildPages.js"
@@ -119,7 +120,7 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
               "album.docs": resolve(dumpInput, "plugin-react-docs/hooks/useAppContext.tsx")
             }
           },
-          plugins: [AlbumReactDocsVitePlugin(context)]
+          plugins: [AlbumReactDocsVitePlugin(context) as any]
         }
       })
     },
@@ -128,7 +129,7 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       p.forceQuit = true
 
       const { info } = p
-      const { inputs } = info
+      const { inputs, outputs } = info
 
       const spinner = ora(green("building docs pages...")).start()
       const map = await buildPages(p, context)
@@ -145,7 +146,13 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
       }
 
       spinner.start(green("clear temp cache..."))
-      await Promise.all([rm(resolve(inputs.cwd, ".swc"), { force: true, recursive: true }), rm(resolve(inputs.cwd, ".temp"), { force: true, recursive: true })])
+      const publicDir = resolve(inputs.cwd, "public")
+      const exist = existsSync(publicDir)
+      await Promise.all([
+        rm(resolve(inputs.cwd, ".swc"), { force: true, recursive: true }),
+        rm(resolve(inputs.cwd, ".temp"), { force: true, recursive: true }),
+        exist ? copy(publicDir, outputs.outDir, { overwrite: true }) : null
+      ])
       spinner.succeed()
     }
   }

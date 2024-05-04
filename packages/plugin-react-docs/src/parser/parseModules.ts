@@ -53,12 +53,10 @@ function mixinErrorRoute(routes: MDRoute[], routeMap: Map<string, MDRoute>, cont
 }
 
 function normalizeOutName(lang: string, path: string) {
-  if (path === "/") {
-    path = "index"
+  if (path.endsWith("/")) {
+    path += "index"
   }
-  if (!path.startsWith("/")) {
-    path = "/" + path
-  }
+
   let name = `${lang}${path}.html`
   if (name.startsWith("/")) {
     name = name.slice(1)

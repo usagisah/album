@@ -60,9 +60,7 @@ export async function ssgRender(options: SSGRenderOption) {
     </script>
   </head>
   <body>
-    <div id="album-docs">
-      <App />
-    </div>
+    <div id="album-docs">${appHtml}</div>
     <script type="text/json" id="_docs-meta">${JSON.stringify({ contentPath, demoClientPath })}</script>
     <script>
       Array.from(document.querySelectorAll("img")).forEach(m => {

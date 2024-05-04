@@ -1,13 +1,14 @@
 import { PluginBuildStartParam } from "@albumjs/album/server"
-import { basename, resolve } from "path"
+import { extname, resolve } from "path"
 import { InlineConfig, Rollup, build, mergeConfig } from "vite"
 import { PluginContext } from "../docs.type.js"
 
-export type BuildTempModule = { appName: string; routePath: string; clientOutPath: string; serverOutPath: string; clientChunk: Rollup.OutputChunk; serverChunk: Rollup.OutputChunk }
+export type BuildTempModule = { url: string; routePath: string; clientOutPath: string; serverOutPath: string; clientChunk: Rollup.OutputChunk; serverChunk: Rollup.OutputChunk }
 export type BuildTempModuleMap = {
   app: BuildTempModule
   chunks: Record<string, BuildTempModule>
   assets: Rollup.OutputAsset[]
+  lib: Record<string, Rollup.OutputChunk & { filepath: string }>
 }
 
 export async function buildPages(p: PluginBuildStartParam, context: PluginContext) {
@@ -18,27 +19,34 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
 
   const sourceModuleEntries: Record<string, string> = { __app: "" }
   routes.map(item => {
-    sourceModuleEntries[basename(item.filepath)] = item.filepath
+    const ext = extname(item.buildOutPath)
+    sourceModuleEntries[item.buildOutPath.slice(0, -1 * ext.length)] = item.filepath
   })
 
   const clientBuildConfig = mergeConfig(viteConfigs, {
+    define: {
+      "process.env.NODE_ENV": "'development'"
+    },
     build: {
       cssCodeSplit: false,
       emptyOutDir: true,
       outDir: resolve(inputs.cwd, ".temp/client"),
       ssr: false,
       ssrEmitAssets: false,
-      copyPublicDir: true,
+      copyPublicDir: false,
       manifest: false,
       ssrManifest: false,
-      minify: true,
+      minify: false,
       cssMinify: true,
       sourcemap: false,
       rollupOptions: {
         output: {
           manualChunks(id, ctx) {
-            if (id === "antd" || id.startsWith("react") || id.includes("@emotion/") || id.includes("node_modules") || id.includes("scheduler")) {
-              return "framework"
+            if (id.includes("@emotion")) {
+              return "_emotion"
+            }
+            if (id === "antd" || id.startsWith("react") || id.includes("node_modules") || id.includes("scheduler")) {
+              return "_framework"
             }
           }
         }
@@ -57,6 +65,7 @@ export async function buildPages(p: PluginBuildStartParam, context: PluginContex
       ssr: true,
       manifest: false,
       minify: false,
+      copyPublicDir: false,
       cssMinify: false,
       sourcemap: false,
       lib: {
@@ -81,7 +90,7 @@ function makeOutModuleMap(
 ): BuildTempModuleMap {
   const { routeMap, albumContext } = context
   const { cwd } = albumContext.inputs
-  const map: BuildTempModuleMap = { app: {}, chunks: {}, assets: [] } as any
+  const map: BuildTempModuleMap = { app: {}, chunks: {}, assets: [], lib: {} } as any
 
   for (const name in sourceModuleEntries) {
     const isApp = name === "__app"
@@ -92,16 +101,19 @@ function makeOutModuleMap(
       map.chunks[filepath] = { routePath: routeMap.get(filepath).buildOutPath } as any
     }
   }
-
   clientResult.output.forEach(chunk => {
     if (chunk.type === "chunk") {
+      if (chunk.name === "_emotion") {
+        map.lib.emotion = { ...chunk, filepath: resolve(cwd, ".temp/client", chunk.fileName) }
+      }
+
       const record = chunk.name === "__app" ? map.app : map.chunks[chunk.facadeModuleId]
       if (record) {
         record.clientChunk = chunk
         record.clientOutPath = resolve(cwd, ".temp/client", chunk.fileName)
 
         if (chunk.name !== "__app") {
-          record.appName = routeMap.get(chunk.facadeModuleId).appName
+          record.url = ("/" + routeMap.get(chunk.facadeModuleId).buildOutPath.slice(0, -1 * ".html".length)).replaceAll("index", "")
         }
       }
       return

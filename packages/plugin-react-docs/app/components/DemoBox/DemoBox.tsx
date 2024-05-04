@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { Tabs } from "antd"
-import { Children, Suspense, createElement, useEffect, useMemo, useState } from "react"
+import { Children, createElement, useEffect, useMemo, useState } from "react"
+import { Tabs } from "./Tabs"
 
 const DemoBoxContainer = styled.div(({ theme }) => ({
   width: "100%",
@@ -16,31 +16,6 @@ const DemoBoxContainer = styled.div(({ theme }) => ({
     background: theme.default,
     borderRadius: theme.radius.large
   },
-
-  ".ant-tabs-nav": {
-    margin: "0"
-  },
-
-  ".ant-tabs-nav-operations": {
-    display: "none!important"
-  },
-
-  ".actions": {
-    display: "flex",
-    gap: "4px",
-    paddingLeft: "1rem"
-  },
-
-  ".u-code": {
-    marginTop: "1rem",
-    backgroundColor: "transparent",
-    border: "none",
-    boxShadow: "none",
-
-    pre: {
-      background: `transparent!important`
-    }
-  }
 }))
 
 export interface DemoBoxProps {
@@ -62,9 +37,7 @@ export function DemoBox(props: DemoBoxProps) {
 
   return (
     <DemoBoxContainer>
-      <Suspense>
-        <LazyComponent client={client} />
-      </Suspense>
+      <LazyComponent client={client} />
       <Tabs defaultActiveKey="0" items={items} />
     </DemoBoxContainer>
   )
@@ -78,8 +51,8 @@ function LazyComponent({ client }: { client?: string }) {
   const [Comp, setComp] = useState<any>(null)
   useEffect(() => {
     import(/*@vite-ignore*/ client!).then(res => {
-      setComp(createElement(res.default))
+      setComp(createElement("div", { className: "demo" }, createElement(res.default) as any))
     })
   }, [])
-  return <div className="demo">{Comp}</div>
+  return Comp
 }

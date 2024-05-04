@@ -58,7 +58,7 @@ Wraps in a
 **强调**
 *斜体*
 [链接](http://baidu.com)
-![链接](https://i2.hdslb.com/bfs/archive/6f58e85e8f6bec9c6b6b33a4b30f7c0aa5dbbbb3.jpg@672w_378h_1c_!web-home-common-cover.avif)
+![链接](https://srv.carbonads.net/static/30242/d73f1601fd4c38caa238b885f3c610c8cbee3169)
 
 
 <br/><br/>
