@@ -66,10 +66,12 @@ export default defineAlbumConfig<PluginReactDocsConfig>({
           },
           { label: "配置和 API 参考", link: "site-config" }
         ],
+
         footer: {
           message: "基于 MIT 许可发布",
-          copyright: "版权所有 © 2019-2024 尤雨溪"
+          copyright: "版权所有 © 2019-2024 xxx"
         },
+
         lang: {
           locales: {
             en: {
@@ -94,6 +96,7 @@ export default defineAlbumConfig<PluginReactDocsConfig>({
             link: "https://github.com"
           }
         ],
+
         search: {},
 
         theme: {

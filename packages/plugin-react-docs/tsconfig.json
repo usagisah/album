@@ -5,7 +5,7 @@
     "moduleResolution": "NodeNext",
     "strict": true,
     "declaration": true,
-    "removeComments": false,
+    "removeComments": true,
     "emitDecoratorMetadata": false,
     "experimentalDecorators": false,
     "allowSyntheticDefaultImports": true,
