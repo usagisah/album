@@ -8,8 +8,8 @@
     "start": "album start"
   },
   "dependencies": {
-    "@albumjs/album": "^0.2.0",
-    "@albumjs/cli": "^0.2.2",
+    "@albumjs/album": "^0.2.1",
+    "@albumjs/cli": "^0.2.3",
     "@albumjs/plugin-react": "^0.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

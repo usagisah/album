@@ -1,6 +1,6 @@
 {
   "name": "@albumjs/album",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "一个组合 vite+nestjs 的集成式框架",
   "keywords": [
     "@albumjs/album",
@@ -45,7 +45,7 @@
     }
   },
   "scripts": {
-    "tsc": "tsc",
+    "tsc": "rm -rf dist && tsc --sourceMap false --removeComments true --incremental false",
     "watch": "tsc -w"
   },
   "dependencies": {

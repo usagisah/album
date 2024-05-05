@@ -1,6 +1,6 @@
 {
   "name": "@albumjs/cli",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "albumjs 配套的脚手架",
   "keywords": [
     "@albumjs/cli",
@@ -22,7 +22,8 @@
     "album": "./dist/cli.js"
   },
   "scripts": {
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "build": "rm -rf dist && tsc --sourceMap false --incremental false --removeComments true"
   },
   "dependencies": {
     "@albumjs/tools": "workspace:^",
