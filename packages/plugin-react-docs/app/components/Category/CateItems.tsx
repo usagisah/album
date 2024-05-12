@@ -11,7 +11,6 @@ export function CateItems(props: { items: Category[]; indent?: number }) {
             <a href={item.link} title={item.label} className={"text " + (location.hash === item.label ? "active" : "")}>
               {item.label}
             </a>
-            <div className="icon" dangerouslySetInnerHTML={{ __html: item.icon ?? "" }}></div>
           </h2>
           {item.children && <CateItems items={item.children} indent={indent + 1} />}
         </div>

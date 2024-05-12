@@ -1,7 +1,6 @@
 import themeConfigs from "@docs/site-theme"
 import { ThemeProvider } from "@emotion/react"
 import { PageContext } from "album.docs"
-import { theme as AntTheme, ConfigProvider } from "antd"
 import { FC, useState } from "react"
 import { Category } from "./components/Category/Category"
 import { DemoBox } from "./components/DemoBox/DemoBox"
@@ -15,7 +14,6 @@ import { NavBar } from "./components/NavBar/NavBar"
 import { NavSearch } from "./components/NavSearch/NavSearch"
 import { NavTitle } from "./components/NavTitle/NavTitle"
 import { PrevNext } from "./components/PrevNext/PrevNext"
-import { SelectMenu } from "./components/SelectMenu/SelectMenu"
 import { Sidebar } from "./components/Sidebar/Sidebar"
 import { AppProvide } from "./hooks/useAppContext"
 import { useTheme } from "./hooks/useTheme"
@@ -24,8 +22,6 @@ import { ErrorLayout } from "./layout/Error/Error"
 import { HomeLayout } from "./layout/Home/Home"
 import { GlobalStyle } from "./theme"
 
-console.error = () => {}
-
 export async function createApp(url: string, siteConfig: any, Content: FC<any>) {
   const { locales } = siteConfig.lang as { locales: Record<string, { label: string; lang?: string; link?: string }> }
   const lang = {
@@ -33,7 +29,7 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
       const { label, lang, link } = locales[key]
       const _link = link ?? (key === "root" ? "/" : `/${key}/`)
       return {
-        label: <a href={_link}>{label}</a>,
+        label: label,
         key,
         lang: lang ?? key,
         link: _link
@@ -65,7 +61,6 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
       NavBar,
       NavSearch,
       NavTitle,
-      SelectMenu,
       Features,
       Header,
       Footer,
@@ -103,10 +98,8 @@ export async function createApp(url: string, siteConfig: any, Content: FC<any>) 
     return (
       <AppProvide context={appContext}>
         <ThemeProvider theme={_theme.style}>
-          <ConfigProvider theme={{ algorithm: _theme.currentTheme === "light" ? AntTheme.defaultAlgorithm : AntTheme.darkAlgorithm }}>
-            <GlobalStyle theme={_theme.style} />
-            <Layout />
-          </ConfigProvider>
+          <GlobalStyle theme={_theme.style} />
+          <Layout />
         </ThemeProvider>
       </AppProvide>
     )

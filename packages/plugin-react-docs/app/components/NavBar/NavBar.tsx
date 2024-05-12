@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import { LinkItem, usePage } from "album.docs"
+import { Select } from "../Select/Select"
 
 const NavBarContainer = styled.ul`
   color: ${({ theme }) => theme.text[1]};
@@ -43,29 +44,28 @@ const NavBarContainer = styled.ul`
 `
 
 export interface NavBarProps {
-  list: LinkItem[]
-  SelectMenu: any
+  list: (LinkItem & { children: LinkItem[] })[]
 }
 
 export function NavBar(props: NavBarProps) {
   const { components, location } = usePage()
   const { IconMenuOutlined } = components
-  const { list, SelectMenu } = props
+  const { list } = props
   return (
     <NavBarContainer className="navBar">
       <div className="pc-nav">
         {list.map((item, index) => (
-          <SelectMenu key={index} linkItems={item.children ?? []}>
-            <li className={"item " + (location.pathname === item.link ? "active" : "")}>
+          <Select key={index} linkItems={item.children ?? []}>
+            <div className={"item " + (location.pathname === item.link ? "active" : "")}>
               <a href={item.link}>{item.label}</a>
-            </li>
-          </SelectMenu>
+            </div>
+          </Select>
         ))}
       </div>
 
-      <SelectMenu linkItems={list} arrow={false} dropdownProps={{ className: "ipad-nav" }}>
+      <Select linkItems={list} className="ipad-nav">
         <IconMenuOutlined size={16} style={{ cursor: "pointer" }} />
-      </SelectMenu>
+      </Select>
     </NavBarContainer>
   )
 }

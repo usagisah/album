@@ -31,7 +31,7 @@ export default defineAlbumConfig<PluginReactDocsConfig>({
           {
             label: "简介",
             children: [
-              { label: "什么是 VitePress？", link: "what-is-vitepress" },
+              { label: "什么是 AlbumPress", link: "what album press" },
               { label: "快速开始", link: "getting-started" },
               { label: "路由", link: "routing" },
               { label: "部署", link: "deploy", children: [{ label: "部署", link: "deploy" }] }
@@ -82,7 +82,7 @@ export default defineAlbumConfig<PluginReactDocsConfig>({
 
         actions: [
           {
-            icon: `<svg
+            label: `<svg
             viewBox="0 0 1024 1024"
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"

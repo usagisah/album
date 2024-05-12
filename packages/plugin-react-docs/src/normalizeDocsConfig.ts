@@ -4,12 +4,11 @@ import mt from "mime-types"
 import { resolve } from "path"
 import { DocsConfig } from "./docs.type.js"
 
-const linkItem: any = lazy(() => {
+const nestLinkItem: any = lazy(() => {
   return object({
     label: string().optional(),
     link: string().optional(),
-    icon: string().optional(),
-    children: array(linkItem).optional()
+    children: array(nestLinkItem).optional()
   })
 })
 
@@ -52,9 +51,21 @@ function validate(config: DocsConfig) {
       copyright: string().optional()
     }).optional(),
 
-    navList: array(linkItem).optional(),
-    sidebar: array(linkItem).optional(),
-    actions: array(linkItem).optional(),
+    navList: array(
+      object({
+        label: string(),
+        link: string().optional(),
+        children: array(object({ label: string(), link: string().optional() })).optional()
+      })
+    ).optional(),
+    sidebar: array(nestLinkItem).optional(),
+    actions: array(
+      object({
+        label: string(),
+        link: string().optional(),
+        children: array(object({ label: string(), link: string().optional() })).optional()
+      })
+    ).optional(),
 
     server: object({
       rewrites: record(string()).optional()

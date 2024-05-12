@@ -11,11 +11,14 @@ declare module "@docs/site-config" {
 
 declare module "album.docs" {
   import { Theme } from "@emotion/react"
+
   export interface LinkItem {
-    label?: string
+    label: any
     link?: string
-    icon?: string
-    children?: LinkItem[]
+  }
+
+  export interface NestLinkItem extends LinkItem {
+    children?: NestLinkItem[]
   }
 
   export interface Category {
@@ -51,12 +54,16 @@ declare module "album.docs" {
     /* html.footer */
     footer: { message?: string; copyright?: string }
 
-    /* 导航链接选项 */
-    navList: LinkItem[]
+    /* 顶部导航链接选项 */
+    navList: (LinkItem & {
+      children?: LinkItem[]
+    })[]
     /* 侧边栏选项 */
-    sidebar: LinkItem[]
+    sidebar: NestLinkItem[]
     /* 自定义功能性图标 */
-    actions: LinkItem[]
+    actions: (LinkItem & {
+      children?: LinkItem[]
+    })[]
 
     /* 搜索 */
     search: boolean | {}

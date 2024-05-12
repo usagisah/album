@@ -39,7 +39,6 @@ export function Header() {
   const { navList, components } = usePage()
   const NavTitle = components["NavTitle"]
   const NavBar = components["NavBar"]
-  const SelectMenu = components["SelectMenu"]
   const scrollStyle = useHeaderScroll()
 
   return (
@@ -48,7 +47,7 @@ export function Header() {
         <section className="nav-list">
           <NavTitle />
           <div style={{ width: "2rem" }}></div>
-          <NavBar list={navList} SelectMenu={SelectMenu} />
+          <NavBar list={navList} />
         </section>
         <PCActions />
         <IpadActions />
