@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { LinkItem, usePage } from "album.docs"
+import { NestLinkItem, usePage } from "album.docs"
 import { useMemo } from "react"
 
 const PrevNextContainer = styled.footer`
@@ -50,9 +50,9 @@ const PrevNextContainer = styled.footer`
 export function PrevNext() {
   const { location, sidebar } = usePage()
   const info = useMemo(() => {
-    const res = { prev: null as LinkItem | null, next: null as LinkItem | null }
-    const linkItems: LinkItem[] = []
-    function nextItems(items: LinkItem[]) {
+    const res = { prev: null as NestLinkItem | null, next: null as NestLinkItem | null }
+    const linkItems: NestLinkItem[] = []
+    function nextItems(items: NestLinkItem[]) {
       for (const item of items) {
         linkItems.push(item)
         if (item.children && item.children.length > 0) {

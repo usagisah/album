@@ -96,7 +96,6 @@ export function renderCode(options: RenderCodeOptions) {
   const originCode = code
   const { text: _lang, args } = parseArgs(lang ?? "")
   const hightLines = resolveHighLines(args)
-
   const codeToThemeCode = (code: string, lang: string) => {
     return highlighter.codeToHtml(code, {
       lang: lang,
@@ -141,6 +140,7 @@ export function renderCode(options: RenderCodeOptions) {
                 return ` style={${JSON.stringify(style, null, 2)}}`
               })
               .replace(/(&#x3C;)/g, "<")
+              .replaceAll(`tabindex="0"`, "")
           }
         }
       ]

@@ -2,11 +2,12 @@ import styled from "@emotion/styled"
 import { LinkItem, usePage } from "album.docs"
 import { ReactNode } from "react"
 
-export interface SelectMenuProps extends React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
+export interface SelectMenuProps extends React.ClassAttributes<HTMLDivElement>, Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   linkItems: LinkItem[]
   children: ReactNode
   arrow?: boolean
   defaultSelected?: any
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => any
 }
 
 const SelectContainer = styled.div(({ theme }) => ({
@@ -31,22 +32,24 @@ const SelectContainer = styled.div(({ theme }) => ({
 export function Select(props: SelectMenuProps) {
   const { components } = usePage()
   const { IconDown } = components
-  const { linkItems = [], arrow = true, children, defaultSelected, ..._props } = props
+  const { linkItems = [], arrow, children, defaultSelected, onChange = e => (location.href = e.target.value), ..._props } = props
   return (
     <SelectContainer {..._props}>
       <div className="content">
         {children}
-        {arrow && <IconDown />}
+        {(arrow || linkItems.length > 0) && <IconDown />}
       </div>
-      <select className="select" onChange={e => (location.href = e.target.value)} value={defaultSelected ?? "_null"}>
-        <option value="_null" disabled>
-          place select one
-        </option>
-        {linkItems.map((item, index) => {
-          const { label, link } = item
-          return <option key={link + "_" + index} value={link} dangerouslySetInnerHTML={{ __html: label }}></option>
-        })}
-      </select>
+      {linkItems.length > 0 && (
+        <select className="select" onChange={onChange} value={defaultSelected ?? "_null"}>
+          <option value="_null" disabled>
+            place select one
+          </option>
+          {linkItems.map((item, index) => {
+            const { label, link } = item
+            return <option key={link + "_" + index} value={link} dangerouslySetInnerHTML={{ __html: label }}></option>
+          })}
+        </select>
+      )}
     </SelectContainer>
   )
 }
