@@ -70,6 +70,16 @@ export interface DocsConfig {
 
 type ReactPlugin = Parameters<typeof react>[0]
 
+export interface SearchMdContent {
+  title: string
+  text: string
+  level?: number
+}
+export interface SearchMdRecord {
+  route: string
+  contents: SearchMdContent[]
+}
+
 export interface PluginContext {
   parseMDConfig: ParseMDConfig
   reactConfig: ReactPlugin
@@ -83,6 +93,7 @@ export interface PluginContext {
   demos: MDDemo[]
   routes: MDRoute[]
   routeMap: Map<string, MDRoute>
+  searchMDMap: Map<string, SearchMdRecord>
   albumContext: AlbumContext
 }
 

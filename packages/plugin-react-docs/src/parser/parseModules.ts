@@ -1,36 +1,43 @@
 import { AppSpecialModule } from "@albumjs/album/server"
-import { resolve } from "path"
+import { readFile } from "fs/promises"
+import { parse, resolve } from "path"
 import { pathToRegexp } from "path-to-regexp"
 import { MDRoute, PluginContext } from "../docs.type.js"
+import { parseSearchContent } from "./parseSearchContent.js"
 
 export async function parseModules(specialModules: AppSpecialModule[][], context: PluginContext, langDirs: string[]) {
   const routes: MDRoute[] = []
   const routeMap = new Map<string, MDRoute>()
 
-  specialModules.map((item, index) => {
-    const lang = langDirs[index - 1] ?? ""
-    for (const module of item) {
-      const { pageFile, routePath } = module
-      const { appName, filepath, ext } = pageFile
+  await Promise.all(
+    specialModules.map(async (item, index) => {
+      const lang = langDirs[index - 1] ?? ""
+      for (const module of item) {
+        const { pageFile, routePath } = module
+        const { appName, filepath, ext } = pageFile
 
-      if (routePath.includes("*")) {
-        continue
-      }
+        if (routePath.includes("*")) {
+          continue
+        }
 
-      const routePathReg = pathToRegexp((lang.length > 0 ? `/${lang}` : lang) + routePath, null, { sensitive: false })
-      const route: MDRoute = {
-        appName,
-        filepath,
-        isErrorPage: false,
-        routePath: lang + routePath,
-        buildOutPath: normalizeOutName(lang, routePath),
-        match: routePathReg,
-        ext
+        const routePathReg = pathToRegexp((lang.length > 0 ? `/${lang}` : lang) + routePath, null, { sensitive: false })
+        const route: MDRoute = {
+          appName,
+          filepath,
+          isErrorPage: false,
+          routePath: lang + routePath,
+          buildOutPath: normalizeOutName(lang, routePath),
+          match: routePathReg,
+          ext
+        }
+        routes.push(route)
+        routeMap.set(filepath, route)
+
+        const searchContents = parseSearchContent(parse(filepath).name, await readFile(filepath, "utf-8"))
+        context.searchMDMap.set(filepath, { route: route.routePath, contents: searchContents })
       }
-      routes.push(route)
-      routeMap.set(filepath, route)
-    }
-  })
+    })
+  )
 
   mixinErrorRoute(routes, routeMap, context)
 

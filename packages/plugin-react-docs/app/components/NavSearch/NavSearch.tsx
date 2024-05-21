@@ -1,4 +1,6 @@
 import styled from "@emotion/styled"
+import { useEffect, useRef, useState } from "react"
+import FilterWorker from "./filter.worker?worker"
 
 const NavSearchContainer = styled.button`
   display: flex;
@@ -35,6 +37,17 @@ export interface NavSearchProps {
 
 export function NavSearch(props: NavSearchProps) {
   const { mobile } = props
+  const [filterList, setFilterList] = useState([])
+  const filterWorker = useRef<Worker>()
+  useEffect(() => {
+    filterWorker.current = new FilterWorker()
+    filterWorker.current!.onmessage = e => {
+      setFilterList(JSON.parse(e.data))
+    }
+    return () => {
+      filterWorker.current = undefined
+    }
+  })
   return (
     <NavSearchContainer className="navSearch">
       <svg width="16" height="16" className="icon" viewBox="0 0 20 20" aria-hidden="true">

@@ -1,14 +1,15 @@
 import react from "@vitejs/plugin-react-swc"
 import gm from "gray-matter"
-import { resolve } from "path"
+import { parse, resolve } from "path"
 import { Plugin, ViteDevServer, mergeConfig } from "vite"
 import { SITE_CONFIG, SITE_THEME } from "./constants.js"
 import { Category, PluginContext } from "./docs.type.js"
 import { parseMdToReact } from "./parser/parseMdToReact.js"
+import { parseSearchContent } from "./parser/parseSearchContent.js"
 export { ParseMDConfig } from "./parser/parseMdToReact.js"
 
 export default function AlbumReactDocsVitePlugin(context: PluginContext) {
-  const { docsConfig, reactConfig, parseMDConfig, demos, albumContext } = context
+  const { docsConfig, reactConfig, parseMDConfig, demos, searchMDMap, albumContext } = context
   const { serverMode, inputs } = albumContext
 
   let server: ViteDevServer
@@ -69,6 +70,11 @@ export default function AlbumReactDocsVitePlugin(context: PluginContext) {
           let path: string = (req as any).path
           if (req.method !== "GET") {
             return next()
+          }
+
+          if (path === "/assets/_searchContentMap") {
+            res.end(JSON.stringify(Array.from(searchMDMap.values())))
+            return 
           }
 
           const { routes } = context

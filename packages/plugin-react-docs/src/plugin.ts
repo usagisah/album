@@ -34,6 +34,7 @@ export default function pluginReactDocs(config: PluginReactDocsConfig = {}): Alb
     reactConfig: react,
     routes: [],
     routeMap: new Map(),
+    searchMDMap: new Map(),
     albumContext: null,
     demos: []
   }
